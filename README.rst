@@ -7,7 +7,7 @@ Rigid Body Motion
         :target: https://pypi.python.org/pypi/rigid-body-motion
 
 .. image:: https://img.shields.io/travis/phausamann/rigid-body-motion.svg
-        :target: https://travis-ci.org/phausamann/rigid-body-motion
+        :target: https://travis-ci.com/phausamann/rigid-body-motion
 
 .. image:: https://readthedocs.org/projects/rigid-body-motion/badge/?version=latest
         :target: https://rigid-body-motion.readthedocs.io/en/latest/?badge=latest
@@ -19,14 +19,23 @@ Rigid Body Motion
 Python utilities for estimating and transforming rigid body motion.
 
 
-* Free software: MIT license
-* Documentation: https://rigid-body-motion.readthedocs.io.
+Documentation: https://rigid-body-motion.readthedocs.io.
 
 
 Features
 --------
 
-* TODO
+* Transform numpy arrays describing rigid body motion between different coordinate systems and reference frames
+
+
+Example
+-------
+
+    import numpy as np
+    import rigid_body_motion as rbm
+
+    arr = np.ones((10, 2))
+    rbm.transform(arr).from_('cartesian').to_('polar')
 
 Credits
 -------

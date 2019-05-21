@@ -10,7 +10,7 @@ __version__ = '0.1.0'
 import numpy as np
 
 
-def _2d_cartesian_to_polar(arr, axis):
+def cartesian_to_polar_2d(arr, axis=-1):
     """"""
     if arr.shape[axis] != 2:
         raise ValueError(
@@ -22,29 +22,18 @@ def _2d_cartesian_to_polar(arr, axis):
     return np.stack((r, phi), axis=axis)
 
 
-class transform(object):
+_cs_funcs = {
+    'cartesian': {'polar': {2: cartesian_to_polar_2d}}}
+
+
+def transform(arr, outof=None, into=None, axis=-1):
     """"""
+    dim = arr.shape[axis]
+    try:
+        transform_func = _cs_funcs[outof][into][dim]
+    except KeyError:
+        raise ValueError(
+            'Unsupported transformation: {} to {} in {} dimensions.'.format(
+                outof, into, dim))
 
-    def __init__(self, arr, axis=-1):
-        """"""
-        self.arr = arr
-        self.axis = axis
-        self.src = None
-
-    def from_(self, src):
-        """"""
-        self.src = src
-        return self
-
-    def to_(self, dst):
-        """"""
-        if self.src is not None:
-            if self.src == 'cartesian' and dst == 'polar':
-                return _2d_cartesian_to_polar(self.arr, self.axis)
-            else:
-                raise ValueError(
-                    'Unsupported transformation: {} to {}.'.format(
-                        self.src, dst))
-        else:
-            raise ValueError(
-                'Unspecified source reference frame or coordinate system.')
+    return transform_func(arr, axis=axis)

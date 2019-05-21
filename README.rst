@@ -1,8 +1,3 @@
-=================
-Rigid Body Motion
-=================
-
-
 .. image:: https://img.shields.io/pypi/v/rigid-body-motion.svg
         :target: https://pypi.python.org/pypi/rigid-body-motion
 
@@ -14,7 +9,9 @@ Rigid Body Motion
         :alt: Documentation Status
 
 
-
+=================
+rigid-body-motion
+=================
 
 Python utilities for estimating and transforming rigid body motion.
 
@@ -25,17 +22,29 @@ Documentation: https://rigid-body-motion.readthedocs.io.
 Features
 --------
 
-* Transform numpy arrays describing rigid body motion between different coordinate systems and reference frames
+* Transform numpy arrays describing rigid body motion between different
+  coordinate systems and reference frames
+
+
+Installation
+------------
+
+.. code-block:: console
+
+    $ pip install git+https://github.com/phausamann/rigid-body-motion.git
 
 
 Example
 -------
 
+.. code-block:: python
+
     import numpy as np
     import rigid_body_motion as rbm
 
     arr = np.ones((10, 2))
-    rbm.transform(arr).from_('cartesian').to_('polar')
+    rbm.transform(arr, outof='cartesian', into='polar')
+
 
 Credits
 -------

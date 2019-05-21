@@ -16,7 +16,7 @@ rigid-body-motion
 Python utilities for estimating and transforming rigid body motion.
 
 
-Documentation: https://rigid-body-motion.readthedocs.io.
+Documentation: https://rigid-body-motion.readthedocs.io
 
 
 Features

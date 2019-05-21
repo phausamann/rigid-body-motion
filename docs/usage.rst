@@ -2,6 +2,10 @@
 Usage
 =====
 
-To use Rigid Body Motion in a project::
+.. code-block:: python
 
-    import rigid_body_motion
+    import numpy as np
+    import rigid_body_motion as rbm
+
+    arr = np.ones((10, 2))
+    rbm.transform(arr, outof='cartesian', into='polar')

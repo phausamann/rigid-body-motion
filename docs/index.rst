@@ -1,11 +1,24 @@
-Welcome to Rigid Body Motion's documentation!
-======================================
+=================
+rigid-body-motion
+=================
+
+Python utilities for estimating and transforming rigid body motion.
+
+
+Hosted on GitHub: https://github.com/phausamann/rigid-body-motion
+
+
+Features
+~~~~~~~~
+
+* Transform numpy arrays describing rigid body motion between different
+  coordinate systems and reference frames
+
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
-   readme
    installation
    usage
    modules

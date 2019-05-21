@@ -31,7 +31,17 @@ class TestTransformCoordinateSystems(object):
         arr = np.ones((10, 2))
         expected = np.tile((np.sqrt(2), np.pi/4), (10, 1))
         actual = rbm.cartesian_to_polar_2d(arr, axis=1)
-        npt.assert_equal(actual, expected)
+        npt.assert_almost_equal(actual, expected)
 
         with pytest.raises(ValueError):
             rbm.cartesian_to_polar_2d(np.ones((10, 3)), axis=1)
+
+    def test_polar_to_cartesian_2d(self):
+        """"""
+        arr = np.tile((np.sqrt(2), np.pi/4), (10, 1))
+        expected = np.ones((10, 2))
+        actual = rbm.polar_to_cartesian_2d(arr, axis=1)
+        npt.assert_almost_equal(actual, expected)
+
+        with pytest.raises(ValueError):
+            rbm.polar_to_cartesian_2d(np.ones((10, 3)), axis=1)

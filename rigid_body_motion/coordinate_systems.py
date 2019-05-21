@@ -3,10 +3,24 @@ import numpy as np
 
 
 def cartesian_to_polar_2d(arr, axis=-1):
-    """"""
+    """ Transform cartesian to polar coordinates in two dimensions.
+
+    Parameters
+    ----------
+    arr : array-like
+        Input array.
+    axis : int, default -1
+        Axis of input array representing x and y in cartesian coordinates.
+        Must be of length 2.
+
+    Returns
+    -------
+    arr_polar : array-like
+        Output array.
+    """
     if arr.shape[axis] != 2:
         raise ValueError(
-            'Expected shape along axis {} to be 2, got {} instead.'.format(
+            'Expected length of axis {} to be 2, got {} instead.'.format(
                 axis, arr.shape[axis]))
 
     r = np.linalg.norm(arr, axis=axis)
@@ -15,10 +29,24 @@ def cartesian_to_polar_2d(arr, axis=-1):
 
 
 def polar_to_cartesian_2d(arr, axis=-1):
-    """"""
+    """ Transform polar to cartesian coordinates in two dimensions.
+
+    Parameters
+    ----------
+    arr : array-like
+        Input array.
+    axis : int, default -1
+        Axis of input array representing r and phi in polar coordinates.
+        Must be of length 2.
+
+    Returns
+    -------
+    arr_cartesian : array-like
+        Output array.
+    """
     if arr.shape[axis] != 2:
         raise ValueError(
-            'Expected shape along axis {} to be 2, got {} instead.'.format(
+            'Expected length of axis {} to be 2, got {} instead.'.format(
                 axis, arr.shape[axis]))
 
     x = np.take(arr, 0, axis=axis) * np.cos(np.take(arr, 1, axis=axis))

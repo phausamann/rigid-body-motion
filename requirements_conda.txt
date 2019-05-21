@@ -1,0 +1,2 @@
+numpy>=1.13
+quaternion>=2019.3

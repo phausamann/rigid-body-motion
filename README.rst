@@ -1,7 +1,7 @@
 .. image:: https://img.shields.io/pypi/v/rigid-body-motion.svg
         :target: https://pypi.python.org/pypi/rigid-body-motion
 
-.. image:: https://img.shields.io/travis/phausamann/rigid-body-motion.svg
+.. image:: https://img.shields.io/travis/com/phausamann/rigid-body-motion.svg
         :target: https://travis-ci.com/phausamann/rigid-body-motion
 
 .. image:: https://readthedocs.org/projects/rigid-body-motion/badge/?version=latest

@@ -2,7 +2,7 @@
 import numpy as np
 
 
-def cartesian_to_polar_2d(arr, axis=-1):
+def cartesian_to_polar(arr, axis=-1):
     """ Transform cartesian to polar coordinates in two dimensions.
 
     Parameters
@@ -28,7 +28,7 @@ def cartesian_to_polar_2d(arr, axis=-1):
     return np.stack((r, phi), axis=axis)
 
 
-def polar_to_cartesian_2d(arr, axis=-1):
+def polar_to_cartesian(arr, axis=-1):
     """ Transform polar to cartesian coordinates in two dimensions.
 
     Parameters

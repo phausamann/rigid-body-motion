@@ -9,11 +9,15 @@ __all__ = [
     'transform',
     'cartesian_to_polar',
     'polar_to_cartesian',
+    'cartesian_to_spherical',
+    'spherical_to_cartesian',
 ]
 
 _cs_funcs = {
-    'cartesian': {'polar': cartesian_to_polar},
+    'cartesian': {'polar': cartesian_to_polar,
+                  'spherical': cartesian_to_spherical},
     'polar': {'cartesian': polar_to_cartesian},
+    'spherical': {'cartesian': spherical_to_cartesian}
 }
 
 

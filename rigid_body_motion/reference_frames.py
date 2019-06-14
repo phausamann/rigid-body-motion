@@ -28,8 +28,9 @@ def _deregister(name):
 
 def register_frame(name, parent=None, translation=None, rotation=None):
     """"""
-    return ReferenceFrame(name, parent=parent, translation=translation,
-                          rotation=rotation, register=True)
+    rf = ReferenceFrame(
+            name, parent=parent, translation=translation, rotation=rotation)
+    _register(rf)
 
 
 def deregister_frame(name):
@@ -45,13 +46,11 @@ def clear_registry():
 class ReferenceFrame(NodeMixin):
     """"""
 
-    def __init__(self, name, parent=None, translation=None, rotation=None,
-                 register=True):
+    def __init__(self, name, parent=None, translation=None, rotation=None):
         """"""
         super(ReferenceFrame, self).__init__()
 
         self.name = name
-        self.register = register
         self.parent = self._resolve(parent)
 
         if self.parent is not None:
@@ -75,12 +74,9 @@ class ReferenceFrame(NodeMixin):
             else:
                 self.translation = None
 
-        if self.register:
-            _register(self)
-
     def __del__(self):
         """"""
-        if self.register and self.name in _registry:
+        if self.name in _registry and _registry[self.name] is self:
             _deregister(self.name)
 
     def _resolve(self, rf):
@@ -112,6 +108,14 @@ class ReferenceFrame(NodeMixin):
             mat[:3, :3] = as_rotation_matrix(quaternion(*self.rotation))
             mat[:3, 3] = self.translation
         return mat
+
+    def register(self):
+        """"""
+        _register(self)
+
+    def deregister(self):
+        """"""
+        _deregister(self.name)
 
     def get_transform(self, to_rf):
         """"""

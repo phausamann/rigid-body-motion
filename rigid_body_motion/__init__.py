@@ -5,8 +5,7 @@ __version__ = '0.1.0'
 
 from rigid_body_motion.coordinate_systems import *
 from rigid_body_motion.reference_frames import \
-    _register, _deregister, clear_registry, \
-    ReferenceFrame
+    register_frame, deregister_frame, clear_registry, ReferenceFrame
 from rigid_body_motion.reference_frames import _registry as _rf_registry
 
 __all__ = [
@@ -17,8 +16,8 @@ __all__ = [
     'cartesian_to_spherical',
     'spherical_to_cartesian',
     # reference frames
-    '_register',
-    '_deregister',
+    'register_frame',
+    'deregister_frame',
     'clear_registry',
     'ReferenceFrame',
 ]

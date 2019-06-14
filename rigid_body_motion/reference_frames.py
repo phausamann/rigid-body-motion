@@ -3,7 +3,8 @@ import numpy as np
 
 from anytree import NodeMixin, Walker
 from quaternion import \
-    quaternion, as_rotation_matrix, from_rotation_matrix, as_float_array
+    quaternion, as_rotation_matrix, from_rotation_matrix, as_float_array, \
+    rotate_vectors
 
 _registry = {}
 
@@ -131,3 +132,16 @@ class ReferenceFrame(NodeMixin):
         rotation = tuple(as_float_array(from_rotation_matrix(mat[:3, :3])))
 
         return translation, rotation
+
+    def get_transform_func(self, to_rf):
+        """"""
+        t, r = self.get_transform(to_rf)
+
+        def transform_func(arr, axis=-1, **kwargs):
+            arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+            t_idx = [np.newaxis] * arr.ndim
+            t_idx[axis] = slice(None)
+            arr = arr + np.array(t)[tuple(t_idx)]
+            return arr
+
+        return transform_func

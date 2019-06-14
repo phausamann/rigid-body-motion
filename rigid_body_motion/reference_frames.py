@@ -8,12 +8,7 @@ from quaternion import \
 _registry = {}
 
 
-def clear_registry():
-    """"""
-    _registry.clear()
-
-
-def register_reference_frame(rf):
+def _register(rf):
     """"""
     if rf.name in _registry:
         raise ValueError('Reference frame with name ' + rf.name +
@@ -22,13 +17,29 @@ def register_reference_frame(rf):
     _registry[rf.name] = rf
 
 
-def deregister_reference_frame(name):
+def _deregister(name):
     """"""
     if name not in _registry:
         raise ValueError('Reference frame with name ' + name +
                          ' not found in registry')
 
     _registry.pop(name)
+
+
+def register_frame(name, parent=None, translation=None, rotation=None):
+    """"""
+    return ReferenceFrame(name, parent=parent, translation=translation,
+                          rotation=rotation, register=True)
+
+
+def deregister_frame(name):
+    """"""
+    _deregister(name)
+
+
+def clear_registry():
+    """"""
+    _registry.clear()
 
 
 class ReferenceFrame(NodeMixin):
@@ -41,15 +52,9 @@ class ReferenceFrame(NodeMixin):
 
         self.name = name
         self.register = register
+        self.parent = self._resolve(parent)
 
-        if isinstance(parent, str):
-            try:
-                parent = _registry[parent]
-            except KeyError:
-                raise ValueError(
-                    'Parent frame "{}" not found in registry.'.format(parent))
-
-        if parent is not None:
+        if self.parent is not None:
             if translation is None:
                 self.translation = (0., 0., 0.)
             else:
@@ -70,25 +75,28 @@ class ReferenceFrame(NodeMixin):
             else:
                 self.translation = None
 
-        self.parent = parent
-
         if self.register:
-            register_reference_frame(self)
+            _register(self)
 
     def __del__(self):
         """"""
         if self.register and self.name in _registry:
-            deregister_reference_frame(self.name)
+            _deregister(self.name)
+
+    def _resolve(self, rf):
+        """"""
+        if isinstance(rf, str):
+            try:
+                return _registry[rf]
+            except KeyError:
+                raise ValueError(
+                    'Frame "' + rf + '" not found in registry.')
+        else:
+            return rf
 
     def _walk(self, to_rf):
         """"""
-        if isinstance(to_rf, str):
-            try:
-                to_rf = _registry[to_rf]
-            except KeyError:
-                raise ValueError(
-                    'Frame "{}" not found in registry.'.format(to_rf))
-
+        to_rf = self._resolve(to_rf)
         walker = Walker()
         up, _, down = walker.walk(self, to_rf)
         return up, down

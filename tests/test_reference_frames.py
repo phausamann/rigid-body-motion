@@ -15,22 +15,25 @@ def mock_quaternion(*angles):
 class TestReferenceFrameRegistry(object):
     """"""
 
-    def test_register_reference_frame(self):
+    def test_register(self):
         """"""
         rf_world = rbm.ReferenceFrame('world', register=False)
-        rbm.register_reference_frame(rf_world)
+        rbm._register(rf_world)
         assert rbm._rf_registry['world'] is rf_world
 
         with pytest.raises(ValueError):
-            rbm.register_reference_frame(rf_world)
+            rbm._register(rf_world)
 
-    def test_deregister_reference_frame(self):
+    def test_deregister(self):
         """"""
-        rbm.deregister_reference_frame('world')
+        rbm._deregister('world')
         assert 'world' not in rbm._rf_registry
 
         with pytest.raises(ValueError):
-            rbm.deregister_reference_frame('not_an_rf')
+            rbm._deregister('not_an_rf')
+
+    def test_register_frame(self):
+        """"""
 
 
 class TestReferenceFrame(object):

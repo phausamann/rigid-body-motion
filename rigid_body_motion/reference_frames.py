@@ -51,6 +51,7 @@ class ReferenceFrame(NodeMixin):
         """"""
         super(ReferenceFrame, self).__init__()
 
+        # TODO check name requirement
         self.name = name
         self.parent = self._resolve(parent)
 
@@ -110,6 +111,24 @@ class ReferenceFrame(NodeMixin):
             mat[:3, 3] = self.translation
         return mat
 
+    def _get_parent_transform(self, rf, t, r, inverse=False, t_first=False):
+        """"""
+        if inverse:
+            q = 1 / quaternion(*rf.rotation)
+            dt = np.array(rf.translation)
+        else:
+            q = quaternion(*rf.rotation)
+            dt = -np.array(rf.translation)
+
+        if t_first ^ inverse:
+            t = rotate_vectors(q, t + dt)
+        else:
+            t = rotate_vectors(q, t) + dt
+
+        r = q * r
+
+        return t, r
+
     def register(self):
         """"""
         _register(self)
@@ -122,16 +141,31 @@ class ReferenceFrame(NodeMixin):
         """"""
         up, down = self._walk(to_rf)
 
+        t = np.zeros(3)
+        r = quaternion(1., 0., 0., 0.)
+
+        for rf in up:
+            t, r = self._get_parent_transform(rf, t, r, inverse=True)
+
+        for rf in down:
+            t, r = self._get_parent_transform(rf, t, r)
+
+        t = tuple(t)
+        r = tuple(as_float_array(r))
+
+        return t, r
+
+    def get_transform_matrix(self, to_rf):
+        """"""
+        up, down = self._walk(to_rf)
+
         mat = np.eye(4)
         for rf in up:
             mat = np.matmul(mat, rf._get_parent_transform_matrix(inverse=True))
         for rf in down:
             mat = np.matmul(mat, rf._get_parent_transform_matrix())
 
-        translation = tuple(mat[:3, 3])
-        rotation = tuple(as_float_array(from_rotation_matrix(mat[:3, :3])))
-
-        return translation, rotation
+        return mat
 
     def get_transform_func(self, to_rf):
         """"""

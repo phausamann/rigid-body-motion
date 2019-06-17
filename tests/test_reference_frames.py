@@ -133,9 +133,10 @@ class TestReferenceFrame(object):
             'child2', parent=rf_world, translation=(-1., 0., 0.))
 
         translation, rotation = rf_child.get_transform(rf_child2)
-        npt.assert_almost_equal(translation, (-2., 0., 0.))
+        npt.assert_almost_equal(translation, (2., 0., 0.))
         npt.assert_almost_equal(rotation, (1., 0., 0., 0.))
 
+        # rotation only
         rf_child = rbm.ReferenceFrame(
             'child3', parent=rf_world,
             rotation=mock_quaternion(np.pi/4, 0., 0.))
@@ -145,18 +146,17 @@ class TestReferenceFrame(object):
 
         translation, rotation = rf_child.get_transform(rf_child2)
         npt.assert_almost_equal(translation, (0., 0., 0.))
-        npt.assert_almost_equal(rotation, -mock_quaternion(-np.pi/2, 0., 0.))
+        npt.assert_almost_equal(rotation, mock_quaternion(-np.pi/2, 0., 0.))
 
+        # both
         rf_child = rbm.ReferenceFrame(
             'child5', parent=rf_world,
-            translation=(1., 0., 0.),
-            rotation=mock_quaternion(np.pi/4, 0., 0.))
+            translation=(1., 0., 0.))
         rf_child2 = rbm.ReferenceFrame(
             'child6', parent=rf_world,
             translation=(-1., 0., 0.),
-            rotation=mock_quaternion(-np.pi/4, 0., 0.))
+            rotation=mock_quaternion(np.pi/2, 0., 0.))
 
         translation, rotation = rf_child.get_transform(rf_child2)
-        npt.assert_almost_equal(translation,
-                                (-1.-np.sqrt(2)/2, np.sqrt(2)/2, 0.))
-        npt.assert_almost_equal(rotation, -mock_quaternion(-np.pi/2, 0., 0.))
+        npt.assert_almost_equal(translation, (1., 1., 0.))
+        npt.assert_almost_equal(rotation, mock_quaternion(np.pi/2, 0., 0.))

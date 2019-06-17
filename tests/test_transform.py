@@ -40,7 +40,7 @@ class TestTransform(object):
             arr_child, outof='child', into='world', axis=1)
 
         expected = np.ones((10, 3, 5))
-        expected[:, 0] = 0.
+        expected[:, 0] = 2.
         npt.assert_almost_equal(arr_world, expected)
 
         # child2 to world

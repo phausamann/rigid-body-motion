@@ -127,36 +127,35 @@ class TestReferenceFrame(object):
         rf_world = rbm.ReferenceFrame('world')
 
         # translation only
-        rf_child = rbm.ReferenceFrame(
-            'child', parent=rf_world, translation=(1., 0., 0.))
+        rf_child1 = rbm.ReferenceFrame(
+            'child1', parent=rf_world, translation=(1., 0., 0.))
         rf_child2 = rbm.ReferenceFrame(
             'child2', parent=rf_world, translation=(-1., 0., 0.))
 
-        translation, rotation = rf_child.get_transform(rf_child2)
-        npt.assert_almost_equal(translation, (2., 0., 0.))
-        npt.assert_almost_equal(rotation, (1., 0., 0., 0.))
+        t, r = rf_child1.get_transform(rf_child2)
+        npt.assert_almost_equal(t, (2., 0., 0.))
+        npt.assert_almost_equal(r, (1., 0., 0., 0.))
 
         # rotation only
-        rf_child = rbm.ReferenceFrame(
-            'child3', parent=rf_world,
+        rf_child1 = rbm.ReferenceFrame(
+            'child1', parent=rf_world,
             rotation=mock_quaternion(np.pi/4, 0., 0.))
         rf_child2 = rbm.ReferenceFrame(
-            'child4', parent=rf_world,
+            'child2', parent=rf_world,
             rotation=mock_quaternion(-np.pi/4, 0., 0.))
 
-        translation, rotation = rf_child.get_transform(rf_child2)
-        npt.assert_almost_equal(translation, (0., 0., 0.))
-        npt.assert_almost_equal(rotation, mock_quaternion(-np.pi/2, 0., 0.))
+        t, r = rf_child1.get_transform(rf_child2)
+        npt.assert_almost_equal(t, (0., 0., 0.))
+        npt.assert_almost_equal(r, (np.sqrt(2)/2, 0., 0., np.sqrt(2)/2))
 
         # both
-        rf_child = rbm.ReferenceFrame(
-            'child5', parent=rf_world,
-            translation=(1., 0., 0.))
+        rf_child1 = rbm.ReferenceFrame(
+            'child1', parent=rf_world, translation=(1., 1., 0.))
         rf_child2 = rbm.ReferenceFrame(
-            'child6', parent=rf_world,
-            translation=(-1., 0., 0.),
-            rotation=mock_quaternion(np.pi/2, 0., 0.))
+            'child2', parent=rf_world, translation=(-1., 0., 0.),
+            rotation=mock_quaternion(np.pi/2, np.pi/3, 0.))
 
-        translation, rotation = rf_child.get_transform(rf_child2)
-        npt.assert_almost_equal(translation, (1., 1., 0.))
-        npt.assert_almost_equal(rotation, mock_quaternion(np.pi/2, 0., 0.))
+        t, r = rf_child1.get_transform(rf_child2)
+        npt.assert_almost_equal(t, (0.5, -2., 0.8660254))
+        npt.assert_almost_equal(r, (0.6123724356957946, 0.3535533905932737,
+                                    -0.35355339059327373, -0.6123724356957945))

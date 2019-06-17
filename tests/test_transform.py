@@ -59,6 +59,5 @@ class TestTransform(object):
             arr_child2, outof='child2', into='child', axis=1)
 
         expected = np.ones((10, 3, 5))
-        expected[:, 0] = -1.
         expected[:, 1] = -1.
         npt.assert_almost_equal(arr_child, expected)

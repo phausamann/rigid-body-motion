@@ -111,23 +111,18 @@ class ReferenceFrame(NodeMixin):
             mat[:3, 3] = self.translation
         return mat
 
-    def _get_parent_transform(self, rf, t, r, inverse=False, t_first=False):
+    def _get_parent_transform(self, rf, t, r, inverse=False):
         """"""
         if inverse:
             q = 1 / quaternion(*rf.rotation)
-            dt = np.array(rf.translation)
-        else:
-            q = quaternion(*rf.rotation)
             dt = -np.array(rf.translation)
-
-        if t_first ^ inverse:
             t = rotate_vectors(q, t + dt)
         else:
+            q = quaternion(*rf.rotation)
+            dt = np.array(rf.translation)
             t = rotate_vectors(q, t) + dt
 
-        r = q * r
-
-        return t, r
+        return t, q * r
 
     def register(self):
         """"""
@@ -145,10 +140,10 @@ class ReferenceFrame(NodeMixin):
         r = quaternion(1., 0., 0., 0.)
 
         for rf in up:
-            t, r = self._get_parent_transform(rf, t, r, inverse=True)
+            t, r = self._get_parent_transform(rf, t, r)
 
         for rf in down:
-            t, r = self._get_parent_transform(rf, t, r)
+            t, r = self._get_parent_transform(rf, t, r, inverse=True)
 
         t = tuple(t)
         r = tuple(as_float_array(r))
@@ -172,10 +167,10 @@ class ReferenceFrame(NodeMixin):
         t, r = self.get_transform(to_rf)
 
         def transform_func(arr, axis=-1, **kwargs):
-            arr = rotate_vectors(quaternion(*r), arr, axis=axis)
             t_idx = [np.newaxis] * arr.ndim
             t_idx[axis] = slice(None)
             arr = arr + np.array(t)[tuple(t_idx)]
+            arr = rotate_vectors(quaternion(*r), arr, axis=axis)
             return arr
 
         return transform_func

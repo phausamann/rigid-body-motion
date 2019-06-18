@@ -3,7 +3,8 @@ import numpy as np
 
 from anytree import NodeMixin, Walker
 from quaternion import \
-    quaternion, as_rotation_matrix, as_float_array, rotate_vectors
+    quaternion, as_rotation_matrix, as_quat_array, as_float_array, \
+    rotate_vectors
 
 _registry = {}
 
@@ -167,10 +168,20 @@ class ReferenceFrame(NodeMixin):
         t, r = self.get_transformation(to_rf)
 
         def transformation_func(arr, axis=-1, **kwargs):
-            t_idx = [np.newaxis] * arr.ndim
-            t_idx[axis] = slice(None)
-            arr = arr + np.array(t)[tuple(t_idx)]
-            arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+            # TODO support quaternion dtype
+            if arr.shape[axis] == 3:
+                arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+                t_idx = [np.newaxis] * arr.ndim
+                t_idx[axis] = slice(None)
+                arr = arr + np.array(t)[tuple(t_idx)]
+            elif arr.shape[axis] == 4:
+                arr = np.swapaxes(arr, axis, -1)
+                arr = quaternion(*r) * as_quat_array(arr)
+                arr = np.swapaxes(as_float_array(arr), -1, axis)
+            else:
+                raise ValueError(
+                    'Expected array to have size 3 or 4 along '
+                    'axis {}, actual size is {}'.format(axis, arr.shape[axis]))
             return arr
 
         return transformation_func

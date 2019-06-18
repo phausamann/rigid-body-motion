@@ -6,17 +6,10 @@ import pandas as pd
 import pytest
 from numpy import testing as npt
 
-from quaternion import from_euler_angles, as_float_array
-
 import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _register, _deregister
 
 test_data_dir = os.path.join(os.path.dirname(__file__), 'test_data')
-
-
-def mock_quaternion(*angles):
-    """"""
-    return as_float_array(from_euler_angles(*angles))
 
 
 def load_csv(filepath):
@@ -27,6 +20,8 @@ def load_csv(filepath):
 
 
 rf_test_grid = load_csv(os.path.join(test_data_dir, 'rf_test_grid.csv'))
+transform_test_grid = load_csv(
+    os.path.join(test_data_dir, 'transform_test_grid.csv'))
 
 
 class TestReferenceFrameRegistry(object):
@@ -151,3 +146,31 @@ class TestReferenceFrame(object):
         t_act, r_act = rf_child1.get_transformation(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)
+
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid)
+    def test_get_transformation_func(
+            self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+        """"""
+        rf_world = rbm.ReferenceFrame('world')
+
+        rf_child1 = rbm.ReferenceFrame(
+            'child1', parent=rf_world, translation=tc1, rotation=rc1)
+        rf_child2 = rbm.ReferenceFrame(
+            'child2', parent=rf_world, translation=tc2, rotation=rc2)
+
+        f = rf_child1.get_transformation_func(rf_child2)
+
+        # single point/orientation
+        pt_act = f(np.array(p))
+        npt.assert_almost_equal(pt_act, pt)
+        ot_act = f(np.array(o))
+        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
+
+        # array of points/orientations
+        pt_act = f(np.tile(np.array(p)[None, :, None], (10, 1, 5)), axis=1)
+        pt_exp = np.tile(np.array(pt)[None, :, None], (10, 1, 5))
+        npt.assert_almost_equal(pt_act, pt_exp)
+        ot_act = f(np.tile(np.array(o)[None, :, None], (10, 1, 5)), axis=1)
+        ot_exp = np.tile(np.array(ot)[None, :, None], (10, 1, 5))
+        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot_exp))

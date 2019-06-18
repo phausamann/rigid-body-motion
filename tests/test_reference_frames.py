@@ -128,18 +128,18 @@ class TestReferenceFrame(object):
         rf_child = rbm.ReferenceFrame('child', parent=rf_world,
                                       translation=(1., 0., 0.))
 
-        actual = rf_child._get_parent_transform_matrix()
+        actual = rf_child._get_parent_transformation_matrix()
         expected = np.eye(4)
         expected[0, 3] = 1.
         npt.assert_equal(actual, expected)
 
-        actual = rf_child._get_parent_transform_matrix(inverse=True)
+        actual = rf_child._get_parent_transformation_matrix(inverse=True)
         expected = np.eye(4)
         expected[0, 3] = -1.
         npt.assert_equal(actual, expected)
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid)
-    def test_get_transform(self, r, rc1, rc2, t, tc1, tc2):
+    def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):
         """"""
         rf_world = rbm.ReferenceFrame('world')
 
@@ -148,6 +148,6 @@ class TestReferenceFrame(object):
         rf_child2 = rbm.ReferenceFrame(
             'child2', parent=rf_world, translation=tc2, rotation=rc2)
 
-        t_act, r_act = rf_child1.get_transform(rf_child2)
+        t_act, r_act = rf_child1.get_transformation(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)

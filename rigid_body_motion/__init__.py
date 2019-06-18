@@ -33,12 +33,12 @@ _cs_funcs = {
 def transform(arr, outof=None, into=None, axis=-1, **kwargs):
     """"""
     if outof in _rf_registry:
-        transform_func = _rf_registry[outof].get_transform_func(into)
+        transformation_func = _rf_registry[outof].get_transformation_func(into)
     else:
         try:
-            transform_func = _cs_funcs[outof][into]
+            transformation_func = _cs_funcs[outof][into]
         except KeyError:
             raise ValueError(
                 'Unsupported transformation: {} to {}.'.format(outof, into))
 
-    return transform_func(arr, axis=axis, **kwargs)
+    return transformation_func(arr, axis=axis, **kwargs)

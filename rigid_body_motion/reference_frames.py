@@ -3,8 +3,7 @@ import numpy as np
 
 from anytree import NodeMixin, Walker
 from quaternion import \
-    quaternion, as_rotation_matrix, from_rotation_matrix, as_float_array, \
-    rotate_vectors
+    quaternion, as_rotation_matrix, as_float_array, rotate_vectors
 
 _registry = {}
 
@@ -99,7 +98,7 @@ class ReferenceFrame(NodeMixin):
         up, _, down = walker.walk(self, to_rf)
         return up, down
 
-    def _get_parent_transform_matrix(self, inverse=False):
+    def _get_parent_transformation_matrix(self, inverse=False):
         """"""
         mat = np.eye(4)
         if inverse:
@@ -111,7 +110,7 @@ class ReferenceFrame(NodeMixin):
             mat[:3, 3] = self.translation
         return mat
 
-    def _get_parent_transform(self, rf, t, r, inverse=False):
+    def _get_parent_transformation(self, rf, t, r, inverse=False):
         """"""
         if inverse:
             q = 1 / quaternion(*rf.rotation)
@@ -132,7 +131,7 @@ class ReferenceFrame(NodeMixin):
         """"""
         _deregister(self.name)
 
-    def get_transform(self, to_rf):
+    def get_transformation(self, to_rf):
         """"""
         up, down = self._walk(to_rf)
 
@@ -140,37 +139,38 @@ class ReferenceFrame(NodeMixin):
         r = quaternion(1., 0., 0., 0.)
 
         for rf in up:
-            t, r = self._get_parent_transform(rf, t, r)
+            t, r = self._get_parent_transformation(rf, t, r)
 
         for rf in down:
-            t, r = self._get_parent_transform(rf, t, r, inverse=True)
+            t, r = self._get_parent_transformation(rf, t, r, inverse=True)
 
         t = tuple(t)
         r = tuple(as_float_array(r))
 
         return t, r
 
-    def get_transform_matrix(self, to_rf):
+    def get_transformation_matrix(self, to_rf):
         """"""
         up, down = self._walk(to_rf)
 
         mat = np.eye(4)
         for rf in up:
-            mat = np.matmul(mat, rf._get_parent_transform_matrix(inverse=True))
+            mat = np.matmul(mat, rf._get_parent_transformation_matrix(
+                inverse=True))
         for rf in down:
-            mat = np.matmul(mat, rf._get_parent_transform_matrix())
+            mat = np.matmul(mat, rf._get_parent_transformation_matrix())
 
         return mat
 
-    def get_transform_func(self, to_rf):
+    def get_transformation_func(self, to_rf):
         """"""
-        t, r = self.get_transform(to_rf)
+        t, r = self.get_transformation(to_rf)
 
-        def transform_func(arr, axis=-1, **kwargs):
+        def transformation_func(arr, axis=-1, **kwargs):
             t_idx = [np.newaxis] * arr.ndim
             t_idx[axis] = slice(None)
             arr = arr + np.array(t)[tuple(t_idx)]
             arr = rotate_vectors(quaternion(*r), arr, axis=axis)
             return arr
 
-        return transform_func
+        return transformation_func

@@ -143,6 +143,12 @@ class TestReferenceFrame(object):
         rf_child2 = rbm.ReferenceFrame(
             'child2', parent=rf_world, translation=tc2, rotation=rc2)
 
+        # child1 to world
+        t_act, r_act = rf_child1.get_transformation(rf_world)
+        npt.assert_almost_equal(t_act, tc1)
+        npt.assert_almost_equal(r_act, rc1)
+
+        # child1 to child2
         t_act, r_act = rf_child1.get_transformation(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)
@@ -160,12 +166,19 @@ class TestReferenceFrame(object):
             'child2', parent=rf_world, translation=tc2, rotation=rc2)
 
         f = rf_child1.get_transformation_func(rf_child2)
+        f_inv = rf_child2.get_transformation_func(rf_child1)
 
         # single point/orientation
         pt_act = f(np.array(p))
         npt.assert_almost_equal(pt_act, pt)
         ot_act = f(np.array(o))
         npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
+
+        # inverse transformation
+        p_act = f_inv(np.array(pt))
+        npt.assert_almost_equal(p_act, p)
+        o_act = f_inv(np.array(ot))
+        npt.assert_almost_equal(np.abs(o_act), np.abs(o))
 
         # array of points/orientations
         pt_act = f(np.tile(np.array(p)[None, :, None], (10, 1, 5)), axis=1)

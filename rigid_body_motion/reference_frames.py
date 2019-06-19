@@ -176,12 +176,17 @@ class ReferenceFrame(NodeMixin):
         """ Remove this frame from the registry. """
         _deregister(self.name)
 
-    def get_transformation(self, to_rf):
+    def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
+
+        The transformation is a rotation followed by a translation which,
+        when applied to a position and/or orientation represented in this
+        reference frame, yields the representation of that
+        position/orientation in the target reference frame.
 
         Parameters
         ----------
-        to_rf: str or ReferenceFrame
+        to_frame: str or ReferenceFrame
             The target reference frame. If str, the frame will be looked up
             in the registry under that name.
 
@@ -193,7 +198,7 @@ class ReferenceFrame(NodeMixin):
         r: tuple, len 4
             The rotation from this frame to the target frame.
         """
-        up, down = self._walk(to_rf)
+        up, down = self._walk(to_frame)
 
         t = np.zeros(3)
         r = quaternion(1., 0., 0., 0.)
@@ -209,12 +214,17 @@ class ReferenceFrame(NodeMixin):
 
         return t, r
 
-    def get_transformation_matrix(self, to_rf):
+    def get_transformation_matrix(self, to_frame):
         """ Calculate the transformation matrix from this frame to another.
+
+        The transformation is a rotation followed by a translation which,
+        when applied to a position and/or orientation represented in this
+        reference frame, yields the representation of that
+        position/orientation in the target reference frame.
 
         Parameters
         ----------
-        to_rf: str or ReferenceFrame
+        to_frame: str or ReferenceFrame
             The target reference frame. If str, the frame will be looked up
             in the registry under that name.
 
@@ -223,7 +233,7 @@ class ReferenceFrame(NodeMixin):
         mat: array, shape (4, 4)
             The transformation matrix from this frame to the target frame.
         """
-        up, down = self._walk(to_rf)
+        up, down = self._walk(to_frame)
 
         mat = np.eye(4)
         for rf in up:
@@ -234,12 +244,17 @@ class ReferenceFrame(NodeMixin):
 
         return mat
 
-    def get_transformation_func(self, to_rf):
+    def get_transformation_func(self, to_frame):
         """ Get the transformation function from this frame to another.
+
+        The transformation is a rotation followed by a translation which,
+        when applied to a position and/or orientation represented in this
+        reference frame, yields the representation of that
+        position/orientation in the target reference frame.
 
         Parameters
         ----------
-        to_rf: str or ReferenceFrame
+        to_frame: str or ReferenceFrame
             The target reference frame. If str, the frame will be looked up
             in the registry under that name.
 
@@ -248,7 +263,7 @@ class ReferenceFrame(NodeMixin):
         func: function
             The transformation function from this frame to the target frame.
         """
-        t, r = self.get_transformation(to_rf)
+        t, r = self.get_transformation(to_frame)
 
         def transformation_func(arr, axis=-1, **kwargs):
             # TODO support quaternion dtype

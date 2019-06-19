@@ -10,7 +10,7 @@ _registry = {}
 
 
 def _register(rf):
-    """"""
+    """ Register a reference frame. """
     if rf.name in _registry:
         raise ValueError('Reference frame with name ' + rf.name +
                          ' is already registered')
@@ -19,7 +19,7 @@ def _register(rf):
 
 
 def _deregister(name):
-    """"""
+    """ Deregister a reference frame. """
     if name not in _registry:
         raise ValueError('Reference frame with name ' + name +
                          ' not found in registry')
@@ -28,27 +28,71 @@ def _deregister(name):
 
 
 def register_frame(name, parent=None, translation=None, rotation=None):
-    """"""
+    """ Register a new reference frame in the registry.
+
+    Parameters
+    ----------
+    name: str
+        The name of the reference frame.
+
+    parent: str or ReferenceFrame, optional
+        The parent reference frame. If str, the frame will be looked up
+        in the registry under that name. If not specified, this frame
+        will be a root node of a new reference frame tree.
+
+    translation: tuple, len 3, optional
+        The translation of this frame wrt the parent frame. Not
+        applicable if there is no parent frame.
+
+    rotation: tuple, len 4, optional
+        The rotation of this frame wrt the parent frame. Not
+        applicable if there is no parent frame.
+    """
     rf = ReferenceFrame(
             name, parent=parent, translation=translation, rotation=rotation)
     _register(rf)
 
 
 def deregister_frame(name):
-    """"""
+    """ Remove a reference frame from the registry.
+
+    Parameters
+    ----------
+    name: str
+        The name of the reference frame.
+    """
     _deregister(name)
 
 
 def clear_registry():
-    """"""
+    """ Clear the reference frame registry. """
     _registry.clear()
 
 
 class ReferenceFrame(NodeMixin):
-    """"""
+    """ A three-dimensional static reference frame. """
 
     def __init__(self, name, parent=None, translation=None, rotation=None):
-        """"""
+        """ Constructor.
+
+        Parameters
+        ----------
+        name: str
+            The name of this reference frame.
+
+        parent: str or ReferenceFrame, optional
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name. If not specified, this frame
+            will be a root node of a new reference frame tree.
+
+        translation: tuple, len 3, optional
+            The translation of this frame wrt the parent frame. Not
+            applicable if there is no parent frame.
+
+        rotation: tuple, len 4, optional
+            The rotation of this frame wrt the parent frame. Not
+            applicable if there is no parent frame.
+        """
         super(ReferenceFrame, self).__init__()
 
         # TODO check name requirement
@@ -77,12 +121,12 @@ class ReferenceFrame(NodeMixin):
                 self.translation = None
 
     def __del__(self):
-        """"""
+        """ Destructor. """
         if self.name in _registry and _registry[self.name] is self:
             _deregister(self.name)
 
     def _resolve(self, rf):
-        """"""
+        """ Retrieve frame by name from registry, if applicable. """
         if isinstance(rf, str):
             try:
                 return _registry[rf]
@@ -93,7 +137,7 @@ class ReferenceFrame(NodeMixin):
             return rf
 
     def _walk(self, to_rf):
-        """"""
+        """ Walk from this frame to a target frame along the tree. """
         to_rf = self._resolve(to_rf)
         walker = Walker()
         up, _, down = walker.walk(self, to_rf)
@@ -111,8 +155,8 @@ class ReferenceFrame(NodeMixin):
             mat[:3, 3] = self.translation
         return mat
 
-    def _get_parent_transformation(self, rf, t, r, inverse=False):
-        """"""
+    def _add_transformation(self, rf, t, r, inverse=False):
+        """ Add transformation of this frame to current transformation. """
         if inverse:
             q = 1 / quaternion(*rf.rotation)
             dt = -np.array(rf.translation)
@@ -125,25 +169,40 @@ class ReferenceFrame(NodeMixin):
         return t, q * r
 
     def register(self):
-        """"""
+        """ Register this frame in the registry. """
         _register(self)
 
     def deregister(self):
-        """"""
+        """ Remove this frame from the registry. """
         _deregister(self.name)
 
     def get_transformation(self, to_rf):
-        """"""
+        """ Calculate the transformation from this frame to another.
+
+        Parameters
+        ----------
+        to_rf: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        Returns
+        -------
+        t: tuple, len 3
+            The translation from this frame to the target frame.
+
+        r: tuple, len 4
+            The rotation from this frame to the target frame.
+        """
         up, down = self._walk(to_rf)
 
         t = np.zeros(3)
         r = quaternion(1., 0., 0., 0.)
 
         for rf in up:
-            t, r = self._get_parent_transformation(rf, t, r)
+            t, r = self._add_transformation(rf, t, r)
 
         for rf in down:
-            t, r = self._get_parent_transformation(rf, t, r, inverse=True)
+            t, r = self._add_transformation(rf, t, r, inverse=True)
 
         t = tuple(t)
         r = tuple(as_float_array(r))
@@ -151,7 +210,19 @@ class ReferenceFrame(NodeMixin):
         return t, r
 
     def get_transformation_matrix(self, to_rf):
-        """"""
+        """ Calculate the transformation matrix from this frame to another.
+
+        Parameters
+        ----------
+        to_rf: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        Returns
+        -------
+        mat: array, shape (4, 4)
+            The transformation matrix from this frame to the target frame.
+        """
         up, down = self._walk(to_rf)
 
         mat = np.eye(4)
@@ -164,7 +235,19 @@ class ReferenceFrame(NodeMixin):
         return mat
 
     def get_transformation_func(self, to_rf):
-        """"""
+        """ Get the transformation function from this frame to another.
+
+        Parameters
+        ----------
+        to_rf: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        Returns
+        -------
+        func: function
+            The transformation function from this frame to the target frame.
+        """
         t, r = self.get_transformation(to_rf)
 
         def transformation_func(arr, axis=-1, **kwargs):

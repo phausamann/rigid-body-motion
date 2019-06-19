@@ -21,7 +21,7 @@ Features
 
    installation
    usage
-   modules
+   api
    contributing
    authors
    history

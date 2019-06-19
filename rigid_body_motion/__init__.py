@@ -31,7 +31,31 @@ _cs_funcs = {
 
 
 def transform(arr, outof=None, into=None, axis=-1, **kwargs):
-    """"""
+    """ Transform motion between coordinate systems and reference frames.
+
+    Parameters
+    ----------
+    arr: array-like
+        The array to transform.
+
+    outof: str
+        The name of a coordinate system or registered reference frame in
+        which the array is currently represented.
+
+    into: str
+        The name of a coordinate system or registered reference frame in
+        which the array will be represented after the transformation.
+
+    axis: int, default -1
+        The axis of the array representing the coordinates of the angular or
+        linear motion.
+
+    Returns
+    -------
+    arr_transformed: array-like
+        The transformed array.
+    """
+    # TODO support ReferenceFrame objects
     if outof in _rf_registry:
         transformation_func = _rf_registry[outof].get_transformation_func(into)
     else:

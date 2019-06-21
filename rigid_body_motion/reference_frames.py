@@ -267,7 +267,10 @@ class ReferenceFrame(NodeMixin):
 
         def transformation_func(arr, axis=-1, **kwargs):
             # TODO support quaternion dtype
-            if arr.shape[axis] == 3:
+            if isinstance(arr, tuple):
+                return tuple(
+                    transformation_func(a, axis=axis, **kwargs) for a in arr)
+            elif arr.shape[axis] == 3:
                 arr = rotate_vectors(quaternion(*r), arr, axis=axis)
                 t_idx = [np.newaxis] * arr.ndim
                 t_idx[axis] = slice(None)

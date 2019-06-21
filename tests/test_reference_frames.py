@@ -173,6 +173,9 @@ class TestReferenceFrame(object):
         npt.assert_almost_equal(pt_act, pt)
         ot_act = f(np.array(o))
         npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
+        pt_act, ot_act = f((np.array(p), np.array(o)))
+        npt.assert_almost_equal(pt_act, pt)
+        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
 
         # inverse transformation
         p_act = f_inv(np.array(pt))

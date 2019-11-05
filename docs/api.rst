@@ -41,6 +41,14 @@ Coordinate Systems
     cartesian_to_spherical
     spherical_to_cartesian
 
+Utility functions
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    qmean
 
 Class member details
 --------------------

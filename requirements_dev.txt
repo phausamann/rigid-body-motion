@@ -6,6 +6,7 @@ tox==3.5.2
 coverage==4.5.1
 Sphinx==1.8.5
 sphinx_rtd_theme==0.4
+numpydoc==0.9.1
 twine==1.12.1
 pygments==2.3.1
 

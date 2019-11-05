@@ -16,6 +16,7 @@ dependencies:
   - pytest-cov=2.7.1
   - sphinx=1.8.5
   - sphinx_rtd_theme=0.4.3
+  - numpydoc=0.9.1
   - coverage=4.5.3
   - bumpversion=0.5.3
   - flake8=3.5.0

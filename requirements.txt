@@ -1,6 +1,6 @@
 numpy>=1.13
 scipy>=1.2.0
 pandas>=0.24
-numpy-quaternion==2019.3.18.14.33.20
+numpy-quaternion>=2019
 numba>=0.43
-anytree==2.6.0
+anytree>=2.6.0

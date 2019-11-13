@@ -118,7 +118,7 @@ class ReferenceFrame(NodeMixin):
                 raise ValueError(
                     'rotation specificied without parent frame.')
             else:
-                self.translation = None
+                self.rotation = None
 
     def __del__(self):
         """ Destructor. """

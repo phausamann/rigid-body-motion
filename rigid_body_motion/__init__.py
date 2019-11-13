@@ -9,6 +9,11 @@ from rigid_body_motion.reference_frames import \
 from rigid_body_motion.reference_frames import _registry as _rf_registry
 from rigid_body_motion.utils import qmean
 
+try:
+    import rigid_body_motion.ros as ros
+except ImportError:
+    pass
+
 __all__ = [
     'transform',
     # coordinate system transforms

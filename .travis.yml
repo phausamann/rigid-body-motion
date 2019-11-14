@@ -4,15 +4,19 @@ dist: bionic
 sudo: required
 
 language: python
-python:
-  - 3.7
-  - 3.6
-  - 3.5
-  - 2.7
-
-# Set up ROS distro if running ROS tox environment
-before_install:
-    - if [ $TOXENV == "ros" ]; then ./ci/install_ros.sh; fi
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=python2.7
+    - python: 3.5
+      env: TOXENV=python3.5
+    - python: 3.6
+      env: TOXENV=python3.6
+    - python: 3.7
+      env: TOXENV=python3.7
+    - env: TOXENV=ros
+      before_install: ./ci/install_ros.sh
+#    - env: TOXENV=flake8
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox-travis && pip install -U -r requirements.txt

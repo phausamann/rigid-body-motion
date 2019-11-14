@@ -12,7 +12,7 @@ python:
 
 # Set up ROS distro if running ROS tox environment
 before_install:
-    - if [[$TOXENV == ros]]; then bash ci/install_ros.sh; fi
+    - if [ $TOXENV == "ros" ]; then ./ci/install_ros.sh; fi
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox-travis && pip install -U -r requirements.txt

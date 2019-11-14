@@ -13,6 +13,7 @@ dependencies:
   - pygments
   - pytest
   - tox
+  - virtualenv
   - pip:
     - rospkg
     - anytree

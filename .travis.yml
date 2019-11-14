@@ -15,7 +15,7 @@ matrix:
     - python: 3.7
       env: TOXENV=python3.7
     - env: TOXENV=ros
-      before_install: ./ci/install_ros.sh
+      before_install: bash ci/install_ros.sh
 #    - env: TOXENV=flake8
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors

@@ -5,10 +5,18 @@ try:
     from geometry_msgs.msg import \
         TransformStamped, Vector3Stamped, Vector3, Point, Quaternion
 except ImportError:
-    # TODO setup environment for CI
-    raise ImportError(
-        'A ROS environment including rospy, tf2_ros and tf2_geometry_msgs is '
-        'required for this module')
+    # try to import pyros_setup instead
+    try:
+        import pyros_setup
+        pyros_setup.configurable_import().configure().activate()
+        import rospy
+        import tf2_ros
+        from geometry_msgs.msg import \
+            TransformStamped, Vector3Stamped, Vector3, Point, Quaternion
+    except ImportError:
+        raise ImportError(
+            'A ROS environment including rospy, tf2_ros and tf2_geometry_msgs '
+            'is required for this module')
 
 import numpy as np
 

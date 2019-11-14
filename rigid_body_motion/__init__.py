@@ -3,7 +3,9 @@ __author__ = """Peter Hausamann"""
 __email__ = 'peter@hausamann.de'
 __version__ = '0.1.0'
 
-from rigid_body_motion.coordinate_systems import *
+from rigid_body_motion.coordinate_systems import \
+    cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical, \
+    spherical_to_cartesian
 from rigid_body_motion.reference_frames import \
     register_frame, deregister_frame, clear_registry, ReferenceFrame
 from rigid_body_motion.reference_frames import _registry as _rf_registry

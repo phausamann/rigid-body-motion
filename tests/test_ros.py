@@ -31,18 +31,34 @@ class TestTransformer(object):
         transformer = Transformer.from_reference_frame(basic_rf)
         assert transformer.can_transform('child1', 'child2')
 
+    def test_lookup_transform(self, basic_rf):
+        """"""
+        transformer = Transformer.from_reference_frame(basic_rf)
+        t, r = transformer.lookup_transform('child1', 'child2')
+        np.testing.assert_allclose(t, (-1., 0., 0.))
+        np.testing.assert_allclose(r, mock_quaternion(np.pi / 4, 0., 0.))
+
     def test_transform_vector(self, basic_rf):
         """"""
         transformer = Transformer.from_reference_frame(basic_rf)
-        vector = (1., 0., 0.)
+        v = (1., 0., 0.)
+        vt = transformer.transform_vector(v, 'child1', 'child2')
         np.testing.assert_allclose(
-            transformer.transform_vector(vector, 'child1', 'child2'),
-            (np.sqrt(2.) / 2., np.sqrt(2.) / 2., 0.))
+            vt, (np.sqrt(2.) / 2., np.sqrt(2.) / 2., 0.))
 
     def test_transform_point(self, basic_rf):
         """"""
         transformer = Transformer.from_reference_frame(basic_rf)
-        point = (1., 0., 0.)
+        p = (1., 0., 0.)
+        pt = transformer.transform_point(p, 'child1', 'child2')
+        np.testing.assert_allclose(pt, (-0.2928932, np.sqrt(2.) / 2., 0.))
+
+    def test_transform_pose(self, basic_rf):
+        """"""
+        transformer = Transformer.from_reference_frame(basic_rf)
+        p = (1., 0., 0.)
+        o = mock_quaternion(np.pi / 4, 0., 0.)
+        pt, ot = transformer.transform_pose(p, o, 'child1', 'child2')
+        np.testing.assert_allclose(pt, (-0.2928932, np.sqrt(2.) / 2., 0.))
         np.testing.assert_allclose(
-            transformer.transform_point(point, 'child1', 'child2'),
-            (-0.2928932, np.sqrt(2.) / 2., 0.))
+            ot, (np.sqrt(2.) / 2., 0., 0., np.sqrt(2.) / 2.))

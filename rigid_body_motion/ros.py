@@ -5,7 +5,7 @@ try:
     import tf2_geometry_msgs
     from geometry_msgs.msg import \
         TransformStamped, Vector3Stamped, Vector3, PointStamped, Point, \
-        QuaternionStamped, Quaternion
+        QuaternionStamped, Quaternion, PoseStamped
 except ImportError:
     # try to import pyros_setup instead
     try:
@@ -41,13 +41,32 @@ def make_transform_msg(t, r, frame_id, child_frame_id, time=0.):
     return msg
 
 
-def static_rf_to_transform_msg(rf, time=0.):
+def unpack_transform_msg(msg):
     """"""
-    return make_transform_msg(
-        rf.translation, rf.rotation, rf.parent.name, rf.name, time=time)
+    t = msg.transform.translation
+    r = msg.transform.rotation
+    return (t.x, t.y, t.z), (r.w, r.x, r.y, r.z)
 
 
-def make_vector3_msg(v, frame_id, time=0.):
+def make_pose_msg(p, o, frame_id, time=0.):
+    """"""
+    msg = PoseStamped()
+    msg.header.stamp = rospy.Time.from_sec(time)
+    msg.header.frame_id = frame_id
+    msg.pose.position = Point(*p)
+    msg.pose.orientation = Quaternion(o[1], o[2], o[3], o[0])
+
+    return msg
+
+
+def unpack_pose_msg(msg):
+    """"""
+    p = msg.pose.position
+    o = msg.pose.orientation
+    return (p.x, p.y, p.z), (o.w, o.x, o.y, o.z)
+
+
+def make_vector_msg(v, frame_id, time=0.):
     """"""
     msg = Vector3Stamped()
     msg.header.stamp = rospy.Time.from_sec(time)
@@ -59,7 +78,8 @@ def make_vector3_msg(v, frame_id, time=0.):
 
 def unpack_vector_msg(msg):
     """"""
-    return msg.vector.x, msg.vector.y, msg.vector.z
+    v = msg.vector
+    return v.x, v.y, v.z
 
 
 def make_point_msg(p, frame_id, time=0.):
@@ -74,7 +94,8 @@ def make_point_msg(p, frame_id, time=0.):
 
 def unpack_point_msg(msg):
     """"""
-    return msg.point.x, msg.point.y, msg.point.z
+    p = msg.point
+    return p.x, p.y, p.z
 
 
 def make_quaternion_msg(q, frame_id, time=0.):
@@ -89,8 +110,14 @@ def make_quaternion_msg(q, frame_id, time=0.):
 
 def unpack_quaternion_msg(msg):
     """"""
-    return \
-        msg.quaternion.w, msg.quaternion.x, msg.quaternion.y, msg.quaternion.z
+    q = msg.quaternion
+    return q.w, q.x, q.y, q.z
+
+
+def static_rf_to_transform_msg(rf, time=0.):
+    """"""
+    return make_transform_msg(
+        rf.translation, rf.rotation, rf.parent.name, rf.name, time=time)
 
 
 class Transformer(object):
@@ -143,20 +170,36 @@ class Transformer(object):
         return self._buffer.can_transform(
             target_frame, source_frame, rospy.Time.from_sec(time))
 
-    def transform_vector(self, vector, target_frame, source_frame, time=0.):
+    def lookup_transform(self, target_frame, source_frame, time=0.):
         """"""
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time))
-        v_msg = make_vector3_msg(vector, source_frame, time)
+
+        return unpack_transform_msg(transform)
+
+    def transform_vector(self, v, target_frame, source_frame, time=0.):
+        """"""
+        transform = self._buffer.lookup_transform(
+            target_frame, source_frame, rospy.Time.from_sec(time))
+        v_msg = make_vector_msg(v, source_frame, time)
         vt_msg = tf2_geometry_msgs.do_transform_vector3(v_msg, transform)
 
         return unpack_vector_msg(vt_msg)
 
-    def transform_point(self, point, target_frame, source_frame, time=0.):
+    def transform_point(self, p, target_frame, source_frame, time=0.):
         """"""
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time))
-        p_msg = make_point_msg(point, source_frame, time)
+        p_msg = make_point_msg(p, source_frame, time)
         pt_msg = tf2_geometry_msgs.do_transform_point(p_msg, transform)
 
         return unpack_point_msg(pt_msg)
+
+    def transform_pose(self, p, o, target_frame, source_frame, time=0.):
+        """"""
+        transform = self._buffer.lookup_transform(
+            target_frame, source_frame, rospy.Time.from_sec(time))
+        p_msg = make_pose_msg(p, o, source_frame, time)
+        pt_msg = tf2_geometry_msgs.do_transform_pose(p_msg, transform)
+
+        return unpack_pose_msg(pt_msg)

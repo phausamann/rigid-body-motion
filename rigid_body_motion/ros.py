@@ -2,8 +2,10 @@
 try:
     import rospy
     import tf2_ros
+    import tf2_geometry_msgs
     from geometry_msgs.msg import \
-        TransformStamped, Vector3Stamped, Vector3, Point, Quaternion
+        TransformStamped, Vector3Stamped, Vector3, PointStamped, Point, \
+        QuaternionStamped, Quaternion
 except ImportError:
     # try to import pyros_setup instead
     try:
@@ -11,8 +13,10 @@ except ImportError:
         pyros_setup.configurable_import().configure().activate()
         import rospy
         import tf2_ros
+        import tf2_geometry_msgs
         from geometry_msgs.msg import \
-            TransformStamped, Vector3Stamped, Vector3, Point, Quaternion
+            TransformStamped, Vector3Stamped, Vector3, PointStamped, Point, \
+            QuaternionStamped, Quaternion
     except ImportError:
         raise ImportError(
             'A ROS environment including rospy, tf2_ros and tf2_geometry_msgs '
@@ -51,6 +55,42 @@ def make_vector3_msg(v, frame_id, time=0.):
     msg.vector = Vector3(*v)
 
     return msg
+
+
+def unpack_vector_msg(msg):
+    """"""
+    return msg.vector.x, msg.vector.y, msg.vector.z
+
+
+def make_point_msg(p, frame_id, time=0.):
+    """"""
+    msg = PointStamped()
+    msg.header.stamp = rospy.Time.from_sec(time)
+    msg.header.frame_id = frame_id
+    msg.point = Point(*p)
+
+    return msg
+
+
+def unpack_point_msg(msg):
+    """"""
+    return msg.point.x, msg.point.y, msg.point.z
+
+
+def make_quaternion_msg(q, frame_id, time=0.):
+    """"""
+    msg = QuaternionStamped()
+    msg.header.stamp = rospy.Time.from_sec(time)
+    msg.header.frame_id = frame_id
+    msg.quaternion = Quaternion(q[1], q[2], q[3], q[0])
+
+    return msg
+
+
+def unpack_quaternion_msg(msg):
+    """"""
+    return \
+        msg.quaternion.w, msg.quaternion.x, msg.quaternion.y, msg.quaternion.z
 
 
 class Transformer(object):
@@ -102,3 +142,21 @@ class Transformer(object):
         """"""
         return self._buffer.can_transform(
             target_frame, source_frame, rospy.Time.from_sec(time))
+
+    def transform_vector(self, vector, target_frame, source_frame, time=0.):
+        """"""
+        transform = self._buffer.lookup_transform(
+            target_frame, source_frame, rospy.Time.from_sec(time))
+        v_msg = make_vector3_msg(vector, source_frame, time)
+        vt_msg = tf2_geometry_msgs.do_transform_vector3(v_msg, transform)
+
+        return unpack_vector_msg(vt_msg)
+
+    def transform_point(self, point, target_frame, source_frame, time=0.):
+        """"""
+        transform = self._buffer.lookup_transform(
+            target_frame, source_frame, rospy.Time.from_sec(time))
+        p_msg = make_point_msg(point, source_frame, time)
+        pt_msg = tf2_geometry_msgs.do_transform_point(p_msg, transform)
+
+        return unpack_point_msg(pt_msg)

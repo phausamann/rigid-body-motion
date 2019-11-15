@@ -195,6 +195,15 @@ class Transformer(object):
 
         return unpack_point_msg(pt_msg)
 
+    def transform_quaternion(self, q, target_frame, source_frame, time=0.):
+        """"""
+        transform = self._buffer.lookup_transform(
+            target_frame, source_frame, rospy.Time.from_sec(time))
+        p_msg = make_pose_msg((0., 0., 0.), q, source_frame, time)
+        pt_msg = tf2_geometry_msgs.do_transform_pose(p_msg, transform)
+
+        return unpack_pose_msg(pt_msg)[1]
+
     def transform_pose(self, p, o, target_frame, source_frame, time=0.):
         """"""
         transform = self._buffer.lookup_transform(

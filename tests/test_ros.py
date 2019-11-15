@@ -1,59 +1,66 @@
 import pytest
-from .helpers import mock_quaternion, rf_test_grid, transform_test_grid
+from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
 
-import rigid_body_motion as rbm
 from rigid_body_motion.ros import Transformer
-
-
-@pytest.fixture()
-def basic_rf():
-    """"""
-    rf_world = rbm.ReferenceFrame('world')
-    rf_child1 = rbm.ReferenceFrame(
-        'child1', parent=rf_world, translation=(1., 0., 0.))
-    rf_child2 = rbm.ReferenceFrame(
-        'child2', parent=rf_world, rotation=mock_quaternion(np.pi / 4, 0., 0.))
-
-    yield rf_child1
 
 
 class TestTransformer(object):
 
-    def test_can_transform(self, basic_rf):
+    def test_can_transform(self):
         """"""
-        transformer = Transformer.from_reference_frame(basic_rf)
+        rf_world, _, _ = get_rf_tree()
+        transformer = Transformer.from_reference_frame(rf_world)
         assert transformer.can_transform('child1', 'child2')
 
-    def test_lookup_transform(self, basic_rf):
+    @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
+    def test_lookup_transform(self, r, rc1, rc2, t, tc1, tc2):
         """"""
-        transformer = Transformer.from_reference_frame(basic_rf)
-        t, r = transformer.lookup_transform('child1', 'child2')
-        np.testing.assert_allclose(t, (-1., 0., 0.))
-        np.testing.assert_allclose(r, mock_quaternion(np.pi / 4, 0., 0.))
+        rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
+        transformer = Transformer.from_reference_frame(rf_world)
+        t_act, r_act = transformer.lookup_transform('child2', 'child1')
+        np.testing.assert_allclose(t_act, t)
+        np.testing.assert_allclose(r_act, r)
 
-    def test_transform_vector(self, basic_rf):
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_vector(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
-        transformer = Transformer.from_reference_frame(basic_rf)
-        v = (1., 0., 0.)
-        vt = transformer.transform_vector(v, 'child1', 'child2')
-        np.testing.assert_allclose(
-            vt, (np.sqrt(2.) / 2., np.sqrt(2.) / 2., 0.))
+        rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
+        transformer = Transformer.from_reference_frame(rf_world)
+        vt_act = transformer.transform_vector(p, 'child2', 'child1')
+        v0t = transformer.transform_point((0., 0., 0.), 'child2', 'child1')
+        vt = np.array(pt) - np.array(v0t)
+        # large relative differences at machine precision
+        np.testing.assert_allclose(vt_act, vt, rtol=1.)
 
-    def test_transform_point(self, basic_rf):
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_point(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
-        transformer = Transformer.from_reference_frame(basic_rf)
-        p = (1., 0., 0.)
-        pt = transformer.transform_point(p, 'child1', 'child2')
-        np.testing.assert_allclose(pt, (-0.2928932, np.sqrt(2.) / 2., 0.))
+        rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
+        transformer = Transformer.from_reference_frame(rf_world)
+        pt_act = transformer.transform_point(p, 'child2', 'child1')
+        np.testing.assert_allclose(pt_act, pt)
 
-    def test_transform_pose(self, basic_rf):
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_quaternion(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
-        transformer = Transformer.from_reference_frame(basic_rf)
-        p = (1., 0., 0.)
-        o = mock_quaternion(np.pi / 4, 0., 0.)
-        pt, ot = transformer.transform_pose(p, o, 'child1', 'child2')
-        np.testing.assert_allclose(pt, (-0.2928932, np.sqrt(2.) / 2., 0.))
-        np.testing.assert_allclose(
-            ot, (np.sqrt(2.) / 2., 0., 0., np.sqrt(2.) / 2.))
+        rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
+        transformer = Transformer.from_reference_frame(rf_world)
+        ot_act = transformer.transform_quaternion(o, 'child2', 'child1')
+        # large relative differences at machine precision
+        np.testing.assert_allclose(ot_act, ot, rtol=1.)
+
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_pose(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+        """"""
+        rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
+        transformer = Transformer.from_reference_frame(rf_world)
+        pt_act, ot_act = transformer.transform_pose(p, o, 'child2', 'child1')
+        np.testing.assert_allclose(pt_act, pt)
+        # large relative differences at machine precision
+        np.testing.assert_allclose(ot_act, ot, rtol=1.)

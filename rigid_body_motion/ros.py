@@ -1,4 +1,12 @@
 """"""
+import os
+
+import numpy as np
+
+from anytree import PreOrderIter
+
+from rigid_body_motion.reference_frames import ReferenceFrame
+
 try:
     import rospy
     import tf2_ros
@@ -18,15 +26,12 @@ except ImportError:
             TransformStamped, Vector3Stamped, Vector3, PointStamped, Point, \
             QuaternionStamped, Quaternion
     except ImportError:
-        raise ImportError(
-            'A ROS environment including rospy, tf2_ros and tf2_geometry_msgs '
-            'is required for this module')
-
-import numpy as np
-
-from anytree import PreOrderIter
-
-from rigid_body_motion.reference_frames import ReferenceFrame
+        if os.environ.get('RBM_ROS_DEBUG'):
+            raise
+        else:
+            raise ImportError(
+                'A ROS environment including rospy, tf2_ros and '
+                'tf2_geometry_msgs is required for this module')
 
 
 def make_transform_msg(t, r, frame_id, child_frame_id, time=0.):

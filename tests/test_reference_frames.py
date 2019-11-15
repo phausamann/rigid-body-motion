@@ -1,31 +1,14 @@
-import os
-
 import numpy as np
-import pandas as pd
 
 import pytest
 from numpy import testing as npt
+from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _register, _deregister
 
-test_data_dir = os.path.join(os.path.dirname(__file__), 'test_data')
-
-
-def load_csv(filepath):
-    """"""
-    df = pd.read_csv(filepath, header=[0, 1], index_col=0)
-    l = [[tuple(r) for r in df[c].values] for c in df.columns.levels[0]]
-    return list(zip(*l))
-
-
-rf_test_grid = load_csv(os.path.join(test_data_dir, 'rf_test_grid.csv'))
-transform_test_grid = load_csv(
-    os.path.join(test_data_dir, 'transform_test_grid.csv'))
-
 
 class TestReferenceFrameRegistry(object):
-    """"""
 
     def test_register(self):
         """"""
@@ -62,7 +45,6 @@ class TestReferenceFrameRegistry(object):
 
 
 class TestReferenceFrame(object):
-    """"""
 
     @pytest.fixture(autouse=True)
     def clear_registry(self):
@@ -133,15 +115,10 @@ class TestReferenceFrame(object):
         expected[0, 3] = -1.
         npt.assert_equal(actual, expected)
 
-    @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid)
+    @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):
         """"""
-        rf_world = rbm.ReferenceFrame('world')
-
-        rf_child1 = rbm.ReferenceFrame(
-            'child1', parent=rf_world, translation=tc1, rotation=rc1)
-        rf_child2 = rbm.ReferenceFrame(
-            'child2', parent=rf_world, translation=tc2, rotation=rc2)
+        rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
 
         # child1 to world
         t_act, r_act = rf_child1.get_transformation(rf_world)
@@ -154,16 +131,11 @@ class TestReferenceFrame(object):
         npt.assert_almost_equal(r_act, r)
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
-                             transform_test_grid)
+                             transform_test_grid())
     def test_get_transformation_func(
             self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
-        rf_world = rbm.ReferenceFrame('world')
-
-        rf_child1 = rbm.ReferenceFrame(
-            'child1', parent=rf_world, translation=tc1, rotation=rc1)
-        rf_child2 = rbm.ReferenceFrame(
-            'child2', parent=rf_world, translation=tc2, rotation=rc2)
+        rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
 
         f = rf_child1.get_transformation_func(rf_child2)
         f_inv = rf_child2.get_transformation_func(rf_child1)

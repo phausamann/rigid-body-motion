@@ -1,15 +1,10 @@
 import pytest
+from .helpers import mock_quaternion, rf_test_grid, transform_test_grid
 
 import numpy as np
-from quaternion import from_euler_angles, as_float_array
 
 import rigid_body_motion as rbm
 from rigid_body_motion.ros import Transformer
-
-
-def mock_quaternion(*angles):
-    """"""
-    return as_float_array(from_euler_angles(*angles))
 
 
 @pytest.fixture()

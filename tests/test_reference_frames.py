@@ -162,3 +162,31 @@ class TestReferenceFrame(object):
         ot_act = f(np.tile(np.array(o)[None, :, None], (10, 1, 5)), axis=1)
         ot_exp = np.tile(np.array(ot)[None, :, None], (10, 1, 5))
         npt.assert_almost_equal(np.abs(ot_act), np.abs(ot_exp))
+
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_vectors(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+        """"""
+        _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        vt_act = rf_child1.transform_vectors(p, rf_child2)
+        v0t = rf_child1.transform_points((0., 0., 0.), rf_child2)
+        vt = np.array(pt) - np.array(v0t)
+        # large relative differences at machine precision
+        np.testing.assert_allclose(vt_act, vt, rtol=1.)
+
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_points(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+        """"""
+        _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        pt_act = rf_child1.transform_points(p, rf_child2)
+        np.testing.assert_allclose(pt_act, pt)
+
+    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
+                             transform_test_grid())
+    def test_transform_quaternions(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+        """"""
+        _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        ot_act = rf_child1.transform_quaternions(o, rf_child2)
+        # large relative differences at machine precision
+        npt.assert_allclose(np.abs(ot_act), np.abs(ot), rtol=1.)

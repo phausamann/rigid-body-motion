@@ -286,3 +286,84 @@ class ReferenceFrame(NodeMixin):
             return arr
 
         return transformation_func
+
+    def transform_vectors(self, arr, to_frame, axis=-1):
+        """ Transform an array of vectors from this frame to another.
+
+        Parameters
+        ----------
+        arr: array-like
+            The array to transform.
+
+        to_frame: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        axis: int, default -1
+            The axis of the array representing the coordinates of the vectors.
+
+        Returns
+        -------
+        arr_transformed: array-like
+            The transformed array.
+        """
+        _, r = self.get_transformation(to_frame)
+        arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+
+        return arr
+
+    def transform_points(self, arr, to_frame, axis=-1):
+        """ Transform an array of points from this frame to another.
+
+        Parameters
+        ----------
+        arr: array-like
+            The array to transform.
+
+        to_frame: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        axis: int, default -1
+            The axis of the array representing the coordinates of the points.
+
+        Returns
+        -------
+        arr_transformed: array-like
+            The transformed array.
+        """
+        t, r = self.get_transformation(to_frame)
+        arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+        t_idx = [np.newaxis] * arr.ndim
+        t_idx[axis] = slice(None)
+        arr = arr + np.array(t)[tuple(t_idx)]
+
+        return arr
+
+    def transform_quaternions(self, arr, to_frame, axis=-1):
+        """ Transform an array of quaternions from this frame to another.
+
+        Parameters
+        ----------
+        arr: array-like
+            The array to transform.
+
+        to_frame: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        axis: int, default -1
+            The axis of the array representing the coordinates of the
+            quaternions.
+
+        Returns
+        -------
+        arr_transformed: array-like
+            The transformed array.
+        """
+        t, r = self.get_transformation(to_frame)
+        arr = np.swapaxes(arr, axis, -1)
+        arr = quaternion(*r) * as_quat_array(arr)
+        arr = np.swapaxes(as_float_array(arr), -1, axis)
+
+        return arr

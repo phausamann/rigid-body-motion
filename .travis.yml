@@ -13,14 +13,20 @@ matrix:
       env: TOXENV=py36
     - python: 3.7
       env: TOXENV=py37
+    - python: 3.7
+      env: TOXENV=flake8
     - python: 2.7
-      env: TOXENV=ros
+      env: RBM_ROS_DEBUG=true
       before_install: bash ci/install_ros.sh
+      install:
+        - pip install -U -r requirements.txt -r requirements_dev.txt
+        - pip install -U pyros_setup rospkg
+        - python setup.py install
       before_script: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ros/melodic/lib
-    - env: TOXENV=flake8
+      script: py.test --basetemp=/tmp --cov=rigid_body_motion
   allow_failures:
     - python: 2.7
-      env: TOXENV=ros
+      env: RBM_ROS_DEBUG=true
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox-travis && pip install -U -r requirements.txt

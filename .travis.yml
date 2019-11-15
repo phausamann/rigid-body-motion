@@ -16,11 +16,11 @@ matrix:
     - python: 2.7
       env: TOXENV=ros
       before_install: bash ci/install_ros.sh
+      before_script: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ros/melodic/lib
     - env: TOXENV=flake8
   allow_failures:
     - python: 2.7
       env: TOXENV=ros
-    - env: TOXENV=flake8
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox-travis && pip install -U -r requirements.txt

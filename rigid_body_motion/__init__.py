@@ -3,6 +3,8 @@ __author__ = """Peter Hausamann"""
 __email__ = 'peter@hausamann.de'
 __version__ = '0.1.0'
 
+from warnings import warn
+
 from rigid_body_motion.coordinate_systems import \
     cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical, \
     spherical_to_cartesian
@@ -67,6 +69,9 @@ def transform(arr, outof=None, into=None, axis=-1, **kwargs):
     """
     # TODO support ReferenceFrame objects
     if outof in _rf_registry:
+        warn('transform for reference frame transformations is deprecated, '
+             'use transform_points, transform_vectors or '
+             'transform_quaternions instead.', DeprecationWarning)
         transformation_func = _rf_registry[outof].get_transformation_func(into)
     else:
         try:
@@ -76,3 +81,84 @@ def transform(arr, outof=None, into=None, axis=-1, **kwargs):
                 'Unsupported transformation: {} to {}.'.format(outof, into))
 
     return transformation_func(arr, axis=axis, **kwargs)
+
+
+def transform_vectors(arr, outof=None, into=None, axis=-1):
+    """ Transform an array of vectors between reference frames.
+
+    Parameters
+    ----------
+    arr: array-like
+        The array to transform.
+
+    outof: str
+        The name of a registered reference frame in which the array is
+        currently represented.
+
+    into: str
+        The name of a registered reference frame in which the array will be
+        represented after the transformation.
+
+    axis: int, default -1
+        The axis of the array representing the coordinates of the vectors.
+
+    Returns
+    -------
+    arr_transformed: array-like
+        The transformed array.
+    """
+    return _rf_registry[outof].transform_vectors(arr, into, axis=axis)
+
+
+def transform_points(arr, outof=None, into=None, axis=-1):
+    """ Transform an array of points between reference frames.
+
+    Parameters
+    ----------
+    arr: array-like
+        The array to transform.
+
+    outof: str
+        The name of a registered reference frame in which the array is
+        currently represented.
+
+    into: str
+        The name of a registered reference frame in which the array will be
+        represented after the transformation.
+
+    axis: int, default -1
+        The axis of the array representing the coordinates of the points.
+
+    Returns
+    -------
+    arr_transformed: array-like
+        The transformed array.
+    """
+    return _rf_registry[outof].transform_points(arr, into, axis=axis)
+
+
+def transform_quaternions(arr, outof=None, into=None, axis=-1):
+    """ Transform an array of quaternions between reference frames.
+
+    Parameters
+    ----------
+    arr: array-like
+        The array to transform.
+
+    outof: str
+        The name of a registered reference frame in which the array is
+        currently represented.
+
+    into: str
+        The name of a registered reference frame in which the array will be
+        represented after the transformation.
+
+    axis: int, default -1
+        The axis of the array representing the coordinates of the quaternions.
+
+    Returns
+    -------
+    arr_transformed: array-like
+        The transformed array.
+    """
+    return _rf_registry[outof].transform_quaternions(arr, into, axis=axis)

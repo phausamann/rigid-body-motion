@@ -1,19 +1,19 @@
 import pytest
 import numpy as np
 import numpy.testing as npt
-
-from quaternion import from_euler_angles, as_float_array
+from helpers import mock_quaternion, register_rf_tree
 
 import rigid_body_motion as rbm
 
 
-def mock_quaternion(*angles):
-    """"""
-    return as_float_array(from_euler_angles(*angles))
-
-
 class TestTransform(object):
     """"""
+
+    @pytest.fixture(autouse=True)
+    def clear_registry(self):
+        """"""
+        rbm.clear_registry()
+        yield
 
     def test_coordinate_system_transforms(self):
         """"""
@@ -29,15 +29,13 @@ class TestTransform(object):
 
     def test_reference_frame_transforms(self):
         """"""
-        rbm.register_frame('world')
-        rbm.register_frame('child', parent='world', translation=(1., 0., 0.))
-        rbm.register_frame('child2', parent='world', translation=(-1., 0., 0.),
-                           rotation=mock_quaternion(np.pi, 0., 0.))
+        register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
+                         rc2=mock_quaternion(np.pi, 0., 0.))
 
         # child to world
         arr_child = np.ones((10, 3, 5))
         arr_world = rbm.transform(
-            arr_child, outof='child', into='world', axis=1)
+            arr_child, outof='child1', into='world', axis=1)
 
         expected = np.ones((10, 3, 5))
         expected[:, 0] = 2.
@@ -56,9 +54,39 @@ class TestTransform(object):
         # child to child2
         arr_child2 = np.ones((10, 3, 5))
         arr_child = rbm.transform(
-            arr_child2, outof='child2', into='child', axis=1)
+            arr_child2, outof='child2', into='child1', axis=1)
 
         expected = np.ones((10, 3, 5))
         expected[:, 0] = -3.
         expected[:, 1] = -1.
         npt.assert_almost_equal(arr_child, expected)
+
+    def test_transform_points(self):
+        """"""
+        register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
+                         rc2=mock_quaternion(np.pi, 0., 0.))
+
+        arr_child2 = (1., 1., 1.)
+        arr_child1 = rbm.transform_points(
+            arr_child2, outof='child2', into='child1')
+        npt.assert_almost_equal(arr_child1, (-3., -1., 1.))
+
+    def test_transform_quaternions(self):
+        """"""
+        register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
+                         rc2=mock_quaternion(np.pi, 0., 0.))
+
+        arr_child2 = (1., 0., 0., 0.)
+        arr_child1 = rbm.transform_quaternions(
+            arr_child2, outof='child2', into='child1')
+        npt.assert_almost_equal(arr_child1, mock_quaternion(np.pi, 0., 0.))
+
+    def test_transform_vectors(self):
+        """"""
+        register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
+                         rc2=mock_quaternion(np.pi, 0., 0.))
+
+        arr_child2 = (1., 1., 1.)
+        arr_child1 = rbm.transform_vectors(
+            arr_child2, outof='child2', into='child1')
+        npt.assert_almost_equal(arr_child1, (-1., -1., 1.))

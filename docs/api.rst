@@ -16,6 +16,9 @@ Transformations
     :toctree: _generated
 
     transform
+    transform_vectors
+    transform_points
+    transform_quaternions
 
 Reference Frames
 ~~~~~~~~~~~~~~~~

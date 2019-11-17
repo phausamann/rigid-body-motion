@@ -40,3 +40,11 @@ def get_rf_tree(tc1=(0., 0., 0.), rc1=(1., 0., 0., 0.),
         'child2', parent=rf_world, translation=tc2, rotation=rc2)
 
     return rf_world, rf_child1, rf_child2
+
+
+def register_rf_tree(tc1=(0., 0., 0.), rc1=(1., 0., 0., 0.),
+                     tc2=(0., 0., 0.), rc2=(1., 0., 0., 0.)):
+    """"""
+    rbm.register_frame('world')
+    rbm.register_frame('child1', parent='world', translation=tc1, rotation=rc1)
+    rbm.register_frame('child2', parent='world', translation=tc2, rotation=rc2)

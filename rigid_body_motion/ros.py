@@ -138,15 +138,12 @@ class Transformer(object):
     @staticmethod
     def from_reference_frame(reference_frame):
         """"""
-        if len(reference_frame.ancestors) > 0:
-            root = reference_frame.ancestors[0]
-        else:
-            root = reference_frame
+        root = reference_frame.root
 
         # get the first and last timestamps for all moving reference frames
         t_start_end = zip(*[
             (node.timestamps[0], node.timestamps[-1])
-            for node in PreOrderIter(root) if hasattr(node, 'timestamps')
+            for node in PreOrderIter(root) if node.timestamps is not None
         ])
 
         if len(t_start_end) == 0:

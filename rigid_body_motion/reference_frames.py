@@ -3,8 +3,9 @@ import numpy as np
 
 from anytree import NodeMixin, Walker
 from quaternion import \
-    quaternion, as_rotation_matrix, as_quat_array, as_float_array, \
-    rotate_vectors
+    quaternion, as_rotation_matrix, as_quat_array, as_float_array
+
+from rigid_body_motion.utils import rotate_vectors
 
 _registry = {}
 
@@ -72,7 +73,8 @@ def clear_registry():
 class ReferenceFrame(NodeMixin):
     """ A three-dimensional static reference frame. """
 
-    def __init__(self, name, parent=None, translation=None, rotation=None):
+    def __init__(self, name, parent=None, translation=None, rotation=None,
+                 timestamps=None):
         """ Constructor.
 
         Parameters
@@ -100,32 +102,64 @@ class ReferenceFrame(NodeMixin):
         self.parent = self._resolve(parent)
 
         if self.parent is not None:
-            if translation is None:
-                self.translation = (0., 0., 0.)
-            else:
-                self.translation = translation
-            if rotation is None:
-                self.rotation = (1., 0., 0., 0.)
-            else:
-                self.rotation = rotation
+            self.translation, self.rotation, self.timestamps = \
+                self._init_arrays(translation, rotation, timestamps)
         else:
-            if translation is not None:
-                raise ValueError(
-                    'translation specificied without parent frame.')
-            else:
-                self.translation = None
-            if rotation is not None:
-                raise ValueError(
-                    'rotation specificied without parent frame.')
-            else:
-                self.rotation = None
+            self._verify_root(translation, rotation, timestamps)
+            self.translation, self.rotation, self.timestamps = None, None, None
 
     def __del__(self):
         """ Destructor. """
         if self.name in _registry and _registry[self.name] is self:
             _deregister(self.name)
 
-    def _resolve(self, rf):
+    @staticmethod
+    def _init_arrays(translation, rotation, timestamps):
+        """ Initialize translation, rotation and timestamp arrays. """
+        if translation is None:
+            translation = np.zeros(3)
+        else:
+            translation = np.asarray(translation)
+        if rotation is None:
+            rotation = np.array((1., 0., 0., 0.))
+        else:
+            rotation = np.asarray(rotation)
+
+        # check timestamps
+        if timestamps is not None:
+            timestamps = np.asarray(timestamps)
+            if timestamps.ndim != 1:
+                raise ValueError('timestamps must be one-dimensional.')
+            t_shape = (len(timestamps), 3)
+            r_shape = (len(timestamps), 4)
+        else:
+            t_shape = (3,)
+            r_shape = (4,)
+
+        # check array shapes
+        if translation.shape != t_shape:
+            raise ValueError(
+                'Expected translation to be of shape {}, got {}'.format(
+                    t_shape, translation.shape))
+        if rotation.shape != r_shape:
+            raise ValueError(
+                'Expected translation to be of shape {}, got {}'.format(
+                    r_shape, rotation.shape))
+
+        return translation, rotation, timestamps
+
+    @staticmethod
+    def _verify_root(translation, rotation, timestamps):
+        """"""
+        if translation is not None:
+            raise ValueError('translation specificied without parent frame.')
+        if rotation is not None:
+            raise ValueError('rotation specificied without parent frame.')
+        if timestamps is not None:
+            raise ValueError('timestamps specificied without parent frame.')
+
+    @staticmethod
+    def _resolve(rf):
         """ Retrieve frame by name from registry, if applicable. """
         if isinstance(rf, str):
             try:
@@ -158,23 +192,15 @@ class ReferenceFrame(NodeMixin):
     def _add_transformation(self, rf, t, r, inverse=False):
         """ Add transformation of this frame to current transformation. """
         if inverse:
-            q = 1 / quaternion(*rf.rotation)
+            q = 1 / as_quat_array(rf.rotation)
             dt = -np.array(rf.translation)
             t = rotate_vectors(q, t + dt)
         else:
-            q = quaternion(*rf.rotation)
+            q = as_quat_array(rf.rotation)
             dt = np.array(rf.translation)
             t = rotate_vectors(q, t) + dt
 
         return t, q * r
-
-    def register(self):
-        """ Register this frame in the registry. """
-        _register(self)
-
-    def deregister(self):
-        """ Remove this frame from the registry. """
-        _deregister(self.name)
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
@@ -209,10 +235,7 @@ class ReferenceFrame(NodeMixin):
         for rf in down:
             t, r = self._add_transformation(rf, t, r, inverse=True)
 
-        t = tuple(t)
-        r = tuple(as_float_array(r))
-
-        return t, r
+        return t, as_float_array(r)
 
     def get_transformation_matrix(self, to_frame):
         """ Calculate the transformation matrix from this frame to another.
@@ -271,13 +294,13 @@ class ReferenceFrame(NodeMixin):
                 return tuple(
                     transformation_func(a, axis=axis, **kwargs) for a in arr)
             elif arr.shape[axis] == 3:
-                arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+                arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
                 t_idx = [np.newaxis] * arr.ndim
                 t_idx[axis] = slice(None)
                 arr = arr + np.array(t)[tuple(t_idx)]
             elif arr.shape[axis] == 4:
                 arr = np.swapaxes(arr, axis, -1)
-                arr = quaternion(*r) * as_quat_array(arr)
+                arr = as_quat_array(r) * as_quat_array(arr)
                 arr = np.swapaxes(as_float_array(arr), -1, axis)
             else:
                 raise ValueError(
@@ -308,7 +331,7 @@ class ReferenceFrame(NodeMixin):
             The transformed array.
         """
         _, r = self.get_transformation(to_frame)
-        arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+        arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
 
         return arr
 
@@ -333,7 +356,7 @@ class ReferenceFrame(NodeMixin):
             The transformed array.
         """
         t, r = self.get_transformation(to_frame)
-        arr = rotate_vectors(quaternion(*r), arr, axis=axis)
+        arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
         t_idx = [np.newaxis] * arr.ndim
         t_idx[axis] = slice(None)
         arr = arr + np.array(t)[tuple(t_idx)]
@@ -363,7 +386,15 @@ class ReferenceFrame(NodeMixin):
         """
         t, r = self.get_transformation(to_frame)
         arr = np.swapaxes(arr, axis, -1)
-        arr = quaternion(*r) * as_quat_array(arr)
+        arr = as_quat_array(r) * as_quat_array(arr)
         arr = np.swapaxes(as_float_array(arr), -1, axis)
 
         return arr
+
+    def register(self):
+        """ Register this frame in the registry. """
+        _register(self)
+
+    def deregister(self):
+        """ Remove this frame from the registry. """
+        _deregister(self.name)

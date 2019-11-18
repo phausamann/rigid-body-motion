@@ -11,7 +11,7 @@ from rigid_body_motion.coordinate_systems import \
 from rigid_body_motion.reference_frames import \
     register_frame, deregister_frame, clear_registry, ReferenceFrame
 from rigid_body_motion.reference_frames import _registry as _rf_registry
-from rigid_body_motion.utils import qmean
+from rigid_body_motion.utils import qmean, rotate_vectors
 
 try:
     import rigid_body_motion.ros as ros

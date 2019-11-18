@@ -52,6 +52,7 @@ Utility functions
     :toctree: _generated
 
     qmean
+    rotate_vectors
 
 Class member details
 --------------------

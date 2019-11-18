@@ -47,7 +47,7 @@ def transform(arr, outof=None, into=None, axis=-1, **kwargs):
 
     Parameters
     ----------
-    arr: array-like
+    arr: array_like
         The array to transform.
 
     outof: str
@@ -64,7 +64,7 @@ def transform(arr, outof=None, into=None, axis=-1, **kwargs):
 
     Returns
     -------
-    arr_transformed: array-like
+    arr_transformed: array_like
         The transformed array.
     """
     # TODO support ReferenceFrame objects
@@ -88,7 +88,7 @@ def transform_vectors(arr, outof=None, into=None, axis=-1):
 
     Parameters
     ----------
-    arr: array-like
+    arr: array_like
         The array to transform.
 
     outof: str
@@ -104,7 +104,7 @@ def transform_vectors(arr, outof=None, into=None, axis=-1):
 
     Returns
     -------
-    arr_transformed: array-like
+    arr_transformed: array_like
         The transformed array.
     """
     return _rf_registry[outof].transform_vectors(arr, into, axis=axis)
@@ -115,7 +115,7 @@ def transform_points(arr, outof=None, into=None, axis=-1):
 
     Parameters
     ----------
-    arr: array-like
+    arr: array_like
         The array to transform.
 
     outof: str
@@ -131,7 +131,7 @@ def transform_points(arr, outof=None, into=None, axis=-1):
 
     Returns
     -------
-    arr_transformed: array-like
+    arr_transformed: array_like
         The transformed array.
     """
     return _rf_registry[outof].transform_points(arr, into, axis=axis)
@@ -142,7 +142,7 @@ def transform_quaternions(arr, outof=None, into=None, axis=-1):
 
     Parameters
     ----------
-    arr: array-like
+    arr: array_like
         The array to transform.
 
     outof: str
@@ -158,7 +158,7 @@ def transform_quaternions(arr, outof=None, into=None, axis=-1):
 
     Returns
     -------
-    arr_transformed: array-like
+    arr_transformed: array_like
         The transformed array.
     """
     return _rf_registry[outof].transform_quaternions(arr, into, axis=axis)

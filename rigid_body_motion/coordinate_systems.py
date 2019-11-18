@@ -7,7 +7,7 @@ def cartesian_to_polar(arr, axis=-1):
 
     Parameters
     ----------
-    arr : array-like
+    arr : array_like
         Input array.
     axis : int, default -1
         Axis of input array representing x and y in cartesian coordinates.
@@ -15,7 +15,7 @@ def cartesian_to_polar(arr, axis=-1):
 
     Returns
     -------
-    arr_polar : array-like
+    arr_polar : array_like
         Output array.
     """
     if arr.shape[axis] != 2:
@@ -33,7 +33,7 @@ def polar_to_cartesian(arr, axis=-1):
 
     Parameters
     ----------
-    arr : array-like
+    arr : array_like
         Input array.
     axis : int, default -1
         Axis of input array representing r and phi in polar coordinates.
@@ -41,7 +41,7 @@ def polar_to_cartesian(arr, axis=-1):
 
     Returns
     -------
-    arr_cartesian : array-like
+    arr_cartesian : array_like
         Output array.
     """
     if arr.shape[axis] != 2:
@@ -61,7 +61,7 @@ def cartesian_to_spherical(arr, axis=-1):
 
     Parameters
     ----------
-    arr : array-like
+    arr : array_like
         Input array.
     axis : int, default -1
         Axis of input array representing x, y and z in cartesian coordinates.
@@ -69,7 +69,7 @@ def cartesian_to_spherical(arr, axis=-1):
 
     Returns
     -------
-    arr_spherical : array-like
+    arr_spherical : array_like
         Output array.
     """
     if arr.shape[axis] != 3:
@@ -90,7 +90,7 @@ def spherical_to_cartesian(arr, axis=-1):
 
     Parameters
     ----------
-    arr : array-like
+    arr : array_like
         Input array.
     axis : int, default -1
         Axis of input array representing r, theta and phi in spherical
@@ -98,7 +98,7 @@ def spherical_to_cartesian(arr, axis=-1):
 
     Returns
     -------
-    arr_cartesian : array-like
+    arr_cartesian : array_like
         Output array.
     """
     if arr.shape[axis] != 3:

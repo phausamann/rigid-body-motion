@@ -1,5 +1,6 @@
 """"""
 import numpy as np
+from scipy.interpolate import interp1d
 
 from anytree import NodeMixin, Walker
 from quaternion import \
@@ -28,7 +29,8 @@ def _deregister(name):
     _registry.pop(name)
 
 
-def register_frame(name, parent=None, translation=None, rotation=None):
+def register_frame(
+        name, parent=None, translation=None, rotation=None, timestamps=None):
     """ Register a new reference frame in the registry.
 
     Parameters
@@ -36,21 +38,21 @@ def register_frame(name, parent=None, translation=None, rotation=None):
     name: str
         The name of the reference frame.
 
-    parent: str or ReferenceFrame, optional
-        The parent reference frame. If str, the frame will be looked up
-        in the registry under that name. If not specified, this frame
-        will be a root node of a new reference frame tree.
-
-    translation: tuple, len 3, optional
+    translation: array_like, optional
         The translation of this frame wrt the parent frame. Not
         applicable if there is no parent frame.
 
-    rotation: tuple, len 4, optional
+    rotation: array_like, optional
         The rotation of this frame wrt the parent frame. Not
         applicable if there is no parent frame.
+
+    timestamps : array_like, optional
+        The timestamps for translation and rotation of this frame. Not
+        applicable if this is a static reference frame.
     """
     rf = ReferenceFrame(
-            name, parent=parent, translation=translation, rotation=rotation)
+        name, parent=parent, translation=translation, rotation=rotation,
+        timestamps=timestamps)
     _register(rf)
 
 
@@ -87,13 +89,17 @@ class ReferenceFrame(NodeMixin):
             in the registry under that name. If not specified, this frame
             will be a root node of a new reference frame tree.
 
-        translation: tuple, len 3, optional
+        translation: array_like, optional
             The translation of this frame wrt the parent frame. Not
             applicable if there is no parent frame.
 
-        rotation: tuple, len 4, optional
+        rotation: array_like, optional
             The rotation of this frame wrt the parent frame. Not
             applicable if there is no parent frame.
+
+        timestamps : array_like, optional
+            The timestamps for translation and rotation of this frame. Not
+            applicable if this is a static reference frame.
         """
         super(ReferenceFrame, self).__init__()
 
@@ -116,16 +122,7 @@ class ReferenceFrame(NodeMixin):
     @staticmethod
     def _init_arrays(translation, rotation, timestamps):
         """ Initialize translation, rotation and timestamp arrays. """
-        if translation is None:
-            translation = np.zeros(3)
-        else:
-            translation = np.asarray(translation)
-        if rotation is None:
-            rotation = np.array((1., 0., 0., 0.))
-        else:
-            rotation = np.asarray(rotation)
-
-        # check timestamps
+        # TODO test
         if timestamps is not None:
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
@@ -136,31 +133,42 @@ class ReferenceFrame(NodeMixin):
             t_shape = (3,)
             r_shape = (4,)
 
-        # check array shapes
-        if translation.shape != t_shape:
-            raise ValueError(
-                'Expected translation to be of shape {}, got {}'.format(
-                    t_shape, translation.shape))
-        if rotation.shape != r_shape:
-            raise ValueError(
-                'Expected translation to be of shape {}, got {}'.format(
-                    r_shape, rotation.shape))
+        if translation is not None:
+            translation = np.asarray(translation)
+            if translation.shape != t_shape:
+                raise ValueError(
+                    'Expected translation to be of shape {}, got {}'.format(
+                        t_shape, translation.shape))
+        else:
+            translation = np.zeros(t_shape)
+
+        if rotation is not None:
+            rotation = np.asarray(rotation)
+            if rotation.shape != r_shape:
+                raise ValueError(
+                    'Expected translation to be of shape {}, got {}'.format(
+                        r_shape, rotation.shape))
+        else:
+            rotation = np.zeros(r_shape)
+            rotation[..., 0] = 1.
 
         return translation, rotation, timestamps
 
     @staticmethod
     def _verify_root(translation, rotation, timestamps):
-        """"""
+        """ Verify arguments for root node. """
+        # TODO test
         if translation is not None:
-            raise ValueError('translation specificied without parent frame.')
+            raise ValueError('translation specified without parent frame.')
         if rotation is not None:
-            raise ValueError('rotation specificied without parent frame.')
+            raise ValueError('rotation specified without parent frame.')
         if timestamps is not None:
-            raise ValueError('timestamps specificied without parent frame.')
+            raise ValueError('timestamps specified without parent frame.')
 
     @staticmethod
     def _resolve(rf):
         """ Retrieve frame by name from registry, if applicable. """
+        # TODO test
         if isinstance(rf, str):
             try:
                 return _registry[rf]
@@ -189,18 +197,58 @@ class ReferenceFrame(NodeMixin):
             mat[:3, 3] = self.translation
         return mat
 
-    def _add_transformation(self, rf, t, r, inverse=False):
+    @classmethod
+    def _broadcast(cls, arr, timestamps):
+        """"""
+        return np.tile(arr, (len(timestamps), 1))
+
+    @classmethod
+    def _interpolate(cls, arr, source_ts, target_ts):
+        """"""
+        # TODO SLERP for quaternions
+        return interp1d(source_ts, arr, axis=0)(target_ts)
+
+    @classmethod
+    def _match_timestamps(cls, arr, arr_ts, rf_ts):
+        """"""
+        # TODO priority='array' or ='reference_frame'
+        if rf_ts is None:
+            return arr
+        elif arr_ts is None:
+            return cls._broadcast(arr, rf_ts)
+        else:
+            return cls._interpolate(arr, arr_ts, rf_ts)
+
+    @classmethod
+    def _add_transformation(cls, rf, t, r, ts, inverse=False):
         """ Add transformation of this frame to current transformation. """
+        # TODO test
+        if rf.timestamps is not None:
+            if ts is None:
+                translation = rf.translation
+                rotation = rf.rotation
+                t = cls._broadcast(t, rf.timestamps)
+                r = cls._broadcast(r, rf.timestamps)
+                ts = rf.timestamps
+            else:
+                translation = cls._interpolate(
+                    rf.translation, rf.timestamps, ts)
+                rotation = cls._interpolate(
+                    rf.rotation, rf.timestamps, ts)
+        else:
+            translation = rf.translation
+            rotation = rf.rotation
+
         if inverse:
-            q = 1 / as_quat_array(rf.rotation)
-            dt = -np.array(rf.translation)
+            q = 1 / as_quat_array(rotation)
+            dt = -np.array(translation)
             t = rotate_vectors(q, t + dt)
         else:
-            q = as_quat_array(rf.rotation)
-            dt = np.array(rf.translation)
+            q = as_quat_array(rotation)
+            dt = np.array(translation)
             t = rotate_vectors(q, t) + dt
 
-        return t, q * r
+        return t, as_float_array(q * as_quat_array(r)), ts
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
@@ -227,15 +275,16 @@ class ReferenceFrame(NodeMixin):
         up, down = self._walk(to_frame)
 
         t = np.zeros(3)
-        r = quaternion(1., 0., 0., 0.)
+        r = np.array((1., 0., 0., 0.))
+        ts = None
 
         for rf in up:
-            t, r = self._add_transformation(rf, t, r)
+            t, r, ts = self._add_transformation(rf, t, r, ts)
 
         for rf in down:
-            t, r = self._add_transformation(rf, t, r, inverse=True)
+            t, r, ts = self._add_transformation(rf, t, r, ts, inverse=True)
 
-        return t, as_float_array(r)
+        return t, r, ts
 
     def get_transformation_matrix(self, to_frame):
         """ Calculate the transformation matrix from this frame to another.
@@ -286,7 +335,7 @@ class ReferenceFrame(NodeMixin):
         func: function
             The transformation function from this frame to the target frame.
         """
-        t, r = self.get_transformation(to_frame)
+        t, r, _ = self.get_transformation(to_frame)
 
         def transformation_func(arr, axis=-1, **kwargs):
             # TODO support quaternion dtype
@@ -310,12 +359,12 @@ class ReferenceFrame(NodeMixin):
 
         return transformation_func
 
-    def transform_vectors(self, arr, to_frame, axis=-1):
+    def transform_vectors(self, arr, to_frame, axis=-1, timestamps=None):
         """ Transform an array of vectors from this frame to another.
 
         Parameters
         ----------
-        arr: array-like
+        arr: array_like
             The array to transform.
 
         to_frame: str or ReferenceFrame
@@ -327,20 +376,24 @@ class ReferenceFrame(NodeMixin):
 
         Returns
         -------
-        arr_transformed: array-like
+        arr_transformed: array_like
             The transformed array.
         """
-        _, r = self.get_transformation(to_frame)
+        arr = np.asarray(arr)
+
+        _, r, ts = self.get_transformation(to_frame)
+
+        arr = self._match_timestamps(arr, timestamps, ts)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
 
         return arr
 
-    def transform_points(self, arr, to_frame, axis=-1):
+    def transform_points(self, arr, to_frame, axis=-1, timestamps=None):
         """ Transform an array of points from this frame to another.
 
         Parameters
         ----------
-        arr: array-like
+        arr: array_like
             The array to transform.
 
         to_frame: str or ReferenceFrame
@@ -352,23 +405,25 @@ class ReferenceFrame(NodeMixin):
 
         Returns
         -------
-        arr_transformed: array-like
+        arr_transformed: array_like
             The transformed array.
         """
-        t, r = self.get_transformation(to_frame)
+        arr = np.asarray(arr)
+
+        t, r, ts = self.get_transformation(to_frame)
+
+        arr = self._match_timestamps(arr, timestamps, ts)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
-        t_idx = [np.newaxis] * arr.ndim
-        t_idx[axis] = slice(None)
-        arr = arr + np.array(t)[tuple(t_idx)]
+        arr = arr + np.array(t)
 
         return arr
 
-    def transform_quaternions(self, arr, to_frame, axis=-1):
+    def transform_quaternions(self, arr, to_frame, axis=-1, timestamps=None):
         """ Transform an array of quaternions from this frame to another.
 
         Parameters
         ----------
-        arr: array-like
+        arr: array_like
             The array to transform.
 
         to_frame: str or ReferenceFrame
@@ -381,10 +436,14 @@ class ReferenceFrame(NodeMixin):
 
         Returns
         -------
-        arr_transformed: array-like
+        arr_transformed: array_like
             The transformed array.
         """
-        t, r = self.get_transformation(to_frame)
+        arr = np.asarray(arr)
+
+        t, r, ts = self.get_transformation(to_frame)
+
+        arr = self._match_timestamps(arr, timestamps, ts)
         arr = np.swapaxes(arr, axis, -1)
         arr = as_quat_array(r) * as_quat_array(arr)
         arr = np.swapaxes(as_float_array(arr), -1, axis)

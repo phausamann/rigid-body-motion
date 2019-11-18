@@ -121,14 +121,27 @@ class TestReferenceFrame(object):
         rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
 
         # child1 to world
-        t_act, r_act = rf_child1.get_transformation(rf_world)
+        t_act, r_act, ts = rf_child1.get_transformation(rf_world)
         npt.assert_almost_equal(t_act, tc1)
         npt.assert_almost_equal(r_act, rc1)
+        assert ts is None
 
         # child1 to child2
-        t_act, r_act = rf_child1.get_transformation(rf_child2)
+        t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)
+        assert ts is None
+
+        # with timestamps
+        rf_child3 = rbm.ReferenceFrame(
+            'child3', rf_child1, timestamps=np.arange(5) + 2.5)
+        rf_child4 = rbm.ReferenceFrame(
+            'child4', rf_child2, timestamps=np.arange(10))
+
+        t_act, r_act, ts = rf_child3.get_transformation(rf_child4)
+        npt.assert_almost_equal(t_act, np.tile(t, (5, 1)))
+        npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
+        npt.assert_equal(ts, np.arange(5) + 2.5)
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
@@ -168,10 +181,26 @@ class TestReferenceFrame(object):
     def test_transform_vectors(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
         _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        rf_child3 = rbm.ReferenceFrame(
+            'child3', rf_child1, timestamps=np.arange(5) + 2.5)
+
+        # static reference frame + single vector
         vt_act = rf_child1.transform_vectors(p, rf_child2)
         v0t = rf_child1.transform_points((0., 0., 0.), rf_child2)
         vt = np.array(pt) - np.array(v0t)
-        # large relative differences at machine precision
+        np.testing.assert_allclose(vt_act, vt, rtol=1.)
+
+        # moving reference frame + single vector
+        vt_act = rf_child3.transform_vectors(p, rf_child2)
+        v0t = rf_child3.transform_points((0., 0., 0.), rf_child2)
+        vt = np.tile(pt, (5, 1)) - np.array(v0t)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.)
+
+        # moving reference frame + multiple vectors
+        vt_act = rf_child3.transform_vectors(
+            np.tile(p, (10, 1)), rf_child2, timestamps=np.arange(10))
+        v0t = rf_child3.transform_points((0., 0., 0.), rf_child2)
+        vt = np.tile(pt, (5, 1)) - np.array(v0t)
         np.testing.assert_allclose(vt_act, vt, rtol=1.)
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
@@ -179,14 +208,41 @@ class TestReferenceFrame(object):
     def test_transform_points(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
         _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        rf_child3 = rbm.ReferenceFrame(
+            'child3', rf_child1, timestamps=np.arange(5) + 2.5)
+
+        # static reference frame + single vector
         pt_act = rf_child1.transform_points(p, rf_child2)
         np.testing.assert_allclose(pt_act, pt)
+
+        # moving reference frame + single point
+        pt_act = rf_child3.transform_points(p, rf_child2)
+        np.testing.assert_allclose(pt_act, np.tile(pt, (5, 1)), rtol=1.)
+
+        # moving reference frame + multiple vectors
+        pt_act = rf_child3.transform_points(
+            np.tile(p, (10, 1)), rf_child2, timestamps=np.arange(10))
+        np.testing.assert_allclose(pt_act, np.tile(pt, (5, 1)), rtol=1.)
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
     def test_transform_quaternions(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
         _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        rf_child3 = rbm.ReferenceFrame(
+            'child3', rf_child1, timestamps=np.arange(5) + 2.5)
+
+        # static reference frame + single quaternion
         ot_act = rf_child1.transform_quaternions(o, rf_child2)
-        # large relative differences at machine precision
         npt.assert_allclose(np.abs(ot_act), np.abs(ot), rtol=1.)
+
+        # moving reference frame + single quaternion
+        ot_act = rf_child3.transform_quaternions(o, rf_child2)
+        np.testing.assert_allclose(
+            np.abs(ot_act), np.tile(np.abs(ot), (5, 1)), rtol=1.)
+
+        # moving reference frame + multiple vectors
+        ot_act = rf_child3.transform_quaternions(
+            np.tile(o, (10, 1)), rf_child2, timestamps=np.arange(10))
+        np.testing.assert_allclose(
+            np.abs(ot_act), np.tile(np.abs(ot), (5, 1)), rtol=1.)

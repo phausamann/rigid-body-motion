@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import numpy.testing as npt
-from helpers import mock_quaternion, register_rf_tree
+from .helpers import mock_quaternion, register_rf_tree
 
 import rigid_body_motion as rbm
 

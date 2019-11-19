@@ -14,9 +14,10 @@ _registry = {}
 def _register(rf):
     """ Register a reference frame. """
     if rf.name in _registry:
-        raise ValueError('Reference frame with name ' + rf.name +
-                         ' is already registered')
+        raise ValueError(
+            'Reference frame with name ' + rf.name + ' is already registered')
     # TODO check if name is a cs transform
+    # TODO update=True/False
     _registry[rf.name] = rf
 
 
@@ -169,6 +170,7 @@ class ReferenceFrame(NodeMixin):
     def _resolve(rf):
         """ Retrieve frame by name from registry, if applicable. """
         # TODO test
+        # TODO raise error if not ReferenceFrame instance?
         if isinstance(rf, str):
             try:
                 return _registry[rf]
@@ -206,18 +208,22 @@ class ReferenceFrame(NodeMixin):
     def _interpolate(cls, arr, source_ts, target_ts):
         """"""
         # TODO SLERP for quaternions
+        # TODO specify time_axis as parameter
+        # TODO policy='raise'/'intersect'
+        # TODO priority=None/<rf_name>
+        # TODO method
         return interp1d(source_ts, arr, axis=0)(target_ts)
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_ts):
         """"""
-        # TODO priority='array' or ='reference_frame'
+        # TODO policy='from_arr'/'from_rf'
         if rf_ts is None:
-            return arr
+            return arr, arr_ts
         elif arr_ts is None:
-            return cls._broadcast(arr, rf_ts)
+            return cls._broadcast(arr, rf_ts), rf_ts
         else:
-            return cls._interpolate(arr, arr_ts, rf_ts)
+            return cls._interpolate(arr, arr_ts, rf_ts), rf_ts
 
     @classmethod
     def _add_transformation(cls, rf, t, r, ts, inverse=False):
@@ -293,6 +299,9 @@ class ReferenceFrame(NodeMixin):
 
         r: array_like, shape (4,) or (n_timestamps, 4)
             The rotation from this frame to the target frame.
+
+        ts: array_like, shape (n_timestamps,) or None
+            The timestamps for which the transformation is defined.
         """
         up, down = self._walk(to_frame)
 
@@ -381,7 +390,9 @@ class ReferenceFrame(NodeMixin):
 
         return transformation_func
 
-    def transform_vectors(self, arr, to_frame, axis=-1, timestamps=None):
+    def transform_vectors(
+            self, arr, to_frame, axis=-1, timestamps=None,
+            return_timestamps=False):
         """ Transform an array of vectors from this frame to another.
 
         Parameters
@@ -396,21 +407,38 @@ class ReferenceFrame(NodeMixin):
         axis: int, default -1
             The axis of the array representing the coordinates of the vectors.
 
+        timestamps: array_like, optional
+            The timestamps of the vectors, corresponding to the first axis
+            of the array. If not None, the first axis of the array will be
+            re-sampled to the timestamps for which the transformation is
+            defined.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps after the transformation.
+
         Returns
         -------
         arr_transformed: array_like
             The transformed array.
+
+        ts: array_like, shape (n_timestamps,) or None
+            The timestamps after the transformation.
         """
-        arr, timestamps = self._validate_input(arr, axis, 3, timestamps)
+        arr, arr_ts = self._validate_input(arr, axis, 3, timestamps)
 
-        _, r, ts = self.get_transformation(to_frame)
+        _, r, rf_ts = self.get_transformation(to_frame)
 
-        arr = self._match_timestamps(arr, timestamps, ts)
+        arr, ts = self._match_timestamps(arr, arr_ts, rf_ts)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
 
-        return arr
+        if not return_timestamps:
+            return arr
+        else:
+            return arr, ts
 
-    def transform_points(self, arr, to_frame, axis=-1, timestamps=None):
+    def transform_points(
+            self, arr, to_frame, axis=-1, timestamps=None,
+            return_timestamps=False):
         """ Transform an array of points from this frame to another.
 
         Parameters
@@ -425,22 +453,39 @@ class ReferenceFrame(NodeMixin):
         axis: int, default -1
             The axis of the array representing the coordinates of the points.
 
+        timestamps: array_like, optional
+            The timestamps of the vectors, corresponding to the first axis
+            of the array. If not None, the first axis of the array will be
+            re-sampled to the timestamps for which the transformation is
+            defined.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps after the transformation.
+
         Returns
         -------
         arr_transformed: array_like
             The transformed array.
+
+        ts: array_like, shape (n_timestamps,) or None
+            The timestamps after the transformation.
         """
-        arr, timestamps = self._validate_input(arr, axis, 3, timestamps)
+        arr, arr_ts = self._validate_input(arr, axis, 3, timestamps)
 
-        t, r, ts = self.get_transformation(to_frame)
+        t, r, rf_ts = self.get_transformation(to_frame)
 
-        arr = self._match_timestamps(arr, timestamps, ts)
+        arr, ts = self._match_timestamps(arr, arr_ts, rf_ts)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
         arr = arr + np.array(t)
 
-        return arr
+        if not return_timestamps:
+            return arr
+        else:
+            return arr, ts
 
-    def transform_quaternions(self, arr, to_frame, axis=-1, timestamps=None):
+    def transform_quaternions(
+            self, arr, to_frame, axis=-1, timestamps=None,
+            return_timestamps=False):
         """ Transform an array of quaternions from this frame to another.
 
         Parameters
@@ -456,24 +501,40 @@ class ReferenceFrame(NodeMixin):
             The axis of the array representing the coordinates of the
             quaternions.
 
+        timestamps: array_like, optional
+            The timestamps of the vectors, corresponding to the first axis
+            of the array. If not None, the first axis of the array will be
+            re-sampled to the timestamps for which the transformation is
+            defined.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps after the transformation.
+
         Returns
         -------
         arr_transformed: array_like
             The transformed array.
+
+        ts: array_like, shape (n_timestamps,) or None
+            The timestamps after the transformation.
         """
-        arr, timestamps = self._validate_input(arr, axis, 4, timestamps)
+        arr, arr_ts = self._validate_input(arr, axis, 4, timestamps)
 
-        t, r, ts = self.get_transformation(to_frame)
+        _, r, rf_ts = self.get_transformation(to_frame)
 
-        arr = self._match_timestamps(arr, timestamps, ts)
+        arr, ts = self._match_timestamps(arr, arr_ts, rf_ts)
         arr = np.swapaxes(arr, axis, -1)
         arr = as_quat_array(r) * as_quat_array(arr)
         arr = np.swapaxes(as_float_array(arr), -1, axis)
 
-        return arr
+        if not return_timestamps:
+            return arr
+        else:
+            return arr, ts
 
     def register(self):
         """ Register this frame in the registry. """
+        # TODO update=True/False
         _register(self)
 
     def deregister(self):

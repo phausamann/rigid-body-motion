@@ -1,8 +1,9 @@
-import numpy as np
-
 import pytest
 from numpy import testing as npt
 from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
+
+import numpy as np
+import xarray as xr
 
 import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _register, _deregister
@@ -126,6 +127,21 @@ class TestReferenceFrame(object):
         # first axis doesn't match timestamps
         with pytest.raises(ValueError):
             rbm.ReferenceFrame._validate_input(arr[:-1], -1, 3, timestamps)
+
+    def test_from_dataset(self):
+        """"""
+        ds = xr.Dataset(
+            {'t': (['time', 'cartesian_axis'], np.ones((10, 3))),
+             'r': (['time', 'quaternion_axis'], np.ones((10, 4)))},
+            {'time': np.arange(10)})
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_dataset(
+            ds, 't', 'r', 'time', rf_world)
+
+        npt.assert_equal(rf_child.translation, np.ones((10, 3)))
+        npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
+        npt.assert_equal(rf_child.timestamps, np.arange(10))
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):

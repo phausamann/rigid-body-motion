@@ -40,6 +40,11 @@ def register_frame(
     name: str
         The name of the reference frame.
 
+    parent: str or ReferenceFrame, optional
+        The parent reference frame. If str, the frame will be looked up
+        in the registry under that name. If not specified, this frame
+        will be a root node of a new reference frame tree.
+
     translation: array_like, optional
         The translation of this frame wrt the parent frame. Not
         applicable if there is no parent frame.
@@ -77,13 +82,13 @@ def clear_registry():
 class ReferenceFrame(NodeMixin):
     """ A three-dimensional static reference frame. """
 
-    def __init__(self, name, parent=None, translation=None, rotation=None,
+    def __init__(self, name=None, parent=None, translation=None, rotation=None,
                  timestamps=None):
         """ Constructor.
 
         Parameters
         ----------
-        name: str
+        name: str, optional
             The name of this reference frame.
 
         parent: str or ReferenceFrame, optional
@@ -253,6 +258,43 @@ class ReferenceFrame(NodeMixin):
         up, _, down = walker.walk(self, to_rf)
         return up, down
 
+    @classmethod
+    def from_dataset(
+            cls, ds, translation, rotation, timestamps, parent, name=None):
+        """ Construct a reference frame from an xarray.Dataset.
+
+        Parameters
+        ----------
+        ds: xarray Dataset
+            The dataset from which to construct the reference frame.
+
+        translation: str
+            The name of the variable representing the translation.
+
+        rotation: str
+            The name of the variable representing the rotation.
+
+        timestamps: str
+            The name of the variable or coordinate representing the
+            timestamps.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO raise errors here if dimensions etc. don't match
+        return cls(
+            name, parent, ds[translation].data, ds[rotation].data,
+            ds[timestamps].data)
+
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
 
@@ -318,7 +360,6 @@ class ReferenceFrame(NodeMixin):
         t, r, _ = self.get_transformation(to_frame)
 
         def transformation_func(arr, axis=-1, **kwargs):
-            # TODO support quaternion dtype
             if isinstance(arr, tuple):
                 return tuple(
                     transformation_func(a, axis=axis, **kwargs) for a in arr)

@@ -116,3 +116,108 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
     vr = v + 2 * np.cross(r, s * v + rxv, axisb=axis, axisc=axis) / m
 
     return vr
+
+
+def is_dataarray(obj, require_attrs=None):
+    """ Check whether an object is a DataArray.
+
+    Parameters
+    ----------
+    obj : anything
+        The object to be checked.
+
+    require_attrs : list of str, optional
+        The attributes the object has to have in order to pass as a DataArray.
+
+    Returns
+    -------
+    bool
+        Whether the object is a DataArray or not.
+    """
+    require_attrs = require_attrs or [
+        'values', 'coords', 'dims', 'to_dataset']
+
+    return all([hasattr(obj, name) for name in require_attrs])
+
+
+def is_dataset(obj, require_attrs=None):
+    """ Check whether an object is a Dataset.
+
+    Parameters
+    ----------
+    obj : anything
+        The object to be checked.
+
+    require_attrs : list of str, optional
+        The attributes the object has to have in order to pass as a Dataset.
+
+    Returns
+    -------
+    bool
+        Whether the object is a Dataset or not.
+    """
+    require_attrs = require_attrs or [
+        'data_vars', 'coords', 'dims', 'to_array']
+
+    return all([hasattr(obj, name) for name in require_attrs])
+
+
+def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
+    """ If input is DataArray, unpack into data, coords and dims. """
+    if not is_dataarray(arr):
+        if dim is not None:
+            raise ValueError(
+                'dim argument specified without DataArray input.')
+        axis = axis or -1
+        coords = None
+        dims = None
+    else:
+        if dim is not None and axis is not None:
+            raise ValueError('You can either specify the dim or the axis '
+                             'argument, not both.')
+        elif dim is not None:
+            axis = arr.dims.index(dim)
+        else:
+            axis = axis or -1
+        if isinstance(timestamps, str):
+            # TODO transpose if time dim is not first?
+            # TODO convert datetimeindex?
+            timestamps = arr[timestamps].data
+        elif timestamps is not None:
+            # TODO time_dim argument
+            raise NotImplementedError(
+                'timestamps argument must be dimension name or None.')
+        coords = dict(arr.coords)
+        dims = arr.dims
+        arr = arr.data
+
+    return arr, axis, timestamps, coords, dims
+
+
+def _make_dataarray(arr, coords, dims, ts_arg, ts_out):
+    """ Make DataArray out of transformation results. """
+    import xarray as xr
+
+    if ts_arg is None:
+        # no timestamps specified
+        if ts_out is not None:
+            coords['time'] = ts_out
+            dims = ('time',) + dims
+    elif isinstance(ts_arg, str):
+        # timestamps specified as coord
+        # TODO transpose if time dim is not first?
+        assert ts_out is not None
+        if len(coords[ts_arg]) != len(ts_out) \
+                or np.any(coords[ts_arg] != ts_out):
+            # interpolate if timestamps after transform have changed
+            for c in coords:
+                if ts_arg in coords[c].dims and c != ts_arg:
+                    coords[c] = coords[c].interp({ts_arg: ts_out})
+            coords[ts_arg] = ts_out
+    else:
+        # timestamps specified as array
+        # TODO time_dim argument
+        raise NotImplementedError(
+            'timestamps argument must be dimension name or None')
+
+    return xr.DataArray(arr, coords, dims)

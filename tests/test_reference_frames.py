@@ -17,8 +17,18 @@ class TestReferenceFrameRegistry(object):
         _register(rf_world)
         assert rbm._rf_registry['world'] is rf_world
 
+        # name is None
+        with pytest.raises(ValueError):
+            _register(rbm.ReferenceFrame())
+
+        # already registered
         with pytest.raises(ValueError):
             _register(rf_world)
+
+        # update=True
+        rf_world2 = rbm.ReferenceFrame('world')
+        _register(rf_world2, update=True)
+        assert rbm._rf_registry['world'] is rf_world2
 
     def test_deregister(self):
         """"""

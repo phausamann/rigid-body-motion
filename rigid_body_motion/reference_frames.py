@@ -12,13 +12,15 @@ from rigid_body_motion.utils import rotate_vectors, _resolve
 _registry = {}
 
 
-def _register(rf):
+def _register(rf, update=False):
     """ Register a reference frame. """
-    if rf.name in _registry:
+    if rf.name is None:
+        raise ValueError('Reference frame name cannot be None.')
+    if rf.name in _registry and not update:
         raise ValueError(
-            'Reference frame with name ' + rf.name + ' is already registered')
+            'Reference frame with name {} is already registered. Specify '
+            'update=True to overwrite.'.format(rf.name))
     # TODO check if name is a cs transform
-    # TODO update=True/False
     _registry[rf.name] = rf
 
 
@@ -522,10 +524,16 @@ class ReferenceFrame(NodeMixin):
         else:
             return arr, ts
 
-    def register(self):
-        """ Register this frame in the registry. """
-        # TODO update=True/False
-        _register(self)
+    def register(self, update=False):
+        """ Register this frame in the registry.
+
+        Parameters
+        ----------
+        update: bool, default False
+            If True, overwrite if there is a frame with the same name in the
+            registry.
+        """
+        _register(self, update=update)
 
     def deregister(self):
         """ Remove this frame from the registry. """

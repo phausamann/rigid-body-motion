@@ -454,7 +454,7 @@ class ReferenceFrame(NodeMixin):
             The axis of the array representing the coordinates of the points.
 
         timestamps: array_like, optional
-            The timestamps of the vectors, corresponding to the first axis
+            The timestamps of the points, corresponding to the first axis
             of the array. If not None, the first axis of the array will be
             re-sampled to the timestamps for which the transformation is
             defined.
@@ -502,7 +502,7 @@ class ReferenceFrame(NodeMixin):
             quaternions.
 
         timestamps: array_like, optional
-            The timestamps of the vectors, corresponding to the first axis
+            The timestamps of the quaternions, corresponding to the first axis
             of the array. If not None, the first axis of the array will be
             re-sampled to the timestamps for which the transformation is
             defined.

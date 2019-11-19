@@ -1,10 +1,11 @@
 """"""
+from warnings import warn
+
 import numpy as np
 from scipy.interpolate import interp1d
 
 from anytree import NodeMixin, Walker
-from quaternion import \
-    quaternion, as_rotation_matrix, as_quat_array, as_float_array
+from quaternion import as_quat_array, as_float_array
 
 from rigid_body_motion.utils import rotate_vectors, _resolve
 
@@ -166,18 +167,6 @@ class ReferenceFrame(NodeMixin):
         if timestamps is not None:
             raise ValueError('timestamps specified without parent frame.')
 
-    def _get_parent_transformation_matrix(self, inverse=False):
-        """"""
-        mat = np.eye(4)
-        if inverse:
-            mat[:3, :3] = as_rotation_matrix(1 / quaternion(*self.rotation))
-            mat[:3, 3] = self.translation
-            mat[:3, 3] = -mat[:3, 3]
-        else:
-            mat[:3, :3] = as_rotation_matrix(quaternion(*self.rotation))
-            mat[:3, 3] = self.translation
-        return mat
-
     @classmethod
     def _broadcast(cls, arr, timestamps):
         """"""
@@ -303,36 +292,6 @@ class ReferenceFrame(NodeMixin):
 
         return t, r, ts
 
-    def get_transformation_matrix(self, to_frame):
-        """ Calculate the transformation matrix from this frame to another.
-
-        The transformation is a rotation followed by a translation which,
-        when applied to a position and/or orientation represented in this
-        reference frame, yields the representation of that
-        position/orientation in the target reference frame.
-
-        Parameters
-        ----------
-        to_frame: str or ReferenceFrame
-            The target reference frame. If str, the frame will be looked up
-            in the registry under that name.
-
-        Returns
-        -------
-        mat: array, shape (4, 4)
-            The transformation matrix from this frame to the target frame.
-        """
-        up, down = self._walk(to_frame)
-
-        mat = np.eye(4)
-        for rf in up:
-            mat = np.matmul(mat, rf._get_parent_transformation_matrix(
-                inverse=True))
-        for rf in down:
-            mat = np.matmul(mat, rf._get_parent_transformation_matrix())
-
-        return mat
-
     def get_transformation_func(self, to_frame):
         """ Get the transformation function from this frame to another.
 
@@ -352,6 +311,10 @@ class ReferenceFrame(NodeMixin):
         func: function
             The transformation function from this frame to the target frame.
         """
+        warn('get_transformation_func is deprecated, use transform_points, '
+             'transform_vectors or transform_quaternions instead.',
+             DeprecationWarning)
+
         t, r, _ = self.get_transformation(to_frame)
 
         def transformation_func(arr, axis=-1, **kwargs):

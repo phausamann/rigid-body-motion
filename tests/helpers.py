@@ -15,14 +15,16 @@ def load_csv(filepath):
     return list(zip(*l))
 
 
-def rf_test_grid():
+def rf_test_grid(step=1):
     """"""
-    return load_csv(os.path.join(test_data_dir, 'rf_test_grid.csv'))
+    grid = load_csv(os.path.join(test_data_dir, 'rf_test_grid.csv'))
+    return grid[::step]
 
 
-def transform_test_grid():
+def transform_test_grid(step=4):
     """"""
-    return load_csv(os.path.join(test_data_dir, 'transform_test_grid.csv'))
+    grid = load_csv(os.path.join(test_data_dir, 'transform_test_grid.csv'))
+    return grid[::step]
 
 
 def mock_quaternion(*angles):

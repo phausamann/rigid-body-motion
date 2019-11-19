@@ -99,22 +99,6 @@ class TestReferenceFrame(object):
         assert up == (rf_child,)
         assert down == (rf_child2,)
 
-    def test_get_parent_transform_matrix(self):
-        """"""
-        rf_world = rbm.ReferenceFrame('world')
-        rf_child = rbm.ReferenceFrame('child', parent=rf_world,
-                                      translation=(1., 0., 0.))
-
-        actual = rf_child._get_parent_transformation_matrix()
-        expected = np.eye(4)
-        expected[0, 3] = 1.
-        npt.assert_equal(actual, expected)
-
-        actual = rf_child._get_parent_transformation_matrix(inverse=True)
-        expected = np.eye(4)
-        expected[0, 3] = -1.
-        npt.assert_equal(actual, expected)
-
     def test_validate_input(self):
         """"""
         # scalar input

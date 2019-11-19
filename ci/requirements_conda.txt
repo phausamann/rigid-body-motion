@@ -1,5 +1,6 @@
 numpy>=1.13
 scipy>=1.2.0
 pandas>=0.24
+xarray>=0.11
 quaternion>=2019.3
-numba=0.43
+numba>=0.43

@@ -17,18 +17,6 @@ class TestTransform(object):
         rbm.clear_registry()
         yield
 
-    def test_coordinate_system_transforms(self):
-        """"""
-        arr = np.ones((10, 2))
-        expected = np.tile((np.sqrt(2), np.pi/4), (10, 1))
-        actual = rbm.transform(arr, outof='cartesian', into='polar', axis=1)
-        npt.assert_equal(actual, expected)
-
-        with pytest.raises(ValueError):
-            rbm.transform(np.ones((10, 3)), outof='cartesian', into='polar')
-        with pytest.raises(ValueError):
-            rbm.transform(np.ones((10, 2)), outof='unsupported', into='polar')
-
     def test_reference_frame_transforms(self):
         """"""
         register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
@@ -131,3 +119,18 @@ class TestTransform(object):
             timestamps='time')
         assert da_child1.shape == (10, 3)
         npt.assert_almost_equal(da_child1[0], arr_exp)
+
+    def test_transform_coordinates(self):
+        """"""
+        arr = np.ones((10, 2))
+        expected = np.tile((np.sqrt(2), np.pi/4), (10, 1))
+        actual = rbm.transform_coordinates(
+            arr, outof='cartesian', into='polar', axis=1)
+        npt.assert_equal(actual, expected)
+
+        with pytest.raises(ValueError):
+            rbm.transform_coordinates(
+                np.ones((10, 3)), outof='cartesian', into='polar')
+        with pytest.raises(ValueError):
+            rbm.transform_coordinates(
+                np.ones((10, 2)), outof='unsupported', into='polar')

@@ -42,6 +42,7 @@ def qmean(q, axis=None):
     qm : ndarray, quaternion dtype
         A new array containing the mean values.
     """
+    # TODO 4-arrays instead of quaternions
     if q.dtype != quaternion:
         raise ValueError('Array dtype must be quaternion.')
 
@@ -63,7 +64,7 @@ def qmean(q, axis=None):
 
 
 def rotate_vectors(q, v, axis=-1, one_to_one=True):
-    """
+    """ Rotate an array of vectors by an array of quaternions.
 
     Parameters
     ----------
@@ -89,6 +90,7 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
         the shape of all non-singleton dimensions in ``q`` and ``v``.
         Otherwise, this array has shape ``q.shape`` + ``v.shape``.
     """
+    # TODO 4-arrays instead of quaternions
     if not one_to_one or q.ndim == 0:
         return quat_rv(q, v, axis=axis)
 

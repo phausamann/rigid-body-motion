@@ -11,6 +11,7 @@ from rigid_body_motion.coordinate_systems import \
 from rigid_body_motion.reference_frames import \
     register_frame, deregister_frame, clear_registry, ReferenceFrame
 from rigid_body_motion.reference_frames import _registry as _rf_registry
+from rigid_body_motion.estimators import shortest_arc_rotation
 from rigid_body_motion.utils import \
     qmean, rotate_vectors, _maybe_unpack_dataarray, _make_dataarray, _resolve
 
@@ -34,6 +35,8 @@ __all__ = [
     'deregister_frame',
     'clear_registry',
     'ReferenceFrame',
+    # estimators
+    'shortest_arc_rotation',
     # utils
     'qmean',
     'rotate_vectors',
@@ -45,47 +48,6 @@ _cs_funcs = {
     'polar': {'cartesian': polar_to_cartesian},
     'spherical': {'cartesian': spherical_to_cartesian}
 }
-
-
-def transform(arr, outof=None, into=None, axis=-1, **kwargs):
-    """ Transform motion between coordinate systems and reference frames.
-
-    Parameters
-    ----------
-    arr: array_like
-        The array to transform.
-
-    outof: str
-        The name of a coordinate system or registered reference frame in
-        which the array is currently represented.
-
-    into: str
-        The name of a coordinate system or registered reference frame in
-        which the array will be represented after the transformation.
-
-    axis: int, default -1
-        The axis of the array representing the coordinates of the angular or
-        linear motion.
-
-    Returns
-    -------
-    arr_transformed: array_like
-        The transformed array.
-    """
-    # TODO support ReferenceFrame objects
-    if outof in _rf_registry:
-        warn('transform for reference frame transformations is deprecated, '
-             'use transform_points, transform_vectors or '
-             'transform_quaternions instead.', DeprecationWarning)
-        transformation_func = _rf_registry[outof].get_transformation_func(into)
-    else:
-        try:
-            transformation_func = _cs_funcs[outof][into]
-        except KeyError:
-            raise ValueError(
-                'Unsupported transformation: {} to {}.'.format(outof, into))
-
-    return transformation_func(arr, axis=axis, **kwargs)
 
 
 def transform_vectors(
@@ -251,3 +213,75 @@ def transform_quaternions(
         return arr, ts_out
     else:
         return arr
+
+
+def transform_coordinates(arr, outof=None, into=None, axis=-1):
+    """ Transform motion between coordinate systems.
+
+    Parameters
+    ----------
+    arr: array_like
+        The array to transform.
+
+    outof: str
+        The name of a coordinate system in which the array is currently
+        represented.
+
+    into: str
+        The name of a coordinate system in which the array will be represented
+        after the transformation.
+
+    axis: int, default -1
+        The axis of the array representing the coordinates of the angular or
+        linear motion.
+
+    Returns
+    -------
+    arr_transformed: array_like
+        The transformed array.
+    """
+    try:
+        return _cs_funcs[outof][into](arr, axis=axis)
+    except KeyError:
+        raise ValueError(
+            'Unsupported transformation: {} to {}.'.format(outof, into))
+
+
+def transform(arr, outof=None, into=None, axis=-1, **kwargs):
+    """ Transform motion between coordinate systems and reference frames.
+
+    Parameters
+    ----------
+    arr: array_like
+        The array to transform.
+
+    outof: str
+        The name of a coordinate system or registered reference frame in
+        which the array is currently represented.
+
+    into: str
+        The name of a coordinate system or registered reference frame in
+        which the array will be represented after the transformation.
+
+    axis: int, default -1
+        The axis of the array representing the coordinates of the angular or
+        linear motion.
+
+    Returns
+    -------
+    arr_transformed: array_like
+        The transformed array.
+    """
+    if outof in _rf_registry:
+        warn('transform for reference frame transformations is deprecated, '
+             'use transform_points, transform_vectors or '
+             'transform_quaternions instead.', DeprecationWarning)
+        transformation_func = _rf_registry[outof].get_transformation_func(into)
+    else:
+        try:
+            transformation_func = _cs_funcs[outof][into]
+        except KeyError:
+            raise ValueError(
+                'Unsupported transformation: {} to {}.'.format(outof, into))
+
+    return transformation_func(arr, axis=axis, **kwargs)

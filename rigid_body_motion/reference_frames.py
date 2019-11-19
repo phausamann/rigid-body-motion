@@ -82,7 +82,7 @@ def clear_registry():
 
 
 class ReferenceFrame(NodeMixin):
-    """ A three-dimensional static reference frame. """
+    """ A three-dimensional reference frame. """
 
     def __init__(self, name=None, parent=None, translation=None, rotation=None,
                  timestamps=None):

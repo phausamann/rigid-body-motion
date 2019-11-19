@@ -12,7 +12,7 @@ from rigid_body_motion.reference_frames import \
     register_frame, deregister_frame, clear_registry, ReferenceFrame
 from rigid_body_motion.reference_frames import _registry as _rf_registry
 from rigid_body_motion.utils import \
-    qmean, rotate_vectors, _maybe_unpack_dataarray, _make_dataarray
+    qmean, rotate_vectors, _maybe_unpack_dataarray, _make_dataarray, _resolve
 
 try:
     import rigid_body_motion.ros as ros
@@ -130,7 +130,7 @@ def transform_vectors(
     arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
-    arr, ts_out = ReferenceFrame._resolve(outof).transform_vectors(
+    arr, ts_out = _resolve(outof).transform_vectors(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
@@ -185,7 +185,7 @@ def transform_points(
     arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
-    arr, ts_out = ReferenceFrame._resolve(outof).transform_points(
+    arr, ts_out = _resolve(outof).transform_points(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
@@ -240,7 +240,7 @@ def transform_quaternions(
     arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
-    arr, ts_out = ReferenceFrame._resolve(outof).transform_quaternions(
+    arr, ts_out = _resolve(outof).transform_quaternions(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:

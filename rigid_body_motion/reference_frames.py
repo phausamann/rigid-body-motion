@@ -6,7 +6,7 @@ from anytree import NodeMixin, Walker
 from quaternion import \
     quaternion, as_rotation_matrix, as_quat_array, as_float_array
 
-from rigid_body_motion.utils import rotate_vectors
+from rigid_body_motion.utils import rotate_vectors, _resolve
 
 _registry = {}
 
@@ -106,7 +106,7 @@ class ReferenceFrame(NodeMixin):
 
         # TODO check name requirement
         self.name = name
-        self.parent = self._resolve(parent)
+        self.parent = _resolve(parent)
 
         if self.parent is not None:
             self.translation, self.rotation, self.timestamps = \
@@ -165,27 +165,6 @@ class ReferenceFrame(NodeMixin):
             raise ValueError('rotation specified without parent frame.')
         if timestamps is not None:
             raise ValueError('timestamps specified without parent frame.')
-
-    @staticmethod
-    def _resolve(rf):
-        """ Retrieve frame by name from registry, if applicable. """
-        # TODO test
-        # TODO raise error if not ReferenceFrame instance?
-        if isinstance(rf, str):
-            try:
-                return _registry[rf]
-            except KeyError:
-                raise ValueError(
-                    'Frame "' + rf + '" not found in registry.')
-        else:
-            return rf
-
-    def _walk(self, to_rf):
-        """ Walk from this frame to a target frame along the tree. """
-        to_rf = self._resolve(to_rf)
-        walker = Walker()
-        up, _, down = walker.walk(self, to_rf)
-        return up, down
 
     def _get_parent_transformation_matrix(self, inverse=False):
         """"""
@@ -277,6 +256,13 @@ class ReferenceFrame(NodeMixin):
                                  'same length as the timestamps.')
 
         return arr, timestamps
+
+    def _walk(self, to_rf):
+        """ Walk from this frame to a target frame along the tree. """
+        to_rf = _resolve(to_rf)
+        walker = Walker()
+        up, _, down = walker.walk(self, to_rf)
+        return up, down
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.

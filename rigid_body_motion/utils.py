@@ -224,3 +224,19 @@ def _make_dataarray(arr, coords, dims, ts_arg, ts_out):
             'timestamps argument must be dimension name or None')
 
     return xr.DataArray(arr, coords, dims)
+
+
+def _resolve(rf):
+    """ Retrieve frame by name from registry, if applicable. """
+    # TODO test
+    # TODO raise error if not ReferenceFrame instance?
+    from rigid_body_motion.reference_frames import _registry
+
+    if isinstance(rf, str):
+        try:
+            return _registry[rf]
+        except KeyError:
+            raise ValueError(
+                'Frame "' + rf + '" not found in registry.')
+    else:
+        return rf

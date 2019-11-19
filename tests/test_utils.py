@@ -117,7 +117,7 @@ class TestUtils(object):
         assert all(c in da.coords for c in coords)
         assert dims is da.dims
 
-        # dim and axis argument
+        # dim and axis argument at the same time
         with pytest.raises(ValueError):
             _maybe_unpack_dataarray(da, dim='cartesian_axis', axis=-1)
 
@@ -143,3 +143,8 @@ class TestUtils(object):
         assert da_out.dims == ('time', 'cartesian_axis')
         npt.assert_equal(da_out.coords['time'], np.arange(5)+2.5)
         npt.assert_allclose(da_out.coords['test_coord'], 2*np.arange(5)+5)
+
+        # invalid coord name
+        with pytest.raises(ValueError):
+            _make_dataarray(
+                arr, dict(da_in.coords), da_in.dims, 'not_a_coord', None)

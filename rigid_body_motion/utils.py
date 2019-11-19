@@ -206,6 +206,9 @@ def _make_dataarray(arr, coords, dims, ts_arg, ts_out):
     elif isinstance(ts_arg, str):
         # timestamps specified as coord
         # TODO transpose if time dim is not first?
+        if ts_arg not in coords:
+            raise ValueError(
+                '{} is not a coordinate of this DataArray'.format(ts_arg))
         assert ts_out is not None
         if len(coords[ts_arg]) != len(ts_out) \
                 or np.any(coords[ts_arg] != ts_out):

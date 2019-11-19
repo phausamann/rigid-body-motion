@@ -15,10 +15,10 @@ Transformations
     :nosignatures:
     :toctree: _generated
 
-    transform
     transform_vectors
     transform_points
     transform_quaternions
+    transform_coordinates
 
 Reference Frames
 ~~~~~~~~~~~~~~~~
@@ -43,6 +43,16 @@ Coordinate Systems
     polar_to_cartesian
     cartesian_to_spherical
     spherical_to_cartesian
+
+Estimators
+~~~~~~~~~~
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    shortest_arc_rotation
+
 
 Utility functions
 ~~~~~~~~~~~~~~~~~

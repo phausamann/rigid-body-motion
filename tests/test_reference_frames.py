@@ -115,6 +115,34 @@ class TestReferenceFrame(object):
         expected[0, 3] = -1.
         npt.assert_equal(actual, expected)
 
+    def test_validate_input(self):
+        """"""
+        # scalar input
+        arr_scalar = (0., 0., 0.)
+        arr_val, _ = rbm.ReferenceFrame._validate_input(
+            arr_scalar, -1, 3, None)
+        assert isinstance(arr_val, np.ndarray)
+        npt.assert_equal(arr_val, np.zeros(3))
+
+        # wrong axis length
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._validate_input(arr_scalar, -1, 4, None)
+
+        # array with timestamps
+        arr = np.ones((10, 3))
+        timestamps = range(10)
+        arr_val, ts_val = rbm.ReferenceFrame._validate_input(
+            arr, -1, 3, timestamps)
+        assert isinstance(ts_val, np.ndarray)
+
+        # timestamps not 1D
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._validate_input(arr, -1, 3, np.ones((10, 10)))
+
+        # first axis doesn't match timestamps
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._validate_input(arr[:-1], -1, 3, timestamps)
+
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):
         """"""

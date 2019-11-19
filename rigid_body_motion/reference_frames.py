@@ -250,6 +250,28 @@ class ReferenceFrame(NodeMixin):
 
         return t, as_float_array(q * as_quat_array(r)), ts
 
+    @classmethod
+    def _validate_input(cls, arr, axis, n_axis, timestamps):
+        """"""
+        # TODO process DataArray (dim=str, timestamps=str)
+        arr = np.asarray(arr)
+
+        if arr.shape[axis] != n_axis:
+            raise ValueError(
+                'Expected array to have length {} along axis {}, '
+                'got {}'.format(n_axis, axis, arr.shape[axis]))
+
+        if timestamps is not None:
+            # TODO specify time_axis as parameter
+            timestamps = np.asarray(timestamps)
+            if timestamps.ndim != 1:
+                raise ValueError('timestamps must be one-dimensional.')
+            if arr.shape[0] != len(timestamps):
+                raise ValueError('The first axis of the array must have the '
+                                 'same length as the timestamps.')
+
+        return arr, timestamps
+
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
 
@@ -266,10 +288,10 @@ class ReferenceFrame(NodeMixin):
 
         Returns
         -------
-        t: tuple, len 3
+        t: array_like, shape (3,) or (n_timestamps, 3)
             The translation from this frame to the target frame.
 
-        r: tuple, len 4
+        r: array_like, shape (4,) or (n_timestamps, 4)
             The rotation from this frame to the target frame.
         """
         up, down = self._walk(to_frame)
@@ -379,7 +401,7 @@ class ReferenceFrame(NodeMixin):
         arr_transformed: array_like
             The transformed array.
         """
-        arr = np.asarray(arr)
+        arr, timestamps = self._validate_input(arr, axis, 3, timestamps)
 
         _, r, ts = self.get_transformation(to_frame)
 
@@ -408,7 +430,7 @@ class ReferenceFrame(NodeMixin):
         arr_transformed: array_like
             The transformed array.
         """
-        arr = np.asarray(arr)
+        arr, timestamps = self._validate_input(arr, axis, 3, timestamps)
 
         t, r, ts = self.get_transformation(to_frame)
 
@@ -439,7 +461,7 @@ class ReferenceFrame(NodeMixin):
         arr_transformed: array_like
             The transformed array.
         """
-        arr = np.asarray(arr)
+        arr, timestamps = self._validate_input(arr, axis, 4, timestamps)
 
         t, r, ts = self.get_transformation(to_frame)
 

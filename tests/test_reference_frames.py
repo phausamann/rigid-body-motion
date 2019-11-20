@@ -159,6 +159,20 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
+    def test_from_rotation_matrix(self):
+        """"""
+        mat = np.array([[0., 0., -1.], [-1., 0., 0.], [0., 1., 0.]])
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_rotation_matrix(mat, rf_world)
+
+        npt.assert_equal(rf_child.translation, (0., 0., 0.))
+        npt.assert_allclose(rf_child.rotation, (-0.5, -0.5,  0.5,  0.5))
+        assert rf_child.timestamps is None
+
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame.from_rotation_matrix(np.zeros((4, 4)), rf_world)
+
     def test_interpolate(self):
         """"""
         arr = np.ones((10, 3))

@@ -5,7 +5,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from anytree import NodeMixin, Walker
-from quaternion import as_quat_array, as_float_array
+from quaternion import as_quat_array, as_float_array, from_rotation_matrix
 
 from rigid_body_motion.utils import rotate_vectors, _resolve
 
@@ -302,6 +302,35 @@ class ReferenceFrame(NodeMixin):
         return cls(
             name, parent, ds[translation].data, ds[rotation].data,
             ds[timestamps].data)
+
+    @classmethod
+    def from_rotation_matrix(cls, mat, parent, name=None):
+        """ Construct a static reference frame from a rotation matrix.
+
+        Parameters
+        ----------
+        mat: array_like, shape (3, 3)
+            The rotation matrix.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO support moving reference frame
+        if mat.shape != (3, 3):
+            raise ValueError(
+                'Expected mat to have shape (3, 3), got {}'.format(mat.shape))
+
+        return cls(
+            name, parent, rotation=as_float_array(from_rotation_matrix(mat)))
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.

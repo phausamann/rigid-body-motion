@@ -190,8 +190,9 @@ class TestReferenceFrame(object):
         # datetime timestamps
         ts1 = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
         ts2 = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
-        arr_int, _ = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
+        arr_int, ts_out = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
         npt.assert_allclose(arr_int, arr[:5])
+        assert ts_out.dtype == ts1.dtype
 
         # not sorted
         with pytest.raises(ValueError):

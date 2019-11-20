@@ -188,6 +188,7 @@ class ReferenceFrame(NodeMixin):
         # TODO policy='raise'/'intersect'
         # TODO priority=None/<rf_name>
         # TODO method + optional scipy dependency?
+        ts_dtype = target_ts.dtype
         source_ts = source_ts.astype(float)
         target_ts = target_ts.astype(float)
 
@@ -203,7 +204,8 @@ class ReferenceFrame(NodeMixin):
         if target_ts[-1] > source_ts[-1]:
             target_ts = target_ts[target_ts <= source_ts[-1]]
 
-        return interp1d(source_ts, arr, axis=0)(target_ts), target_ts
+        return interp1d(source_ts, arr, axis=0)(target_ts), \
+               target_ts.astype(ts_dtype)
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_ts):

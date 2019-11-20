@@ -178,16 +178,26 @@ class TestReferenceFrame(object):
         arr = np.ones((10, 3))
 
         # float timestamps
-        source_ts = np.arange(10)
-        target_ts = np.arange(5) + 2.5
-        arr_int = rbm.ReferenceFrame._interpolate(arr, source_ts, target_ts)
+        ts1 = np.arange(10)
+        ts2 = np.arange(5) + 2.5
+        arr_int, _ = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
         npt.assert_allclose(arr_int, arr[:5])
 
+        # target range greater than source range
+        arr_int, _ = rbm.ReferenceFrame._interpolate(arr[:5], ts2, ts1)
+        npt.assert_allclose(arr_int, arr[:4])
+
         # datetime timestamps
-        source_ts = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
-        target_ts = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
-        arr_int = rbm.ReferenceFrame._interpolate(arr, source_ts, target_ts)
+        ts1 = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
+        ts2 = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
+        arr_int, _ = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
         npt.assert_allclose(arr_int, arr[:5])
+
+        # not sorted
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._interpolate(arr, ts1[::-1], ts2)
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._interpolate(arr, ts1, ts2[::-1])
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):

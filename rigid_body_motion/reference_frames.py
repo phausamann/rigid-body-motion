@@ -190,7 +190,20 @@ class ReferenceFrame(NodeMixin):
         # TODO method + optional scipy dependency?
         source_ts = source_ts.astype(float)
         target_ts = target_ts.astype(float)
-        return interp1d(source_ts, arr, axis=0)(target_ts)
+
+        # TODO sort somewhere and turn these into assertions
+        if np.any(np.diff(source_ts) < 0):
+            raise ValueError('source_ts is not sorted.')
+        if np.any(np.diff(target_ts) < 0):
+            raise ValueError('target_ts is not sorted.')
+
+        # TODO raise error when intersection is empty
+        if target_ts[0] < source_ts[0]:
+            target_ts = target_ts[target_ts >= source_ts[0]]
+        if target_ts[-1] > source_ts[-1]:
+            target_ts = target_ts[target_ts <= source_ts[-1]]
+
+        return interp1d(source_ts, arr, axis=0)(target_ts), target_ts
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_ts):
@@ -202,7 +215,7 @@ class ReferenceFrame(NodeMixin):
         elif arr_ts is None:
             return cls._broadcast(arr, rf_ts), rf_ts
         elif len(arr_ts) != len(rf_ts) or np.any(arr_ts != rf_ts):
-            return cls._interpolate(arr, arr_ts, rf_ts), rf_ts
+            return cls._interpolate(arr, arr_ts, rf_ts)
         else:
             return arr, rf_ts
 
@@ -218,9 +231,9 @@ class ReferenceFrame(NodeMixin):
                 r = cls._broadcast(r, rf.timestamps)
                 ts = rf.timestamps
             else:
-                translation = cls._interpolate(
+                translation, ts = cls._interpolate(
                     rf.translation, rf.timestamps, ts)
-                rotation = cls._interpolate(
+                rotation, ts = cls._interpolate(
                     rf.rotation, rf.timestamps, ts)
         else:
             translation = rf.translation

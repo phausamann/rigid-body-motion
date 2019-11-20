@@ -3,6 +3,7 @@ from numpy import testing as npt
 from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 import rigid_body_motion as rbm
@@ -93,6 +94,11 @@ class TestReferenceFrame(object):
         assert 'world' in rbm._rf_registry
         assert rbm._rf_registry['world'] is rf_world
 
+        # update=True
+        rf_world2 = rbm.ReferenceFrame('world')
+        rf_world2.register(update=True)
+        assert rbm._rf_registry['world'] is rf_world2
+
     def test_deregister(self):
         """"""
         rf_world = rbm.ReferenceFrame('world')
@@ -152,6 +158,22 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.translation, np.ones((10, 3)))
         npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
+
+    def test_interpolate(self):
+        """"""
+        arr = np.ones((10, 3))
+
+        # float timestamps
+        source_ts = np.arange(10)
+        target_ts = np.arange(5) + 2.5
+        arr_int = rbm.ReferenceFrame._interpolate(arr, source_ts, target_ts)
+        npt.assert_allclose(arr_int, arr[:5])
+
+        # datetime timestamps
+        source_ts = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
+        target_ts = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
+        arr_int = rbm.ReferenceFrame._interpolate(arr, source_ts, target_ts)
+        npt.assert_allclose(arr_int, arr[:5])
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):

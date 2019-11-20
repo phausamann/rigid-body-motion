@@ -177,6 +177,7 @@ class ReferenceFrame(NodeMixin):
     @classmethod
     def _broadcast(cls, arr, timestamps):
         """"""
+        # TODO test
         return np.tile(arr, (len(timestamps), 1))
 
     @classmethod
@@ -186,19 +187,24 @@ class ReferenceFrame(NodeMixin):
         # TODO specify time_axis as parameter
         # TODO policy='raise'/'intersect'
         # TODO priority=None/<rf_name>
-        # TODO method
+        # TODO method + optional scipy dependency?
+        source_ts = source_ts.astype(float)
+        target_ts = target_ts.astype(float)
         return interp1d(source_ts, arr, axis=0)(target_ts)
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_ts):
         """"""
+        # TODO test
         # TODO policy='from_arr'/'from_rf'
         if rf_ts is None:
             return arr, arr_ts
         elif arr_ts is None:
             return cls._broadcast(arr, rf_ts), rf_ts
-        else:
+        elif len(arr_ts) != len(rf_ts) or np.any(arr_ts != rf_ts):
             return cls._interpolate(arr, arr_ts, rf_ts), rf_ts
+        else:
+            return arr, rf_ts
 
     @classmethod
     def _add_transformation(cls, rf, t, r, ts, inverse=False):

@@ -7,7 +7,7 @@ from warnings import warn
 
 from rigid_body_motion.coordinate_systems import \
     cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical, \
-    spherical_to_cartesian
+    spherical_to_cartesian, _replace_dim
 from rigid_body_motion.reference_frames import \
     register_frame, deregister_frame, clear_registry, ReferenceFrame
 from rigid_body_motion.reference_frames import _registry as _rf_registry
@@ -215,7 +215,8 @@ def transform_quaternions(
         return arr
 
 
-def transform_coordinates(arr, outof=None, into=None, axis=-1):
+def transform_coordinates(
+        arr, outof=None, into=None, dim=None, axis=None, replace_dim=True):
     """ Transform motion between coordinate systems.
 
     Parameters
@@ -231,9 +232,19 @@ def transform_coordinates(arr, outof=None, into=None, axis=-1):
         The name of a coordinate system in which the array will be represented
         after the transformation.
 
-    axis: int, default -1
-        The axis of the array representing the coordinates of the angular or
-        linear motion.
+    dim: str, optional
+        If the array is a DataArray, the name of the dimension representing
+        the coordinates of the motion.
+
+    axis: int, optional
+        The axis of the array representing the coordinates of the motion.
+        Defaults to the last axis of the array.
+
+    replace_dim: bool, default True
+        If True and the array is a DataArray, replace the dimension
+        representing the coordinates by a new dimension that describes the
+        new coordinate system and its axes (e.g. ``cartesian_axis: [x, y, z]``.
+        All coordinates that contained the original dimension will be dropped.
 
     Returns
     -------
@@ -241,10 +252,23 @@ def transform_coordinates(arr, outof=None, into=None, axis=-1):
         The transformed array.
     """
     try:
-        return _cs_funcs[outof][into](arr, axis=axis)
+        transform_func = _cs_funcs[outof][into]
     except KeyError:
         raise ValueError(
             'Unsupported transformation: {} to {}.'.format(outof, into))
+
+    arr, axis, _, coords, dims = _maybe_unpack_dataarray(arr, dim, axis)
+
+    arr = transform_func(arr, axis=axis)
+
+    if coords is not None:
+        if replace_dim:
+            # TODO accept (name, coord) tuple
+            coords, dims = _replace_dim(
+                coords, dims, axis, into, arr.shape[axis])
+        return _make_dataarray(arr, coords, dims, None, None)
+    else:
+        return arr
 
 
 def transform(arr, outof=None, into=None, axis=-1, **kwargs):

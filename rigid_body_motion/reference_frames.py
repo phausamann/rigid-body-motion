@@ -204,8 +204,9 @@ class ReferenceFrame(NodeMixin):
         if target_ts[-1] > source_ts[-1]:
             target_ts = target_ts[target_ts <= source_ts[-1]]
 
-        return interp1d(source_ts, arr, axis=0)(target_ts), \
-               target_ts.astype(ts_dtype)
+        arr_interp = interp1d(source_ts, arr, axis=0)(target_ts)
+
+        return arr_interp, target_ts.astype(ts_dtype)
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_ts):

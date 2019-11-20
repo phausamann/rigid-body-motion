@@ -122,11 +122,26 @@ class TestTransform(object):
 
     def test_transform_coordinates(self):
         """"""
+        # ndarray
         arr = np.ones((10, 2))
         expected = np.tile((np.sqrt(2), np.pi/4), (10, 1))
         actual = rbm.transform_coordinates(
             arr, outof='cartesian', into='polar', axis=1)
         npt.assert_equal(actual, expected)
+
+        # DataArray
+        da = xr.DataArray(
+            np.ones((10, 3)),
+            {'time': np.arange(10), 'cartesian_axis': ['x', 'y', 'z']},
+            ('time', 'cartesian_axis'))
+        expected = xr.DataArray(
+            np.tile((1.732051, 0.955317, 0.785398), (10, 1)),
+            {'time': np.arange(10), 'spherical_axis': ['r', 'theta', 'phi']},
+            ('time', 'spherical_axis'))
+
+        actual = rbm.transform_coordinates(
+            da, outof='cartesian', into='spherical')
+        xr.testing.assert_allclose(actual, expected)
 
         with pytest.raises(ValueError):
             rbm.transform_coordinates(

@@ -59,6 +59,8 @@ def register_frame(
         The timestamps for translation and rotation of this frame. Not
         applicable if this is a static reference frame.
     """
+    # TODO make this a class with __call__, from_dataset etc. methods?
+    # TODO update=True/False
     rf = ReferenceFrame(
         name, parent=parent, translation=translation, rotation=rotation,
         timestamps=timestamps)
@@ -192,7 +194,8 @@ class ReferenceFrame(NodeMixin):
         source_ts = source_ts.astype(float)
         target_ts = target_ts.astype(float)
 
-        # TODO sort somewhere and turn these into assertions
+        # TODO sort somewhere and turn these into assertions or use min/max
+        #  with boolean indexing
         if np.any(np.diff(source_ts) < 0):
             raise ValueError('source_ts is not sorted.')
         if np.any(np.diff(target_ts) < 0):

@@ -20,6 +20,9 @@ def _replace_dim(coords, dims, axis, into, dimensionality):
         elif into == 'spherical':
             new_dim = 'spherical_axis'
             new_coord = ['r', 'theta', 'phi']
+        elif into == 'quaternion':
+            new_dim = 'quaternion_axis'
+            new_coord = ['w', 'x', 'y', 'z']
 
     dims = tuple((d if d != old_dim else new_dim) for d in dims)
 

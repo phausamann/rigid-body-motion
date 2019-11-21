@@ -40,6 +40,11 @@ class TestCoordinateSystems(object):
         assert new_coords['spherical_axis'] == ['r', 'theta', 'phi']
         assert new_dims == ('time', 'spherical_axis')
 
+        new_coords, new_dims = _replace_dim(coords, dims, -1, 'quaternion', 3)
+        assert set(new_coords.keys()) == set(new_dims)
+        assert new_coords['quaternion_axis'] == ['w', 'x', 'y', 'z']
+        assert new_dims == ('time', 'quaternion_axis')
+
     def test_cartesian_to_polar(self):
         """"""
         arr = np.ones((10, 2))

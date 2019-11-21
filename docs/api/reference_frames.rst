@@ -14,6 +14,8 @@ Construction
     :toctree: _generated
 
     ReferenceFrame.from_dataset
+    ReferenceFrame.from_translation_dataarray
+    ReferenceFrame.from_rotation_dataarray
     ReferenceFrame.from_rotation_matrix
 
 Transforms

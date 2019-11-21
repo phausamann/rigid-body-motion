@@ -288,7 +288,7 @@ class ReferenceFrame(NodeMixin):
     @classmethod
     def from_dataset(
             cls, ds, translation, rotation, timestamps, parent, name=None):
-        """ Construct a reference frame from an xarray.Dataset.
+        """ Construct a reference frame from a Dataset.
 
         Parameters
         ----------
@@ -321,6 +321,66 @@ class ReferenceFrame(NodeMixin):
         return cls(
             name, parent, ds[translation].data, ds[rotation].data,
             ds[timestamps].data)
+
+    @classmethod
+    def from_translation_dataarray(
+            cls, da, timestamps, parent, name=None):
+        """ Construct a reference frame from a translation DataArray.
+
+        Parameters
+        ----------
+        da: xarray DataArray
+            The array from which to construct the reference frame.
+
+        timestamps: str
+            The name of the variable or coordinate representing the
+            timestamps.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO raise errors here if dimensions etc. don't match
+        return cls(
+            name, parent, translation=da.data, timestamps=da[timestamps].data)
+
+    @classmethod
+    def from_rotation_dataarray(
+            cls, da, timestamps, parent, name=None):
+        """ Construct a reference frame from a rotation DataArray.
+
+        Parameters
+        ----------
+        da: xarray DataArray
+            The array from which to construct the reference frame.
+
+        timestamps: str
+            The name of the variable or coordinate representing the
+            timestamps.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO raise errors here if dimensions etc. don't match
+        return cls(
+            name, parent, rotation=da.data, timestamps=da[timestamps].data)
 
     @classmethod
     def from_rotation_matrix(cls, mat, parent, name=None):

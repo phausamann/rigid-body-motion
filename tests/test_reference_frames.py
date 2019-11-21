@@ -159,6 +159,30 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
+    def test_from_translation_datarray(self):
+        """"""
+        da = xr.DataArray(
+            np.ones((10, 3)), {'time': np.arange(10)}, ('time', 'axis'))
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_translation_dataarray(
+            da, 'time', rf_world)
+
+        npt.assert_equal(rf_child.translation, np.ones((10, 3)))
+        npt.assert_equal(rf_child.timestamps, np.arange(10))
+
+    def test_from_rotation_datarray(self):
+        """"""
+        da = xr.DataArray(
+            np.ones((10, 4)), {'time': np.arange(10)}, ('time', 'axis'))
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_rotation_dataarray(
+            da, 'time', rf_world)
+
+        npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
+        npt.assert_equal(rf_child.timestamps, np.arange(10))
+
     def test_from_rotation_matrix(self):
         """"""
         mat = np.array([[0., 0., -1.], [-1., 0., 0.], [0., 1., 0.]])

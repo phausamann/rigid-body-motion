@@ -16,10 +16,14 @@ def _register(rf, update=False):
     """ Register a reference frame. """
     if rf.name is None:
         raise ValueError('Reference frame name cannot be None.')
-    if rf.name in _registry and not update:
-        raise ValueError(
-            'Reference frame with name {} is already registered. Specify '
-            'update=True to overwrite.'.format(rf.name))
+    if rf.name in _registry:
+        if update:
+            # TODO keep children?
+            _registry[rf.name].parent = None
+        else:
+            raise ValueError(
+                'Reference frame with name {} is already registered. Specify '
+                'update=True to overwrite.'.format(rf.name))
     # TODO check if name is a cs transform
     _registry[rf.name] = rf
 
@@ -35,7 +39,7 @@ def _deregister(name):
 
 def register_frame(
         name, parent=None, translation=None, rotation=None, timestamps=None,
-        inverse=False):
+        inverse=False, update=False):
     """ Register a new reference frame in the registry.
 
     Parameters
@@ -64,13 +68,16 @@ def register_frame(
         If True, invert the transform wrt the parent frame, i.e. the
         translation and rotation are specified for the parent frame wrt this
         frame.
+
+    update: bool, default False
+        If True, overwrite if there is a frame with the same name in the
+        registry.
     """
     # TODO make this a class with __call__, from_dataset etc. methods?
-    # TODO update=True/False
     rf = ReferenceFrame(
         name, parent=parent, translation=translation, rotation=rotation,
         timestamps=timestamps, inverse=inverse)
-    _register(rf)
+    _register(rf, update=update)
 
 
 def deregister_frame(name):

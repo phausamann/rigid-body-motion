@@ -27,9 +27,12 @@ class TestReferenceFrameRegistry(object):
             _register(rf_world)
 
         # update=True
-        rf_world2 = rbm.ReferenceFrame('world')
-        _register(rf_world2, update=True)
-        assert rbm.registry['world'] is rf_world2
+        rf_child = rbm.ReferenceFrame('child', parent=rf_world)
+        _register(rf_child)
+        rf_child_new = rbm.ReferenceFrame('child', parent=rf_world)
+        _register(rf_child_new, update=True)
+        assert rbm.registry['child'] is rf_child_new
+        assert rbm.registry['child'].parent is rf_world
 
     def test_deregister(self):
         """"""

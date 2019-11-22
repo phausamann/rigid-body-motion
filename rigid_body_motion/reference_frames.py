@@ -34,7 +34,8 @@ def _deregister(name):
 
 
 def register_frame(
-        name, parent=None, translation=None, rotation=None, timestamps=None):
+        name, parent=None, translation=None, rotation=None, timestamps=None,
+        inverse=False):
     """ Register a new reference frame in the registry.
 
     Parameters
@@ -55,15 +56,20 @@ def register_frame(
         The rotation of this frame wrt the parent frame. Not
         applicable if there is no parent frame.
 
-    timestamps : array_like, optional
+    timestamps: array_like, optional
         The timestamps for translation and rotation of this frame. Not
         applicable if this is a static reference frame.
+
+    inverse: bool, default False
+        If True, invert the transform wrt the parent frame, i.e. the
+        translation and rotation are specified for the parent frame wrt this
+        frame.
     """
     # TODO make this a class with __call__, from_dataset etc. methods?
     # TODO update=True/False
     rf = ReferenceFrame(
         name, parent=parent, translation=translation, rotation=rotation,
-        timestamps=timestamps)
+        timestamps=timestamps, inverse=inverse)
     _register(rf)
 
 
@@ -87,7 +93,7 @@ class ReferenceFrame(NodeMixin):
     """ A three-dimensional reference frame. """
 
     def __init__(self, name=None, parent=None, translation=None, rotation=None,
-                 timestamps=None):
+                 timestamps=None, inverse=False):
         """ Constructor.
 
         Parameters
@@ -111,6 +117,11 @@ class ReferenceFrame(NodeMixin):
         timestamps : array_like, optional
             The timestamps for translation and rotation of this frame. Not
             applicable if this is a static reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            translation and rotation are specified for the parent frame wrt
+            this frame.
         """
         super(ReferenceFrame, self).__init__()
 
@@ -120,7 +131,7 @@ class ReferenceFrame(NodeMixin):
 
         if self.parent is not None:
             self.translation, self.rotation, self.timestamps = \
-                self._init_arrays(translation, rotation, timestamps)
+                self._init_arrays(translation, rotation, timestamps, inverse)
         else:
             self._verify_root(translation, rotation, timestamps)
             self.translation, self.rotation, self.timestamps = None, None, None
@@ -131,9 +142,8 @@ class ReferenceFrame(NodeMixin):
             _deregister(self.name)
 
     @staticmethod
-    def _init_arrays(translation, rotation, timestamps):
+    def _init_arrays(translation, rotation, timestamps, inverse):
         """ Initialize translation, rotation and timestamp arrays. """
-        # TODO test
         if timestamps is not None:
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
@@ -162,6 +172,11 @@ class ReferenceFrame(NodeMixin):
         else:
             rotation = np.zeros(r_shape)
             rotation[..., 0] = 1.
+
+        if inverse:
+            # TODO utils.qinv
+            rotation = as_float_array(1 / as_quat_array(rotation))
+            translation = -rotate_vectors(as_quat_array(rotation), translation)
 
         return translation, rotation, timestamps
 
@@ -287,7 +302,8 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def from_dataset(
-            cls, ds, translation, rotation, timestamps, parent, name=None):
+            cls, ds, translation, rotation, timestamps, parent, name=None,
+            inverse=False):
         """ Construct a reference frame from a Dataset.
 
         Parameters
@@ -296,10 +312,12 @@ class ReferenceFrame(NodeMixin):
             The dataset from which to construct the reference frame.
 
         translation: str
-            The name of the variable representing the translation.
+            The name of the variable representing the translation
+            wrt the parent frame.
 
         rotation: str
-            The name of the variable representing the rotation.
+            The name of the variable representing the rotation
+            wrt the parent frame.
 
         timestamps: str
             The name of the variable or coordinate representing the
@@ -311,6 +329,11 @@ class ReferenceFrame(NodeMixin):
 
         name: str, default None
             The name of the reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            translation and rotation are specified for the parent frame wrt
+            this frame.
 
         Returns
         -------
@@ -320,17 +343,18 @@ class ReferenceFrame(NodeMixin):
         # TODO raise errors here if dimensions etc. don't match
         return cls(
             name, parent, ds[translation].data, ds[rotation].data,
-            ds[timestamps].data)
+            ds[timestamps].data, inverse=inverse)
 
     @classmethod
     def from_translation_dataarray(
-            cls, da, timestamps, parent, name=None):
+            cls, da, timestamps, parent, name=None, inverse=False):
         """ Construct a reference frame from a translation DataArray.
 
         Parameters
         ----------
         da: xarray DataArray
-            The array from which to construct the reference frame.
+            The array that describes the translation of this frame
+            wrt the parent frame.
 
         timestamps: str
             The name of the variable or coordinate representing the
@@ -343,6 +367,10 @@ class ReferenceFrame(NodeMixin):
         name: str, default None
             The name of the reference frame.
 
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            translation is specified for the parent frame wrt this frame.
+
         Returns
         -------
         rf: ReferenceFrame
@@ -350,17 +378,19 @@ class ReferenceFrame(NodeMixin):
         """
         # TODO raise errors here if dimensions etc. don't match
         return cls(
-            name, parent, translation=da.data, timestamps=da[timestamps].data)
+            name, parent, translation=da.data, timestamps=da[timestamps].data,
+            inverse=inverse)
 
     @classmethod
     def from_rotation_dataarray(
-            cls, da, timestamps, parent, name=None):
+            cls, da, timestamps, parent, name=None, inverse=False):
         """ Construct a reference frame from a rotation DataArray.
 
         Parameters
         ----------
         da: xarray DataArray
-            The array from which to construct the reference frame.
+            The array that describes the rotation of this frame
+            wrt the parent frame.
 
         timestamps: str
             The name of the variable or coordinate representing the
@@ -373,6 +403,10 @@ class ReferenceFrame(NodeMixin):
         name: str, default None
             The name of the reference frame.
 
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            rotation is specified for the parent frame wrt this frame.
+
         Returns
         -------
         rf: ReferenceFrame
@@ -380,16 +414,18 @@ class ReferenceFrame(NodeMixin):
         """
         # TODO raise errors here if dimensions etc. don't match
         return cls(
-            name, parent, rotation=da.data, timestamps=da[timestamps].data)
+            name, parent, rotation=da.data, timestamps=da[timestamps].data,
+            inverse=inverse)
 
     @classmethod
-    def from_rotation_matrix(cls, mat, parent, name=None):
+    def from_rotation_matrix(cls, mat, parent, name=None, inverse=False):
         """ Construct a static reference frame from a rotation matrix.
 
         Parameters
         ----------
         mat: array_like, shape (3, 3)
-            The rotation matrix.
+            The rotation matrix that describes the rotation of this frame
+            wrt the parent frame.
 
         parent: str or ReferenceFrame
             The parent reference frame. If str, the frame will be looked up
@@ -397,6 +433,10 @@ class ReferenceFrame(NodeMixin):
 
         name: str, default None
             The name of the reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            rotation is specified for the parent frame wrt this frame.
 
         Returns
         -------
@@ -409,7 +449,8 @@ class ReferenceFrame(NodeMixin):
                 'Expected mat to have shape (3, 3), got {}'.format(mat.shape))
 
         return cls(
-            name, parent, rotation=as_float_array(from_rotation_matrix(mat)))
+            name, parent, rotation=as_float_array(from_rotation_matrix(mat)),
+            inverse=inverse)
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.

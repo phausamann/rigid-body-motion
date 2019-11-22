@@ -16,7 +16,7 @@ class TestReferenceFrameRegistry(object):
         """"""
         rf_world = rbm.ReferenceFrame('world')
         _register(rf_world)
-        assert rbm._rf_registry['world'] is rf_world
+        assert rbm.registry['world'] is rf_world
 
         # name is None
         with pytest.raises(ValueError):
@@ -29,12 +29,12 @@ class TestReferenceFrameRegistry(object):
         # update=True
         rf_world2 = rbm.ReferenceFrame('world')
         _register(rf_world2, update=True)
-        assert rbm._rf_registry['world'] is rf_world2
+        assert rbm.registry['world'] is rf_world2
 
     def test_deregister(self):
         """"""
         _deregister('world')
-        assert 'world' not in rbm._rf_registry
+        assert 'world' not in rbm.registry
 
         with pytest.raises(ValueError):
             _deregister('not_an_rf')
@@ -42,18 +42,18 @@ class TestReferenceFrameRegistry(object):
     def test_register_frame(self):
         """"""
         rbm.register_frame('world')
-        assert isinstance(rbm._rf_registry['world'], rbm.ReferenceFrame)
+        assert isinstance(rbm.registry['world'], rbm.ReferenceFrame)
 
     def test_deregister_frame(self):
         """"""
         rbm.deregister_frame('world')
-        assert 'world' not in rbm._rf_registry
+        assert 'world' not in rbm.registry
 
     def test_clear_registry(self):
         """"""
         rbm.register_frame('world')
         rbm.clear_registry()
-        assert len(rbm._rf_registry) == 0
+        assert len(rbm.registry) == 0
 
 
 class TestReferenceFrame(object):
@@ -83,9 +83,14 @@ class TestReferenceFrame(object):
         rf_world = rbm.ReferenceFrame('world')
         _register(rf_world)
         del rf_world
-        assert 'world' in rbm._rf_registry
-        del rbm._rf_registry['world']
-        assert 'world' not in rbm._rf_registry
+        assert 'world' in rbm.registry
+        del rbm.registry['world']
+        assert 'world' not in rbm.registry
+
+    def test_str(self):
+        """"""
+        rf_world = rbm.ReferenceFrame('world')
+        assert str(rf_world) == '<ReferenceFrame \'world\'>'
 
     def test_init_arrays(self):
         """"""
@@ -130,20 +135,20 @@ class TestReferenceFrame(object):
         """"""
         rf_world = rbm.ReferenceFrame('world')
         rf_world.register()
-        assert 'world' in rbm._rf_registry
-        assert rbm._rf_registry['world'] is rf_world
+        assert 'world' in rbm.registry
+        assert rbm.registry['world'] is rf_world
 
         # update=True
         rf_world2 = rbm.ReferenceFrame('world')
         rf_world2.register(update=True)
-        assert rbm._rf_registry['world'] is rf_world2
+        assert rbm.registry['world'] is rf_world2
 
     def test_deregister(self):
         """"""
         rf_world = rbm.ReferenceFrame('world')
         rf_world.register()
         rf_world.deregister()
-        assert 'world' not in rbm._rf_registry
+        assert 'world' not in rbm.registry
 
     def test_walk(self):
         """"""

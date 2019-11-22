@@ -10,7 +10,7 @@ from rigid_body_motion.coordinate_systems import \
     spherical_to_cartesian, _replace_dim
 from rigid_body_motion.reference_frames import \
     register_frame, deregister_frame, clear_registry, ReferenceFrame
-from rigid_body_motion.reference_frames import _registry as _rf_registry
+from rigid_body_motion.reference_frames import _registry as registry
 from rigid_body_motion.estimators import shortest_arc_rotation
 from rigid_body_motion.utils import \
     qmean, rotate_vectors, _maybe_unpack_dataarray, _make_dataarray, _resolve
@@ -296,11 +296,11 @@ def transform(arr, outof=None, into=None, axis=-1, **kwargs):
     arr_transformed: array_like
         The transformed array.
     """
-    if outof in _rf_registry:
+    if outof in registry:
         warn('transform for reference frame transformations is deprecated, '
              'use transform_points, transform_vectors or '
              'transform_quaternions instead.', DeprecationWarning)
-        transformation_func = _rf_registry[outof].get_transformation_func(into)
+        transformation_func = registry[outof].get_transformation_func(into)
     else:
         try:
             transformation_func = _cs_funcs[outof][into]

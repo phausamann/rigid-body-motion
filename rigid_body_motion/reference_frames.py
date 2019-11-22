@@ -141,6 +141,14 @@ class ReferenceFrame(NodeMixin):
         if self.name in _registry and _registry[self.name] is self:
             _deregister(self.name)
 
+    def __str__(self):
+        """ String representation. """
+        return '<ReferenceFrame \'{}\'>'.format(self.name)
+
+    def __repr__(self):
+        """ String representation. """
+        return self.__str__()
+
     @staticmethod
     def _init_arrays(translation, rotation, timestamps, inverse):
         """ Initialize translation, rotation and timestamp arrays. """

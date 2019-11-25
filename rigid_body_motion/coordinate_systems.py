@@ -2,6 +2,36 @@
 import numpy as np
 
 
+def _replace_dim(coords, dims, axis, into, dimensionality):
+    """ Replace the dimension after coordinate transformation """
+    old_dim = dims[axis]
+
+    if dimensionality == 2:
+        if into == 'cartesian':
+            new_dim = 'cartesian_axis'
+            new_coord = ['x', 'y']
+        elif into == 'polar':
+            new_dim = 'polar_axis'
+            new_coord = ['r', 'phi']
+    elif dimensionality == 3:
+        if into == 'cartesian':
+            new_dim = 'cartesian_axis'
+            new_coord = ['x', 'y', 'z']
+        elif into == 'spherical':
+            new_dim = 'spherical_axis'
+            new_coord = ['r', 'theta', 'phi']
+        elif into == 'quaternion':
+            new_dim = 'quaternion_axis'
+            new_coord = ['w', 'x', 'y', 'z']
+
+    dims = tuple((d if d != old_dim else new_dim) for d in dims)
+
+    coords = {c: coords[c] for c in coords if old_dim not in coords[c].dims}
+    coords[new_dim] = new_coord
+
+    return coords, dims
+
+
 def cartesian_to_polar(arr, axis=-1):
     """ Transform cartesian to polar coordinates in two dimensions.
 

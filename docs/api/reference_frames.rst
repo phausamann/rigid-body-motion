@@ -6,12 +6,36 @@ reference_frames
 ReferenceFrame
 --------------
 
+Construction
+~~~~~~~~~~~~
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    ReferenceFrame.from_dataset
+    ReferenceFrame.from_translation_dataarray
+    ReferenceFrame.from_rotation_dataarray
+    ReferenceFrame.from_rotation_matrix
+
+Transforms
+~~~~~~~~~~
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    ReferenceFrame.get_transformation
+    ReferenceFrame.transform_points
+    ReferenceFrame.transform_quaternions
+    ReferenceFrame.transform_vectors
+
+Registry
+~~~~~~~~
+
 .. autosummary::
     :nosignatures:
     :toctree: _generated
 
     ReferenceFrame.register
     ReferenceFrame.deregister
-    ReferenceFrame.get_transformation
-    ReferenceFrame.get_transformation_func
-    ReferenceFrame.get_transformation_matrix

@@ -5,7 +5,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 from anytree import NodeMixin, Walker
-from quaternion import as_quat_array, as_float_array
+from quaternion import as_quat_array, as_float_array, from_rotation_matrix
 
 from rigid_body_motion.utils import rotate_vectors, _resolve
 
@@ -16,10 +16,14 @@ def _register(rf, update=False):
     """ Register a reference frame. """
     if rf.name is None:
         raise ValueError('Reference frame name cannot be None.')
-    if rf.name in _registry and not update:
-        raise ValueError(
-            'Reference frame with name {} is already registered. Specify '
-            'update=True to overwrite.'.format(rf.name))
+    if rf.name in _registry:
+        if update:
+            # TODO keep children?
+            _registry[rf.name].parent = None
+        else:
+            raise ValueError(
+                'Reference frame with name {} is already registered. Specify '
+                'update=True to overwrite.'.format(rf.name))
     # TODO check if name is a cs transform
     _registry[rf.name] = rf
 
@@ -34,7 +38,8 @@ def _deregister(name):
 
 
 def register_frame(
-        name, parent=None, translation=None, rotation=None, timestamps=None):
+        name, parent=None, translation=None, rotation=None, timestamps=None,
+        inverse=False, update=False):
     """ Register a new reference frame in the registry.
 
     Parameters
@@ -55,14 +60,24 @@ def register_frame(
         The rotation of this frame wrt the parent frame. Not
         applicable if there is no parent frame.
 
-    timestamps : array_like, optional
+    timestamps: array_like, optional
         The timestamps for translation and rotation of this frame. Not
         applicable if this is a static reference frame.
+
+    inverse: bool, default False
+        If True, invert the transform wrt the parent frame, i.e. the
+        translation and rotation are specified for the parent frame wrt this
+        frame.
+
+    update: bool, default False
+        If True, overwrite if there is a frame with the same name in the
+        registry.
     """
+    # TODO make this a class with __call__, from_dataset etc. methods?
     rf = ReferenceFrame(
         name, parent=parent, translation=translation, rotation=rotation,
-        timestamps=timestamps)
-    _register(rf)
+        timestamps=timestamps, inverse=inverse)
+    _register(rf, update=update)
 
 
 def deregister_frame(name):
@@ -85,7 +100,7 @@ class ReferenceFrame(NodeMixin):
     """ A three-dimensional reference frame. """
 
     def __init__(self, name=None, parent=None, translation=None, rotation=None,
-                 timestamps=None):
+                 timestamps=None, inverse=False):
         """ Constructor.
 
         Parameters
@@ -109,6 +124,11 @@ class ReferenceFrame(NodeMixin):
         timestamps : array_like, optional
             The timestamps for translation and rotation of this frame. Not
             applicable if this is a static reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            translation and rotation are specified for the parent frame wrt
+            this frame.
         """
         super(ReferenceFrame, self).__init__()
 
@@ -118,7 +138,7 @@ class ReferenceFrame(NodeMixin):
 
         if self.parent is not None:
             self.translation, self.rotation, self.timestamps = \
-                self._init_arrays(translation, rotation, timestamps)
+                self._init_arrays(translation, rotation, timestamps, inverse)
         else:
             self._verify_root(translation, rotation, timestamps)
             self.translation, self.rotation, self.timestamps = None, None, None
@@ -128,10 +148,17 @@ class ReferenceFrame(NodeMixin):
         if self.name in _registry and _registry[self.name] is self:
             _deregister(self.name)
 
+    def __str__(self):
+        """ String representation. """
+        return '<ReferenceFrame \'{}\'>'.format(self.name)
+
+    def __repr__(self):
+        """ String representation. """
+        return self.__str__()
+
     @staticmethod
-    def _init_arrays(translation, rotation, timestamps):
+    def _init_arrays(translation, rotation, timestamps, inverse):
         """ Initialize translation, rotation and timestamp arrays. """
-        # TODO test
         if timestamps is not None:
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
@@ -161,6 +188,11 @@ class ReferenceFrame(NodeMixin):
             rotation = np.zeros(r_shape)
             rotation[..., 0] = 1.
 
+        if inverse:
+            # TODO utils.qinv
+            rotation = as_float_array(1 / as_quat_array(rotation))
+            translation = -rotate_vectors(as_quat_array(rotation), translation)
+
         return translation, rotation, timestamps
 
     @staticmethod
@@ -177,6 +209,7 @@ class ReferenceFrame(NodeMixin):
     @classmethod
     def _broadcast(cls, arr, timestamps):
         """"""
+        # TODO test
         return np.tile(arr, (len(timestamps), 1))
 
     @classmethod
@@ -186,19 +219,41 @@ class ReferenceFrame(NodeMixin):
         # TODO specify time_axis as parameter
         # TODO policy='raise'/'intersect'
         # TODO priority=None/<rf_name>
-        # TODO method
-        return interp1d(source_ts, arr, axis=0)(target_ts)
+        # TODO method + optional scipy dependency?
+        ts_dtype = target_ts.dtype
+        source_ts = source_ts.astype(float)
+        target_ts = target_ts.astype(float)
+
+        # TODO sort somewhere and turn these into assertions or use min/max
+        #  with boolean indexing
+        if np.any(np.diff(source_ts) < 0):
+            raise ValueError('source_ts is not sorted.')
+        if np.any(np.diff(target_ts) < 0):
+            raise ValueError('target_ts is not sorted.')
+
+        # TODO raise error when intersection is empty
+        if target_ts[0] < source_ts[0]:
+            target_ts = target_ts[target_ts >= source_ts[0]]
+        if target_ts[-1] > source_ts[-1]:
+            target_ts = target_ts[target_ts <= source_ts[-1]]
+
+        arr_interp = interp1d(source_ts, arr, axis=0)(target_ts)
+
+        return arr_interp, target_ts.astype(ts_dtype)
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_ts):
         """"""
+        # TODO test
         # TODO policy='from_arr'/'from_rf'
         if rf_ts is None:
             return arr, arr_ts
         elif arr_ts is None:
             return cls._broadcast(arr, rf_ts), rf_ts
+        elif len(arr_ts) != len(rf_ts) or np.any(arr_ts != rf_ts):
+            return cls._interpolate(arr, arr_ts, rf_ts)
         else:
-            return cls._interpolate(arr, arr_ts, rf_ts), rf_ts
+            return arr, rf_ts
 
     @classmethod
     def _add_transformation(cls, rf, t, r, ts, inverse=False):
@@ -212,9 +267,9 @@ class ReferenceFrame(NodeMixin):
                 r = cls._broadcast(r, rf.timestamps)
                 ts = rf.timestamps
             else:
-                translation = cls._interpolate(
+                translation, ts = cls._interpolate(
                     rf.translation, rf.timestamps, ts)
-                rotation = cls._interpolate(
+                rotation, ts = cls._interpolate(
                     rf.rotation, rf.timestamps, ts)
         else:
             translation = rf.translation
@@ -262,8 +317,9 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def from_dataset(
-            cls, ds, translation, rotation, timestamps, parent, name=None):
-        """ Construct a reference frame from an xarray.Dataset.
+            cls, ds, translation, rotation, timestamps, parent, name=None,
+            inverse=False):
+        """ Construct a reference frame from a Dataset.
 
         Parameters
         ----------
@@ -271,10 +327,12 @@ class ReferenceFrame(NodeMixin):
             The dataset from which to construct the reference frame.
 
         translation: str
-            The name of the variable representing the translation.
+            The name of the variable representing the translation
+            wrt the parent frame.
 
         rotation: str
-            The name of the variable representing the rotation.
+            The name of the variable representing the rotation
+            wrt the parent frame.
 
         timestamps: str
             The name of the variable or coordinate representing the
@@ -287,6 +345,11 @@ class ReferenceFrame(NodeMixin):
         name: str, default None
             The name of the reference frame.
 
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            translation and rotation are specified for the parent frame wrt
+            this frame.
+
         Returns
         -------
         rf: ReferenceFrame
@@ -295,7 +358,114 @@ class ReferenceFrame(NodeMixin):
         # TODO raise errors here if dimensions etc. don't match
         return cls(
             name, parent, ds[translation].data, ds[rotation].data,
-            ds[timestamps].data)
+            ds[timestamps].data, inverse=inverse)
+
+    @classmethod
+    def from_translation_dataarray(
+            cls, da, timestamps, parent, name=None, inverse=False):
+        """ Construct a reference frame from a translation DataArray.
+
+        Parameters
+        ----------
+        da: xarray DataArray
+            The array that describes the translation of this frame
+            wrt the parent frame.
+
+        timestamps: str
+            The name of the variable or coordinate representing the
+            timestamps.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            translation is specified for the parent frame wrt this frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO raise errors here if dimensions etc. don't match
+        return cls(
+            name, parent, translation=da.data, timestamps=da[timestamps].data,
+            inverse=inverse)
+
+    @classmethod
+    def from_rotation_dataarray(
+            cls, da, timestamps, parent, name=None, inverse=False):
+        """ Construct a reference frame from a rotation DataArray.
+
+        Parameters
+        ----------
+        da: xarray DataArray
+            The array that describes the rotation of this frame
+            wrt the parent frame.
+
+        timestamps: str
+            The name of the variable or coordinate representing the
+            timestamps.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            rotation is specified for the parent frame wrt this frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO raise errors here if dimensions etc. don't match
+        return cls(
+            name, parent, rotation=da.data, timestamps=da[timestamps].data,
+            inverse=inverse)
+
+    @classmethod
+    def from_rotation_matrix(cls, mat, parent, name=None, inverse=False):
+        """ Construct a static reference frame from a rotation matrix.
+
+        Parameters
+        ----------
+        mat: array_like, shape (3, 3)
+            The rotation matrix that describes the rotation of this frame
+            wrt the parent frame.
+
+        parent: str or ReferenceFrame
+            The parent reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        name: str, default None
+            The name of the reference frame.
+
+        inverse: bool, default False
+            If True, invert the transform wrt the parent frame, i.e. the
+            rotation is specified for the parent frame wrt this frame.
+
+        Returns
+        -------
+        rf: ReferenceFrame
+            The constructed reference frame.
+        """
+        # TODO support moving reference frame
+        if mat.shape != (3, 3):
+            raise ValueError(
+                'Expected mat to have shape (3, 3), got {}'.format(mat.shape))
+
+        return cls(
+            name, parent, rotation=as_float_array(from_rotation_matrix(mat)),
+            inverse=inverse)
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.

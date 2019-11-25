@@ -3,6 +3,7 @@ from numpy import testing as npt
 from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 import rigid_body_motion as rbm
@@ -15,7 +16,7 @@ class TestReferenceFrameRegistry(object):
         """"""
         rf_world = rbm.ReferenceFrame('world')
         _register(rf_world)
-        assert rbm._rf_registry['world'] is rf_world
+        assert rbm.registry['world'] is rf_world
 
         # name is None
         with pytest.raises(ValueError):
@@ -26,14 +27,17 @@ class TestReferenceFrameRegistry(object):
             _register(rf_world)
 
         # update=True
-        rf_world2 = rbm.ReferenceFrame('world')
-        _register(rf_world2, update=True)
-        assert rbm._rf_registry['world'] is rf_world2
+        rf_child = rbm.ReferenceFrame('child', parent=rf_world)
+        _register(rf_child)
+        rf_child_new = rbm.ReferenceFrame('child', parent=rf_world)
+        _register(rf_child_new, update=True)
+        assert rbm.registry['child'] is rf_child_new
+        assert rbm.registry['child'].parent is rf_world
 
     def test_deregister(self):
         """"""
         _deregister('world')
-        assert 'world' not in rbm._rf_registry
+        assert 'world' not in rbm.registry
 
         with pytest.raises(ValueError):
             _deregister('not_an_rf')
@@ -41,18 +45,18 @@ class TestReferenceFrameRegistry(object):
     def test_register_frame(self):
         """"""
         rbm.register_frame('world')
-        assert isinstance(rbm._rf_registry['world'], rbm.ReferenceFrame)
+        assert isinstance(rbm.registry['world'], rbm.ReferenceFrame)
 
     def test_deregister_frame(self):
         """"""
         rbm.deregister_frame('world')
-        assert 'world' not in rbm._rf_registry
+        assert 'world' not in rbm.registry
 
     def test_clear_registry(self):
         """"""
         rbm.register_frame('world')
         rbm.clear_registry()
-        assert len(rbm._rf_registry) == 0
+        assert len(rbm.registry) == 0
 
 
 class TestReferenceFrame(object):
@@ -82,23 +86,72 @@ class TestReferenceFrame(object):
         rf_world = rbm.ReferenceFrame('world')
         _register(rf_world)
         del rf_world
-        assert 'world' in rbm._rf_registry
-        del rbm._rf_registry['world']
-        assert 'world' not in rbm._rf_registry
+        assert 'world' in rbm.registry
+        del rbm.registry['world']
+        assert 'world' not in rbm.registry
+
+    def test_str(self):
+        """"""
+        rf_world = rbm.ReferenceFrame('world')
+        assert str(rf_world) == '<ReferenceFrame \'world\'>'
+
+    def test_init_arrays(self):
+        """"""
+        # tuples
+        t, r, ts = rbm.ReferenceFrame._init_arrays(
+            (1., 1., 1.), (1., 0., 0., 0.), None, False)
+        assert isinstance(t, np.ndarray)
+        assert isinstance(r, np.ndarray)
+        assert ts is None
+
+        # nothing
+        t, r, ts = rbm.ReferenceFrame._init_arrays(None, None, None, False)
+        npt.assert_equal(t, (0., 0., 0.))
+        npt.assert_equal(r, (1., 0., 0., 0.))
+        assert ts is None
+
+        # timestamps
+        t, r, ts = rbm.ReferenceFrame._init_arrays(
+            np.ones((10, 3)), np.ones((10, 4)), np.arange(10), False)
+        npt.assert_equal(t, np.ones((10, 3)))
+        npt.assert_equal(r, np.ones((10, 4)))
+        npt.assert_equal(ts, np.arange(10))
+
+        # timestamps not 1d
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._init_arrays(None, None, np.ones((5, 5)), False)
+
+        # wrong r/t shape
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._init_arrays(np.ones((5, 3)), None, None, False)
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._init_arrays(None, np.ones((5, 3)), None, False)
+
+        # inverse
+        t, r, ts = rbm.ReferenceFrame._init_arrays(
+            (1., 1., 1.), (0., 0., 0., 1.), None, True)
+        npt.assert_allclose(t, (1., 1., -1.))
+        npt.assert_allclose(r, (0., 0., 0., -1.))
+        assert ts is None
 
     def test_register(self):
         """"""
         rf_world = rbm.ReferenceFrame('world')
         rf_world.register()
-        assert 'world' in rbm._rf_registry
-        assert rbm._rf_registry['world'] is rf_world
+        assert 'world' in rbm.registry
+        assert rbm.registry['world'] is rf_world
+
+        # update=True
+        rf_world2 = rbm.ReferenceFrame('world')
+        rf_world2.register(update=True)
+        assert rbm.registry['world'] is rf_world2
 
     def test_deregister(self):
         """"""
         rf_world = rbm.ReferenceFrame('world')
         rf_world.register()
         rf_world.deregister()
-        assert 'world' not in rbm._rf_registry
+        assert 'world' not in rbm.registry
 
     def test_walk(self):
         """"""
@@ -153,6 +206,71 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
+    def test_from_translation_datarray(self):
+        """"""
+        da = xr.DataArray(
+            np.ones((10, 3)), {'time': np.arange(10)}, ('time', 'axis'))
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_translation_dataarray(
+            da, 'time', rf_world)
+
+        npt.assert_equal(rf_child.translation, np.ones((10, 3)))
+        npt.assert_equal(rf_child.timestamps, np.arange(10))
+
+    def test_from_rotation_datarray(self):
+        """"""
+        da = xr.DataArray(
+            np.ones((10, 4)), {'time': np.arange(10)}, ('time', 'axis'))
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_rotation_dataarray(
+            da, 'time', rf_world)
+
+        npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
+        npt.assert_equal(rf_child.timestamps, np.arange(10))
+
+    def test_from_rotation_matrix(self):
+        """"""
+        mat = np.array([[0., 0., -1.], [-1., 0., 0.], [0., 1., 0.]])
+
+        rf_world = rbm.ReferenceFrame('world')
+        rf_child = rbm.ReferenceFrame.from_rotation_matrix(mat, rf_world)
+
+        npt.assert_equal(rf_child.translation, (0., 0., 0.))
+        npt.assert_allclose(rf_child.rotation, (-0.5, -0.5,  0.5,  0.5))
+        assert rf_child.timestamps is None
+
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame.from_rotation_matrix(np.zeros((4, 4)), rf_world)
+
+    def test_interpolate(self):
+        """"""
+        arr = np.ones((10, 3))
+
+        # float timestamps
+        ts1 = np.arange(10)
+        ts2 = np.arange(5) + 2.5
+        arr_int, _ = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
+        npt.assert_allclose(arr_int, arr[:5])
+
+        # target range greater than source range
+        arr_int, _ = rbm.ReferenceFrame._interpolate(arr[:5], ts2, ts1)
+        npt.assert_allclose(arr_int, arr[:4])
+
+        # datetime timestamps
+        ts1 = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
+        ts2 = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
+        arr_int, ts_out = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
+        npt.assert_allclose(arr_int, arr[:5])
+        assert ts_out.dtype == ts1.dtype
+
+        # not sorted
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._interpolate(arr, ts1[::-1], ts2)
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._interpolate(arr, ts1, ts2[::-1])
+
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):
         """"""
@@ -168,6 +286,14 @@ class TestReferenceFrame(object):
         t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)
+        assert ts is None
+
+        # inverse
+        rf_child1_inv = rbm.ReferenceFrame(
+            parent=rf_world, translation=tc1, rotation=rc1, inverse=True)
+        t_act, r_act, ts = rf_world.get_transformation(rf_child1_inv)
+        npt.assert_almost_equal(t_act, tc1)
+        npt.assert_almost_equal(r_act, rc1)
         assert ts is None
 
         # with timestamps
@@ -245,11 +371,11 @@ class TestReferenceFrame(object):
                              transform_test_grid())
     def test_transform_points(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
-        _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
+        rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
         rf_child3 = rbm.ReferenceFrame(
             'child3', rf_child1, timestamps=np.arange(5) + 2.5)
 
-        # static reference frame + single vector
+        # static reference frame + single point
         pt_act = rf_child1.transform_points(p, rf_child2)
         np.testing.assert_allclose(pt_act, pt)
 

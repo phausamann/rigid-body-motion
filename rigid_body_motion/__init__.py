@@ -89,14 +89,15 @@ def transform_vectors(
     ts: array_like
         The timestamps after the transformation.
     """
-    arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
+    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
     arr, ts_out = _resolve(outof).transform_vectors(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
-        return _make_dataarray(arr, coords, dims, timestamps, ts_out)
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out)
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
         #  parameter and do this when return_timestamps=None
@@ -144,14 +145,15 @@ def transform_points(
     ts: array_like
         The timestamps after the transformation.
     """
-    arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
+    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
     arr, ts_out = _resolve(outof).transform_points(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
-        return _make_dataarray(arr, coords, dims, timestamps, ts_out)
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out)
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
         #  parameter and do this when return_timestamps=None
@@ -199,14 +201,15 @@ def transform_quaternions(
     ts: array_like
         The timestamps after the transformation.
     """
-    arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
+    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
     arr, ts_out = _resolve(outof).transform_quaternions(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
-        return _make_dataarray(arr, coords, dims, timestamps, ts_out)
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out)
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
         #  parameter and do this when return_timestamps=None
@@ -257,7 +260,8 @@ def transform_coordinates(
         raise ValueError(
             'Unsupported transformation: {} to {}.'.format(outof, into))
 
-    arr, axis, _, coords, dims = _maybe_unpack_dataarray(arr, dim, axis)
+    arr, axis, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
+        arr, dim, axis)
 
     arr = transform_func(arr, axis=axis)
 
@@ -266,7 +270,7 @@ def transform_coordinates(
             # TODO accept (name, coord) tuple
             coords, dims = _replace_dim(
                 coords, dims, axis, into, arr.shape[axis])
-        return _make_dataarray(arr, coords, dims, None, None)
+        return _make_dataarray(arr, coords, dims, name, attrs, None, None)
     else:
         return arr
 
@@ -296,10 +300,11 @@ def transform(arr, outof=None, into=None, axis=-1, **kwargs):
     arr_transformed: array_like
         The transformed array.
     """
+    warn('transform is deprecated, use transform_points, transform_vectors '
+         'transform_quaternions or transform_coordinates instead.',
+         DeprecationWarning)
+
     if outof in registry:
-        warn('transform for reference frame transformations is deprecated, '
-             'use transform_points, transform_vectors or '
-             'transform_quaternions instead.', DeprecationWarning)
         transformation_func = registry[outof].get_transformation_func(into)
     else:
         try:

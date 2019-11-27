@@ -174,6 +174,8 @@ def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
         axis = axis or -1
         coords = None
         dims = None
+        name = None
+        attrs = None
     else:
         if dim is not None and axis is not None:
             raise ValueError('You can either specify the dim or the axis '
@@ -192,12 +194,14 @@ def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
                 'timestamps argument must be dimension name or None.')
         coords = dict(arr.coords)
         dims = arr.dims
+        name = arr.name
+        attrs = arr.attrs
         arr = arr.data
 
-    return arr, axis, timestamps, coords, dims
+    return arr, axis, timestamps, coords, dims, name, attrs
 
 
-def _make_dataarray(arr, coords, dims, ts_arg, ts_out):
+def _make_dataarray(arr, coords, dims, name, attrs, ts_arg, ts_out):
     """ Make DataArray out of transformation results. """
     # TODO name?
     import xarray as xr
@@ -227,7 +231,7 @@ def _make_dataarray(arr, coords, dims, ts_arg, ts_out):
         raise NotImplementedError(
             'timestamps argument must be dimension name or None')
 
-    return xr.DataArray(arr, coords, dims)
+    return xr.DataArray(arr, coords, dims, name, attrs)
 
 
 def _resolve(rf):

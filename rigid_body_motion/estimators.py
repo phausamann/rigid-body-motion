@@ -30,7 +30,8 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
         The quaternion representation of the shortest-arc rotation.
     """
     # TODO accept tuple for v2
-    v1, axis, _, coords, dims = _maybe_unpack_dataarray(v1, dim, axis, None)
+    v1, axis, _, coords, dims, name, attrs = \
+        _maybe_unpack_dataarray(v1, dim, axis, None)
 
     sn1 = np.sum(v1 ** 2, axis=axis, keepdims=True)
     sn2 = np.sum(v2 ** 2, axis=axis, keepdims=True)
@@ -41,6 +42,6 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
 
     if coords is not None:
         coords, dims = _replace_dim(coords, dims, axis, 'quaternion', 3)
-        return _make_dataarray(q, coords, dims, None, None)
+        return _make_dataarray(q, coords, dims, name, attrs, None, None)
     else:
         return q

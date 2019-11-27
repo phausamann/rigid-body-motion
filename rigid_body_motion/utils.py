@@ -166,6 +166,7 @@ def is_dataset(obj, require_attrs=None):
 
 def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
     """ If input is DataArray, unpack into data, coords and dims. """
+    # TODO name?
     if not is_dataarray(arr):
         if dim is not None:
             raise ValueError(
@@ -198,6 +199,7 @@ def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
 
 def _make_dataarray(arr, coords, dims, ts_arg, ts_out):
     """ Make DataArray out of transformation results. """
+    # TODO name?
     import xarray as xr
 
     if ts_arg is None:

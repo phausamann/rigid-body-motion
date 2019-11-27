@@ -33,6 +33,7 @@ class TestReferenceFrameRegistry(object):
         _register(rf_child_new, update=True)
         assert rbm.registry['child'] is rf_child_new
         assert rbm.registry['child'].parent is rf_world
+        assert rbm.registry['world'].children == (rf_child_new,)
 
     def test_deregister(self):
         """"""
@@ -246,30 +247,40 @@ class TestReferenceFrame(object):
 
     def test_interpolate(self):
         """"""
-        arr = np.ones((10, 3))
+        arr1 = np.ones((10, 3))
+        ts1 = np.arange(10)
+        arr2 = np.ones((5, 3))
+        ts2 = np.arange(5) + 2.5
 
         # float timestamps
-        ts1 = np.arange(10)
-        ts2 = np.arange(5) + 2.5
-        arr_int, _ = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
-        npt.assert_allclose(arr_int, arr[:5])
+        arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
+            arr1, arr2, ts1, ts2)
+        npt.assert_allclose(arr1_int, arr1[:5])
+        npt.assert_allclose(arr2_int, arr2)
+        npt.assert_allclose(ts_out, ts2)
 
         # target range greater than source range
-        arr_int, _ = rbm.ReferenceFrame._interpolate(arr[:5], ts2, ts1)
-        npt.assert_allclose(arr_int, arr[:4])
+        arr2_int, arr1_int, ts_out = rbm.ReferenceFrame._interpolate(
+            arr2, arr1, ts2, ts1)
+        npt.assert_allclose(arr2_int, arr2[:-1])
+        npt.assert_allclose(arr1_int, arr1[:4])
+        npt.assert_allclose(ts_out, ts1[3:7])
 
         # datetime timestamps
         ts1 = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
         ts2 = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
-        arr_int, ts_out = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
-        npt.assert_allclose(arr_int, arr[:5])
+        arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
+            arr1, arr2, ts1, ts2)
+        npt.assert_allclose(arr1_int, arr1[:5])
+        npt.assert_allclose(arr2_int, arr2)
+        npt.assert_allclose(ts_out.astype(float), ts1[:5].astype(float))
         assert ts_out.dtype == ts1.dtype
 
         # not sorted
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr, ts1[::-1], ts2)
+            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1[::-1], ts2)
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr, ts1, ts2[::-1])
+            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):

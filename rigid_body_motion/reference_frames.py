@@ -213,11 +213,10 @@ class ReferenceFrame(NodeMixin):
         return np.tile(arr, (len(timestamps), 1))
 
     @classmethod
-    def _interpolate(cls, arr, source_ts, target_ts):
+    def _interpolate(cls, source_arr, target_arr, source_ts, target_ts):
         """"""
         # TODO SLERP for quaternions
         # TODO specify time_axis as parameter
-        # TODO policy='raise'/'intersect'
         # TODO priority=None/<rf_name>
         # TODO method + optional scipy dependency?
         ts_dtype = target_ts.dtype
@@ -233,27 +232,33 @@ class ReferenceFrame(NodeMixin):
 
         # TODO raise error when intersection is empty
         if target_ts[0] < source_ts[0]:
+            target_arr = target_arr[target_ts >= source_ts[0]]
             target_ts = target_ts[target_ts >= source_ts[0]]
         if target_ts[-1] > source_ts[-1]:
+            target_arr = target_arr[target_ts <= source_ts[-1]]
             target_ts = target_ts[target_ts <= source_ts[-1]]
 
-        arr_interp = interp1d(source_ts, arr, axis=0)(target_ts)
+        source_arr_interp = interp1d(source_ts, source_arr, axis=0)(target_ts)
 
-        return arr_interp, target_ts.astype(ts_dtype)
+        return source_arr_interp, target_arr, target_ts.astype(ts_dtype)
 
     @classmethod
-    def _match_timestamps(cls, arr, arr_ts, rf_ts):
+    def _match_timestamps(cls, arr, arr_ts, rf_t, rf_r, rf_ts):
         """"""
         # TODO test
         # TODO policy='from_arr'/'from_rf'
         if rf_ts is None:
-            return arr, arr_ts
+            return arr, rf_t, rf_r, arr_ts
         elif arr_ts is None:
-            return cls._broadcast(arr, rf_ts), rf_ts
+            return cls._broadcast(arr, rf_ts), rf_t, rf_r, rf_ts
         elif len(arr_ts) != len(rf_ts) or np.any(arr_ts != rf_ts):
-            return cls._interpolate(arr, arr_ts, rf_ts)
+            # abuse interpolate by stacking t and r and splitting afterwards
+            rf_tr = np.hstack((rf_t, rf_r))
+            arr, rf_tr, rf_ts = cls._interpolate(arr, rf_tr, arr_ts, rf_ts)
+            rf_t, rf_r = np.hsplit(rf_tr, [3])
+            return arr, rf_t, rf_r, rf_ts
         else:
-            return arr, rf_ts
+            return arr, rf_t, rf_r, rf_ts
 
     @classmethod
     def _add_transformation(cls, rf, t, r, ts, inverse=False):
@@ -265,15 +270,16 @@ class ReferenceFrame(NodeMixin):
                 rotation = rf.rotation
                 t = cls._broadcast(t, rf.timestamps)
                 r = cls._broadcast(r, rf.timestamps)
-                ts = rf.timestamps
+                ts_new = rf.timestamps
             else:
-                translation, ts = cls._interpolate(
-                    rf.translation, rf.timestamps, ts)
-                rotation, ts = cls._interpolate(
-                    rf.rotation, rf.timestamps, ts)
+                translation, t, ts_new = cls._interpolate(
+                    rf.translation, t, rf.timestamps, ts)
+                rotation, r, ts_new = cls._interpolate(
+                    rf.rotation, r, rf.timestamps, ts)
         else:
             translation = rf.translation
             rotation = rf.rotation
+            ts_new = ts
 
         if inverse:
             q = 1 / as_quat_array(rotation)
@@ -284,7 +290,7 @@ class ReferenceFrame(NodeMixin):
             dt = np.array(translation)
             t = rotate_vectors(q, t) + dt
 
-        return t, as_float_array(q * as_quat_array(r)), ts
+        return t, as_float_array(q * as_quat_array(r)), ts_new
 
     @classmethod
     def _validate_input(cls, arr, axis, n_axis, timestamps):
@@ -588,9 +594,9 @@ class ReferenceFrame(NodeMixin):
         """
         arr, arr_ts = self._validate_input(arr, axis, 3, timestamps)
 
-        _, r, rf_ts = self.get_transformation(to_frame)
+        t, r, rf_ts = self.get_transformation(to_frame)
 
-        arr, ts = self._match_timestamps(arr, arr_ts, rf_ts)
+        arr, _, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
 
         if not return_timestamps:
@@ -636,7 +642,7 @@ class ReferenceFrame(NodeMixin):
 
         t, r, rf_ts = self.get_transformation(to_frame)
 
-        arr, ts = self._match_timestamps(arr, arr_ts, rf_ts)
+        arr, t, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
         arr = arr + np.array(t)
 
@@ -682,9 +688,9 @@ class ReferenceFrame(NodeMixin):
         """
         arr, arr_ts = self._validate_input(arr, axis, 4, timestamps)
 
-        _, r, rf_ts = self.get_transformation(to_frame)
+        t, r, rf_ts = self.get_transformation(to_frame)
 
-        arr, ts = self._match_timestamps(arr, arr_ts, rf_ts)
+        arr, _, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
         arr = np.swapaxes(arr, axis, -1)
         arr = as_quat_array(r) * as_quat_array(arr)
         arr = np.swapaxes(as_float_array(arr), -1, axis)

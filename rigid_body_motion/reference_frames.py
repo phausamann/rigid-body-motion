@@ -7,7 +7,8 @@ from scipy.interpolate import interp1d
 from anytree import NodeMixin, Walker
 from quaternion import as_quat_array, as_float_array, from_rotation_matrix
 
-from rigid_body_motion.utils import rotate_vectors, _resolve
+from rigid_body_motion.utils import rotate_vectors
+from rigid_body_motion.core import _resolve_rf
 
 _registry = {}
 
@@ -134,7 +135,7 @@ class ReferenceFrame(NodeMixin):
 
         # TODO check name requirement
         self.name = name
-        self.parent = _resolve(parent)
+        self.parent = _resolve_rf(parent)
 
         if self.parent is not None:
             self.translation, self.rotation, self.timestamps = \
@@ -316,7 +317,7 @@ class ReferenceFrame(NodeMixin):
 
     def _walk(self, to_rf):
         """ Walk from this frame to a target frame along the tree. """
-        to_rf = _resolve(to_rf)
+        to_rf = _resolve_rf(to_rf)
         walker = Walker()
         up, _, down = walker.walk(self, to_rf)
         return up, down

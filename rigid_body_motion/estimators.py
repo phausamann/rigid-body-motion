@@ -1,7 +1,7 @@
 """"""
 import numpy as np
 
-from rigid_body_motion.utils import _maybe_unpack_dataarray, _make_dataarray
+from rigid_body_motion.core import _maybe_unpack_dataarray, _make_dataarray
 from rigid_body_motion.coordinate_systems import _replace_dim
 
 

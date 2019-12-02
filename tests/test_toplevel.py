@@ -8,7 +8,7 @@ import xarray as xr
 import rigid_body_motion as rbm
 
 
-class TestTransform(object):
+class TestTopLevel(object):
     """"""
 
     @pytest.fixture(autouse=True)

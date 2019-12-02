@@ -320,39 +320,6 @@ class TestReferenceFrame(object):
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
-    def test_get_transformation_func(
-            self, o, ot, p, pt, rc1, rc2, tc1, tc2):
-        """"""
-        rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
-
-        f = rf_child1.get_transformation_func(rf_child2)
-        f_inv = rf_child2.get_transformation_func(rf_child1)
-
-        # single point/orientation
-        pt_act = f(np.array(p))
-        npt.assert_almost_equal(pt_act, pt)
-        ot_act = f(np.array(o))
-        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
-        pt_act, ot_act = f((np.array(p), np.array(o)))
-        npt.assert_almost_equal(pt_act, pt)
-        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
-
-        # inverse transformation
-        p_act = f_inv(np.array(pt))
-        npt.assert_almost_equal(p_act, p)
-        o_act = f_inv(np.array(ot))
-        npt.assert_almost_equal(np.abs(o_act), np.abs(o))
-
-        # array of points/orientations
-        pt_act = f(np.tile(np.array(p)[None, :, None], (10, 1, 5)), axis=1)
-        pt_exp = np.tile(np.array(pt)[None, :, None], (10, 1, 5))
-        npt.assert_almost_equal(pt_act, pt_exp)
-        ot_act = f(np.tile(np.array(o)[None, :, None], (10, 1, 5)), axis=1)
-        ot_exp = np.tile(np.array(ot)[None, :, None], (10, 1, 5))
-        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot_exp))
-
-    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
-                             transform_test_grid())
     def test_transform_vectors(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
         """"""
         _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)

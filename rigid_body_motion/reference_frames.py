@@ -513,52 +513,6 @@ class ReferenceFrame(NodeMixin):
 
         return t, r, ts
 
-    def get_transformation_func(self, to_frame):
-        """ Get the transformation function from this frame to another.
-
-        The transformation is a rotation followed by a translation which,
-        when applied to a position and/or orientation represented in this
-        reference frame, yields the representation of that
-        position/orientation in the target reference frame.
-
-        Parameters
-        ----------
-        to_frame: str or ReferenceFrame
-            The target reference frame. If str, the frame will be looked up
-            in the registry under that name.
-
-        Returns
-        -------
-        func: function
-            The transformation function from this frame to the target frame.
-        """
-        warn('get_transformation_func is deprecated, use transform_points, '
-             'transform_vectors or transform_quaternions instead.',
-             DeprecationWarning)
-
-        t, r, _ = self.get_transformation(to_frame)
-
-        def transformation_func(arr, axis=-1, **kwargs):
-            if isinstance(arr, tuple):
-                return tuple(
-                    transformation_func(a, axis=axis, **kwargs) for a in arr)
-            elif arr.shape[axis] == 3:
-                arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
-                t_idx = [np.newaxis] * arr.ndim
-                t_idx[axis] = slice(None)
-                arr = arr + np.array(t)[tuple(t_idx)]
-            elif arr.shape[axis] == 4:
-                arr = np.swapaxes(arr, axis, -1)
-                arr = as_quat_array(r) * as_quat_array(arr)
-                arr = np.swapaxes(as_float_array(arr), -1, axis)
-            else:
-                raise ValueError(
-                    'Expected array to have size 3 or 4 along '
-                    'axis {}, actual size is {}'.format(axis, arr.shape[axis]))
-            return arr
-
-        return transformation_func
-
     def transform_vectors(
             self, arr, to_frame, axis=-1, timestamps=None,
             return_timestamps=False):

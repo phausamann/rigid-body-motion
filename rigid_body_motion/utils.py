@@ -146,5 +146,3 @@ def is_dataset(obj, require_attrs=None):
         'data_vars', 'coords', 'dims', 'to_array']
 
     return all([hasattr(obj, name) for name in require_attrs])
-
-

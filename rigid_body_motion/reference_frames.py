@@ -1,14 +1,12 @@
 """"""
-from warnings import warn
-
 import numpy as np
 from scipy.interpolate import interp1d
 
 from anytree import NodeMixin, Walker
 from quaternion import as_quat_array, as_float_array, from_rotation_matrix
 
-from rigid_body_motion.utils import rotate_vectors
 from rigid_body_motion.core import _resolve_rf
+from rigid_body_motion.utils import rotate_vectors
 
 _registry = {}
 
@@ -25,7 +23,7 @@ def _register(rf, update=False):
             raise ValueError(
                 'Reference frame with name {} is already registered. Specify '
                 'update=True to overwrite.'.format(rf.name))
-    # TODO check if name is a cs transform
+    # TODO check if name is a cs transform?
     _registry[rf.name] = rf
 
 

@@ -22,7 +22,6 @@ except ImportError:
     pass
 
 __all__ = [
-    'transform',
     'transform_points',
     'transform_quaternions',
     'transform_vectors',
@@ -274,44 +273,3 @@ def transform_coordinates(
         return _make_dataarray(arr, coords, dims, name, attrs, None, None)
     else:
         return arr
-
-
-def transform(arr, outof=None, into=None, axis=-1, **kwargs):
-    """ Transform motion between coordinate systems and reference frames.
-
-    Parameters
-    ----------
-    arr: array_like
-        The array to transform.
-
-    outof: str
-        The name of a coordinate system or registered reference frame in
-        which the array is currently represented.
-
-    into: str
-        The name of a coordinate system or registered reference frame in
-        which the array will be represented after the transformation.
-
-    axis: int, default -1
-        The axis of the array representing the coordinates of the angular or
-        linear motion.
-
-    Returns
-    -------
-    arr_transformed: array_like
-        The transformed array.
-    """
-    warn('transform is deprecated, use transform_points, transform_vectors '
-         'transform_quaternions or transform_coordinates instead.',
-         DeprecationWarning)
-
-    if outof in registry:
-        transformation_func = registry[outof].get_transformation_func(into)
-    else:
-        try:
-            transformation_func = _cs_funcs[outof][into]
-        except KeyError:
-            raise ValueError(
-                'Unsupported transformation: {} to {}.'.format(outof, into))
-
-    return transformation_func(arr, axis=axis, **kwargs)

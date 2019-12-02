@@ -1,8 +1,6 @@
 """"""
 import numpy as np
 
-from rigid_body_motion.utils import is_dataarray
-
 
 def _resolve_axis(axis, ndim):
     """ Convert axis argument into actual array axes. """
@@ -40,7 +38,8 @@ def _resolve_rf(rf):
 
 def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
     """ If input is DataArray, unpack into data, coords and dims. """
-    # TODO name?
+    from rigid_body_motion.utils import is_dataarray
+
     if not is_dataarray(arr):
         if dim is not None:
             raise ValueError(
@@ -77,7 +76,6 @@ def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
 
 def _make_dataarray(arr, coords, dims, name, attrs, ts_arg, ts_out):
     """ Make DataArray out of transformation results. """
-    # TODO name?
     import xarray as xr
 
     if ts_arg is None:

@@ -20,19 +20,33 @@ Python utilities for estimating and transforming rigid body motion.
 Documentation: https://rigid-body-motion.readthedocs.io
 
 
-Features
+Overview
 --------
 
-* Transform numpy arrays describing rigid body motion between different
-  coordinate systems and reference frames
+This package provides a high-level interface for transforming arrays
+describing motion of rigid bodies between different coordinate systems and
+reference frames. The core of the reference frame handling is a fast
+re-implementation of ROS's ``tf2`` library in pure Python. The package also
+provides first-class support for xarray_ data types.
 
+.. _xarray: https://xarray.pydata.org
 
 Installation
 ------------
 
+rigid-body-motion can be installed via ``pip``:
+
 .. code-block:: console
 
-    $ pip install git+https://github.com/phausamann/rigid-body-motion.git
+    $ pip install rigid-body-motion
+
+If using the ``conda`` package manager, install these dependencies first:
+
+.. code-block:: console
+
+    $ conda install numpy quaternion scipy
+
+Afterwards, install the package via ``pip`` as detailed above.
 
 
 Examples

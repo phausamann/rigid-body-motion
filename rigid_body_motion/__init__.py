@@ -3,16 +3,14 @@ __author__ = """Peter Hausamann"""
 __email__ = 'peter@hausamann.de'
 __version__ = '0.1.0'
 
-from warnings import warn
-
 from rigid_body_motion.core import \
     _maybe_unpack_dataarray, _make_dataarray, _resolve_rf
 from rigid_body_motion.coordinate_systems import \
     cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical, \
     spherical_to_cartesian, _replace_dim
 from rigid_body_motion.reference_frames import \
-    register_frame, deregister_frame, clear_registry, ReferenceFrame
-from rigid_body_motion.reference_frames import _registry as registry
+    register_frame, deregister_frame, clear_registry, ReferenceFrame, \
+    _registry as registry
 from rigid_body_motion.estimators import shortest_arc_rotation
 from rigid_body_motion.utils import qmean, rotate_vectors
 
@@ -88,6 +86,10 @@ def transform_vectors(
 
     ts: array_like
         The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_quaternions, transform_points, ReferenceFrame
     """
     arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
@@ -144,6 +146,10 @@ def transform_points(
 
     ts: array_like
         The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_vectors, transform_quaternions, ReferenceFrame
     """
     arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
@@ -200,6 +206,10 @@ def transform_quaternions(
 
     ts: array_like
         The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_vectors, transform_points, ReferenceFrame
     """
     arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
@@ -253,6 +263,11 @@ def transform_coordinates(
     -------
     arr_transformed: array_like
         The transformed array.
+
+    See Also
+    --------
+    cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical,
+    spherical_to_cartesian
     """
     try:
         transform_func = _cs_funcs[outof][into]

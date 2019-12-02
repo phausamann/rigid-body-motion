@@ -2,6 +2,9 @@
 Usage
 =====
 
+Coordinate system transforms
+----------------------------
+
 Transform numpy arrays between coordinate systems:
 
 .. code-block:: python
@@ -13,6 +16,9 @@ Transform numpy arrays between coordinate systems:
     arr_polar = rbm.transform_coordinates(
         arr_cart, outof='cartesian', into='polar')
 
+
+Reference frame transforms
+--------------------------
 
 Transform numpy arrays across a tree of reference frames:
 

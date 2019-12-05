@@ -38,7 +38,7 @@ rigid-body-motion can be installed via ``pip``:
 
 .. code-block:: console
 
-    $ pip install rigid-body-motion
+    $ pip install git+https://github.com/phausamann/rigid-body-motion.git
 
 If using the ``conda`` package manager, install these dependencies first:
 

@@ -33,6 +33,7 @@ class TestReferenceFrameRegistry(object):
         _register(rf_child_new, update=True)
         assert rbm.registry['child'] is rf_child_new
         assert rbm.registry['child'].parent is rf_world
+        assert rbm.registry['world'].children == (rf_child_new,)
 
     def test_deregister(self):
         """"""
@@ -246,30 +247,40 @@ class TestReferenceFrame(object):
 
     def test_interpolate(self):
         """"""
-        arr = np.ones((10, 3))
+        arr1 = np.ones((10, 3))
+        ts1 = np.arange(10)
+        arr2 = np.ones((5, 3))
+        ts2 = np.arange(5) + 2.5
 
         # float timestamps
-        ts1 = np.arange(10)
-        ts2 = np.arange(5) + 2.5
-        arr_int, _ = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
-        npt.assert_allclose(arr_int, arr[:5])
+        arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
+            arr1, arr2, ts1, ts2)
+        npt.assert_allclose(arr1_int, arr1[:5])
+        npt.assert_allclose(arr2_int, arr2)
+        npt.assert_allclose(ts_out, ts2)
 
         # target range greater than source range
-        arr_int, _ = rbm.ReferenceFrame._interpolate(arr[:5], ts2, ts1)
-        npt.assert_allclose(arr_int, arr[:4])
+        arr2_int, arr1_int, ts_out = rbm.ReferenceFrame._interpolate(
+            arr2, arr1, ts2, ts1)
+        npt.assert_allclose(arr2_int, arr2[:-1])
+        npt.assert_allclose(arr1_int, arr1[:4])
+        npt.assert_allclose(ts_out, ts1[3:7])
 
         # datetime timestamps
         ts1 = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
         ts2 = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
-        arr_int, ts_out = rbm.ReferenceFrame._interpolate(arr, ts1, ts2)
-        npt.assert_allclose(arr_int, arr[:5])
+        arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
+            arr1, arr2, ts1, ts2)
+        npt.assert_allclose(arr1_int, arr1[:5])
+        npt.assert_allclose(arr2_int, arr2)
+        npt.assert_allclose(ts_out.astype(float), ts1[:5].astype(float))
         assert ts_out.dtype == ts1.dtype
 
         # not sorted
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr, ts1[::-1], ts2)
+            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1[::-1], ts2)
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr, ts1, ts2[::-1])
+            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
     def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):
@@ -306,39 +317,6 @@ class TestReferenceFrame(object):
         npt.assert_almost_equal(t_act, np.tile(t, (5, 1)))
         npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
         npt.assert_equal(ts, np.arange(5) + 2.5)
-
-    @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
-                             transform_test_grid())
-    def test_get_transformation_func(
-            self, o, ot, p, pt, rc1, rc2, tc1, tc2):
-        """"""
-        rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
-
-        f = rf_child1.get_transformation_func(rf_child2)
-        f_inv = rf_child2.get_transformation_func(rf_child1)
-
-        # single point/orientation
-        pt_act = f(np.array(p))
-        npt.assert_almost_equal(pt_act, pt)
-        ot_act = f(np.array(o))
-        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
-        pt_act, ot_act = f((np.array(p), np.array(o)))
-        npt.assert_almost_equal(pt_act, pt)
-        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot))
-
-        # inverse transformation
-        p_act = f_inv(np.array(pt))
-        npt.assert_almost_equal(p_act, p)
-        o_act = f_inv(np.array(ot))
-        npt.assert_almost_equal(np.abs(o_act), np.abs(o))
-
-        # array of points/orientations
-        pt_act = f(np.tile(np.array(p)[None, :, None], (10, 1, 5)), axis=1)
-        pt_exp = np.tile(np.array(pt)[None, :, None], (10, 1, 5))
-        npt.assert_almost_equal(pt_act, pt_exp)
-        ot_act = f(np.tile(np.array(o)[None, :, None], (10, 1, 5)), axis=1)
-        ot_exp = np.tile(np.array(ot)[None, :, None], (10, 1, 5))
-        npt.assert_almost_equal(np.abs(ot_act), np.abs(ot_exp))
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())

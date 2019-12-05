@@ -3,17 +3,16 @@ __author__ = """Peter Hausamann"""
 __email__ = 'peter@hausamann.de'
 __version__ = '0.1.0'
 
-from warnings import warn
-
+from rigid_body_motion.core import \
+    _maybe_unpack_dataarray, _make_dataarray, _resolve_rf
 from rigid_body_motion.coordinate_systems import \
     cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical, \
     spherical_to_cartesian, _replace_dim
 from rigid_body_motion.reference_frames import \
-    register_frame, deregister_frame, clear_registry, ReferenceFrame
-from rigid_body_motion.reference_frames import _registry as registry
+    register_frame, deregister_frame, clear_registry, ReferenceFrame, \
+    _registry as registry
 from rigid_body_motion.estimators import shortest_arc_rotation
-from rigid_body_motion.utils import \
-    qmean, rotate_vectors, _maybe_unpack_dataarray, _make_dataarray, _resolve
+from rigid_body_motion.utils import qmean, rotate_vectors
 
 try:
     import rigid_body_motion.ros as ros
@@ -21,7 +20,6 @@ except ImportError:
     pass
 
 __all__ = [
-    'transform',
     'transform_points',
     'transform_quaternions',
     'transform_vectors',
@@ -88,15 +86,20 @@ def transform_vectors(
 
     ts: array_like
         The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_quaternions, transform_points, ReferenceFrame
     """
-    arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
+    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
-    arr, ts_out = _resolve(outof).transform_vectors(
+    arr, ts_out = _resolve_rf(outof).transform_vectors(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
-        return _make_dataarray(arr, coords, dims, timestamps, ts_out)
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out)
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
         #  parameter and do this when return_timestamps=None
@@ -143,15 +146,20 @@ def transform_points(
 
     ts: array_like
         The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_vectors, transform_quaternions, ReferenceFrame
     """
-    arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
+    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
-    arr, ts_out = _resolve(outof).transform_points(
+    arr, ts_out = _resolve_rf(outof).transform_points(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
-        return _make_dataarray(arr, coords, dims, timestamps, ts_out)
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out)
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
         #  parameter and do this when return_timestamps=None
@@ -198,15 +206,20 @@ def transform_quaternions(
 
     ts: array_like
         The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_vectors, transform_points, ReferenceFrame
     """
-    arr, axis, ts_in, coords, dims = _maybe_unpack_dataarray(
+    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim=dim, axis=axis, timestamps=timestamps)
 
-    arr, ts_out = _resolve(outof).transform_quaternions(
+    arr, ts_out = _resolve_rf(outof).transform_quaternions(
         arr, into, axis=axis, timestamps=ts_in, return_timestamps=True)
 
     if coords is not None:
-        return _make_dataarray(arr, coords, dims, timestamps, ts_out)
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out)
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
         #  parameter and do this when return_timestamps=None
@@ -250,6 +263,11 @@ def transform_coordinates(
     -------
     arr_transformed: array_like
         The transformed array.
+
+    See Also
+    --------
+    cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical,
+    spherical_to_cartesian
     """
     try:
         transform_func = _cs_funcs[outof][into]
@@ -257,7 +275,8 @@ def transform_coordinates(
         raise ValueError(
             'Unsupported transformation: {} to {}.'.format(outof, into))
 
-    arr, axis, _, coords, dims = _maybe_unpack_dataarray(arr, dim, axis)
+    arr, axis, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
+        arr, dim, axis)
 
     arr = transform_func(arr, axis=axis)
 
@@ -266,46 +285,6 @@ def transform_coordinates(
             # TODO accept (name, coord) tuple
             coords, dims = _replace_dim(
                 coords, dims, axis, into, arr.shape[axis])
-        return _make_dataarray(arr, coords, dims, None, None)
+        return _make_dataarray(arr, coords, dims, name, attrs, None, None)
     else:
         return arr
-
-
-def transform(arr, outof=None, into=None, axis=-1, **kwargs):
-    """ Transform motion between coordinate systems and reference frames.
-
-    Parameters
-    ----------
-    arr: array_like
-        The array to transform.
-
-    outof: str
-        The name of a coordinate system or registered reference frame in
-        which the array is currently represented.
-
-    into: str
-        The name of a coordinate system or registered reference frame in
-        which the array will be represented after the transformation.
-
-    axis: int, default -1
-        The axis of the array representing the coordinates of the angular or
-        linear motion.
-
-    Returns
-    -------
-    arr_transformed: array_like
-        The transformed array.
-    """
-    if outof in registry:
-        warn('transform for reference frame transformations is deprecated, '
-             'use transform_points, transform_vectors or '
-             'transform_quaternions instead.', DeprecationWarning)
-        transformation_func = registry[outof].get_transformation_func(into)
-    else:
-        try:
-            transformation_func = _cs_funcs[outof][into]
-        except KeyError:
-            raise ValueError(
-                'Unsupported transformation: {} to {}.'.format(outof, into))
-
-    return transformation_func(arr, axis=axis, **kwargs)

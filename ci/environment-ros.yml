@@ -10,13 +10,11 @@ dependencies:
   - xarray
   - quaternion
   - numba
-  - pygments
   - pytest
-  - tox
-  - virtualenv
   - sip
   - sphinx=1.8.5
   - sphinx_rtd_theme
+  - sphinx-gallery=0.4.0
   - numpydoc
   - pip:
     - rospkg

@@ -1,7 +1,10 @@
 numpy>=1.13
+xarray>=0.11
+numpy-quaternion==2019.10.3.10.26.21
 numba==0.43
 anytree==2.6.0
 
 sphinx==1.8.5
 sphinx_rtd_theme==0.4.3
+sphinx-gallery==0.4.0
 numpydoc==0.9.1

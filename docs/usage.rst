@@ -7,14 +7,13 @@ Coordinate system transforms
 
 Transform numpy arrays between coordinate systems:
 
-.. code-block:: python
+.. doctest::
 
-    import numpy as np
-    import rigid_body_motion as rbm
-
-    arr_cart = np.ones((10, 2))
-    arr_polar = rbm.transform_coordinates(
-        arr_cart, outof='cartesian', into='polar')
+    >>> import numpy as np
+    >>> import rigid_body_motion as rbm
+    >>> arr = [1., 1.]
+    >>> rbm.transform_coordinates(arr, outof='cartesian', into='polar')
+    array([1.41421356, 0.78539816])
 
 
 Reference frame transforms

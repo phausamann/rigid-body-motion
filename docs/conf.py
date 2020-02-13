@@ -37,12 +37,19 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     # 'sphinx.ext.napoleon',
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.doctest',
     'numpydoc',
 ]
 
 autosummary_generate = True
 # numpydoc_class_members_toctree = True
 numpydoc_show_class_members = False
+
+sphinx_gallery_conf = {
+     'examples_dirs': '../examples',   # path to your example scripts
+     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -26,6 +26,7 @@ provides first-class support for xarray_ data types.
 
    installation
    usage
+   auto_examples/index
    api
    roadmap
    contributing

@@ -19,14 +19,12 @@ test_requirements = ['pytest', ]
 
 setup(
     author="Peter Hausamann",
-    author_email='peter@hausamann.de',
+    author_email='peter.hausamann@tum.de',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',

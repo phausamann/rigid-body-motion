@@ -1,8 +1,12 @@
 import pytest
-from numpy import testing as npt
+import numpy.testing as npt
 
 import numpy as np
-import xarray as xr
+
+try:
+    import xarray as xr
+except ImportError:
+    xr = None
 
 import rigid_body_motion as rbm
 from rigid_body_motion.coordinate_systems import _replace_dim
@@ -10,6 +14,7 @@ from rigid_body_motion.coordinate_systems import _replace_dim
 
 class TestCoordinateSystems(object):
 
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
     def test_replace_dim(self):
         """"""
         da = xr.DataArray(

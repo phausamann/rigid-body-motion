@@ -181,7 +181,7 @@ class ReferenceFrame(NodeMixin):
             rotation = np.asarray(rotation)
             if rotation.shape != r_shape:
                 raise ValueError(
-                    'Expected translation to be of shape {}, got {}'.format(
+                    'Expected rotation to be of shape {}, got {}'.format(
                         r_shape, rotation.shape))
         else:
             rotation = np.zeros(r_shape)
@@ -207,13 +207,13 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def _broadcast(cls, arr, timestamps):
-        """"""
+        """ Broadcast scalar array along timestamp axis. """
         # TODO test
         return np.tile(arr, (len(timestamps), 1))
 
     @classmethod
     def _interpolate(cls, source_arr, target_arr, source_ts, target_ts):
-        """"""
+        """ Interpolate source array at target array timestamps. """
         # TODO SLERP for quaternions
         # TODO specify time_axis as parameter
         # TODO priority=None/<rf_name>
@@ -243,7 +243,7 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def _match_timestamps(cls, arr, arr_ts, rf_t, rf_r, rf_ts):
-        """"""
+        """ Match timestamps of array and reference frame. """
         # TODO test
         # TODO policy='from_arr'/'from_rf'
         if rf_ts is None:
@@ -293,7 +293,7 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def _validate_input(cls, arr, axis, n_axis, timestamps):
-        """"""
+        """ Validate shape of array and timestamps. """
         # TODO process DataArray (dim=str, timestamps=str)
         arr = np.asarray(arr)
 

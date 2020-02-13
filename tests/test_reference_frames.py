@@ -1,10 +1,14 @@
 import pytest
-from numpy import testing as npt
+import numpy.testing as npt
 from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
 import pandas as pd
-import xarray as xr
+
+try:
+    import xarray as xr
+except ImportError:
+    xr = None
 
 import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _register, _deregister
@@ -192,6 +196,7 @@ class TestReferenceFrame(object):
         with pytest.raises(ValueError):
             rbm.ReferenceFrame._validate_input(arr[:-1], -1, 3, timestamps)
 
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
     def test_from_dataset(self):
         """"""
         ds = xr.Dataset(
@@ -207,6 +212,7 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
     def test_from_translation_datarray(self):
         """"""
         da = xr.DataArray(
@@ -219,6 +225,7 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.translation, np.ones((10, 3)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
     def test_from_rotation_datarray(self):
         """"""
         da = xr.DataArray(
@@ -267,8 +274,8 @@ class TestReferenceFrame(object):
         npt.assert_allclose(ts_out, ts1[3:7])
 
         # datetime timestamps
-        ts1 = pd.DatetimeIndex(start=0, freq='1s', periods=10).values
-        ts2 = pd.DatetimeIndex(start=0, freq='1s', periods=5).values
+        ts1 = pd.date_range(start=0, freq='1s', periods=10).values
+        ts2 = pd.date_range(start=0, freq='1s', periods=5).values
         arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
             arr1, arr2, ts1, ts2)
         npt.assert_allclose(arr1_int, arr1[:5])

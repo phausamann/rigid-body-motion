@@ -26,7 +26,7 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
 
     Returns
     -------
-    q: array_like, shape (..., 3, ...)
+    q: array_like, shape (..., 4, ...)
         The quaternion representation of the shortest-arc rotation.
     """
     # TODO accept tuple for v2

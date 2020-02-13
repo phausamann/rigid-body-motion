@@ -5,3 +5,6 @@ xarray==0.11
 numpy-quaternion==2019.10.3.10.26.21
 numba==0.43
 anytree==2.6.0
+pip==18.1
+pytest==4.5.0
+pytest-runner==4.2

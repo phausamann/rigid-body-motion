@@ -5,35 +5,36 @@ language: python
 
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=py27
     - python: 3.5
       env: TOXENV=py35
     - python: 3.6
       env: TOXENV=py36
-    - python: 3.6
-      env: TOXENV=docs
     - python: 3.7
       env: TOXENV=py37
+    - python: 3.6
+      env: TOXENV=minimal
     - python: 3.7
+      env: TOXENV=latest
+    - python: 3.6
+      env: TOXENV=docs
+    - python: 3.6
       env: TOXENV=flake8
     - python: 2.7
       env: RBM_ROS_DEBUG=true
       before_install: bash ci/install_ros.sh
       install:
-        - pip install -U -r requirements.txt -r requirements_dev.txt
-        - pip install -U pyros_setup rospkg
+        - pip install -U -r ci/requirements_ros.txt
         - python setup.py install
       before_script: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ros/melodic/lib
-      script: py.test --basetemp=/tmp --cov=rigid_body_motion
+      script: py.test --basetemp=/tmp
   allow_failures:
     - python: 2.7
       env: RBM_ROS_DEBUG=true
 
-# Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: pip install -U tox-travis && pip install -U -r requirements.txt
+# Command to install build system dependencies
+install: pip install -U tox-travis
 
-# Command to run tests, e.g. python setup.py test
+# Command to run tests
 script: tox
 
 # Assuming you have installed the travis-ci CLI tool, after you

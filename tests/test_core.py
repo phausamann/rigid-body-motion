@@ -1,8 +1,12 @@
 import pytest
-from numpy import testing as npt
+import numpy.testing as npt
 
 import numpy as np
-import xarray as xr
+
+try:
+    import xarray as xr
+except ImportError:
+    xr = None
 
 from rigid_body_motion.core import \
     _resolve_axis, _maybe_unpack_dataarray, _make_dataarray
@@ -22,6 +26,7 @@ class TestCore(object):
         with pytest.raises(IndexError):
             _resolve_axis((-2, 0), 1)
 
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
     def test_maybe_unpack_datarray(self):
         """"""
         # ndarray
@@ -68,6 +73,7 @@ class TestCore(object):
         with pytest.raises(ValueError):
             _maybe_unpack_dataarray(da, dim='cartesian_axis', axis=-1)
 
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
     def test_make_dataarray(self):
         """"""
         arr = np.ones((10, 3))

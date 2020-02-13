@@ -3,7 +3,11 @@ import numpy.testing as npt
 from .helpers import mock_quaternion, register_rf_tree
 
 import numpy as np
-import xarray as xr
+
+try:
+    import xarray as xr
+except ImportError:
+    xr = None
 
 import rigid_body_motion as rbm
 
@@ -17,11 +21,14 @@ class TestTopLevel(object):
         rbm.clear_registry()
         yield
 
-    def test_transform_points(self):
+    @pytest.fixture()
+    def rf_tree(self):
         """"""
         register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
                          rc2=mock_quaternion(np.pi, 0., 0.))
 
+    def test_transform_points(self, rf_tree):
+        """"""
         arr_child2 = (1., 1., 1.)
         arr_exp = (-3., -1., 1.)
 
@@ -30,7 +37,12 @@ class TestTopLevel(object):
             arr_child2, outof='child2', into='child1')
         npt.assert_almost_equal(arr_child1, arr_exp)
 
-        # DataArray with timestamps
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
+    def test_transform_points_xr(self, rf_tree):
+        """"""
+        arr_child2 = (1., 1., 1.)
+        arr_exp = (-3., -1., 1.)
+
         da_child2 = xr.DataArray(
             np.tile(arr_child2, (10, 1)), {'time': np.arange(10)},
             ('time', 'cartesian_axis'))
@@ -40,11 +52,8 @@ class TestTopLevel(object):
         assert da_child1.shape == (10, 3)
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
-    def test_transform_quaternions(self):
+    def test_transform_quaternions(self, rf_tree):
         """"""
-        register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
-                         rc2=mock_quaternion(np.pi, 0., 0.))
-
         arr_child2 = (1., 0., 0., 0.)
         arr_exp = mock_quaternion(np.pi, 0., 0.)
 
@@ -53,7 +62,12 @@ class TestTopLevel(object):
             arr_child2, outof='child2', into='child1')
         npt.assert_almost_equal(arr_child1, arr_exp)
 
-        # DataArray with timestamps
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
+    def test_transform_quaternions_xr(self, rf_tree):
+        """"""
+        arr_child2 = (1., 0., 0., 0.)
+        arr_exp = mock_quaternion(np.pi, 0., 0.)
+
         da_child2 = xr.DataArray(
             np.tile(arr_child2, (10, 1)), {'time': np.arange(10)},
             ('time', 'quaternion_axis'))
@@ -63,11 +77,8 @@ class TestTopLevel(object):
         assert da_child1.shape == (10, 4)
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
-    def test_transform_vectors(self):
+    def test_transform_vectors(self, rf_tree):
         """"""
-        register_rf_tree(tc1=(1., 0., 0.), tc2=(-1., 0., 0.),
-                         rc2=mock_quaternion(np.pi, 0., 0.))
-
         arr_child2 = (1., 1., 1.)
         arr_exp = (-1., -1., 1.)
 
@@ -76,7 +87,12 @@ class TestTopLevel(object):
             arr_child2, outof='child2', into='child1')
         npt.assert_almost_equal(arr_child1, arr_exp)
 
-        # DataArray with timestamps
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
+    def test_transform_vectors_xr(self, rf_tree):
+        """"""
+        arr_child2 = (1., 1., 1.)
+        arr_exp = (-1., -1., 1.)
+
         da_child2 = xr.DataArray(
             np.tile(arr_child2, (10, 1)), {'time': np.arange(10)},
             ('time', 'cartesian_axis'))
@@ -95,6 +111,16 @@ class TestTopLevel(object):
             arr, outof='cartesian', into='polar', axis=1)
         npt.assert_equal(actual, expected)
 
+        with pytest.raises(ValueError):
+            rbm.transform_coordinates(
+                np.ones((10, 3)), outof='cartesian', into='polar')
+        with pytest.raises(ValueError):
+            rbm.transform_coordinates(
+                np.ones((10, 2)), outof='unsupported', into='polar')
+
+    @pytest.mark.skipif(xr is None, reason='xarray not installed')
+    def test_transform_coordinates_xr(self):
+        """"""
         # DataArray
         da = xr.DataArray(
             np.ones((10, 3)),
@@ -108,10 +134,3 @@ class TestTopLevel(object):
         actual = rbm.transform_coordinates(
             da, outof='cartesian', into='spherical')
         xr.testing.assert_allclose(actual, expected)
-
-        with pytest.raises(ValueError):
-            rbm.transform_coordinates(
-                np.ones((10, 3)), outof='cartesian', into='polar')
-        with pytest.raises(ValueError):
-            rbm.transform_coordinates(
-                np.ones((10, 2)), outof='unsupported', into='polar')

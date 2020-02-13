@@ -33,7 +33,8 @@ matrix:
       env: RBM_ROS_DEBUG=true
 
 # Command to install build system dependencies
-install: pip install -U tox-travis
+# numpy is necessary because py27 pandas install fails otherwise
+install: pip install -U tox-travis numpy
 
 # Command to run tests
 script: tox

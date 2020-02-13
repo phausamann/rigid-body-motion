@@ -26,7 +26,7 @@ matrix:
         - pip install -U -r ci/requirements_ros.txt
         - python setup.py install
       before_script: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ros/melodic/lib
-      script: py.test --basetemp=/tmp --cov=rigid_body_motion
+      script: py.test --basetemp=/tmp
   allow_failures:
     - python: 2.7
       env: RBM_ROS_DEBUG=true

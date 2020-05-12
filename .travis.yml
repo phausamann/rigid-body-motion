@@ -68,6 +68,7 @@ deploy:
       tags: true
       repo: phausamann/rigid-body-motion
       python: 3.7
+    skip_cleanup: true
   # Install anaconda client, then run:
   # $ anaconda auth -c -n travis --url https://anaconda.org/<username> --scopes "api:write api:read"
   # and add the generated token as $ANACONDA_TOKEN to the repo's env variables
@@ -79,3 +80,4 @@ deploy:
       branch: devel
       repo: phausamann/rigid-body-motion
       condition: "$CONDA_BLD_PATH = $HOME/conda-bld"
+    skip_cleanup: true

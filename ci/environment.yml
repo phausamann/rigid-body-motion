@@ -1,4 +1,4 @@
-name: rigid-body-motion
+name: rbm
 channels:
   - conda-forge
 dependencies:
@@ -10,7 +10,7 @@ dependencies:
   - xarray=0.12.1
   - quaternion=2019.3.18.14.33.20
   - numba=0.43
-  - pygments=2.4.0
+  - anytree==2.8.0
   - pytest=4.5.0
   - pytest-runner=4.4
   - pytest-cov=2.7.1
@@ -18,10 +18,6 @@ dependencies:
   - sphinx_rtd_theme=0.4.3
   - numpydoc=0.9.1
   - coverage=4.5.3
-  - bumpversion=0.5.3
+  - bump2version=1.0.0
   - flake8=3.5.0
   - tox=3.5.2
-  - twine=1.12.1
-  - pip:
-    - watchdog==0.9.0
-    - anytree==2.6.0

@@ -11,8 +11,8 @@ test_data_dir = os.path.join(os.path.dirname(__file__), "test_data")
 def load_csv(filepath):
     """"""
     df = pd.read_csv(filepath, header=[0, 1], index_col=0)
-    l = [[tuple(r) for r in df[c].values] for c in df.columns.levels[0]]
-    return list(zip(*l))
+    contents = [[tuple(r) for r in df[c].values] for c in df.columns.levels[0]]
+    return list(zip(*contents))
 
 
 def rf_test_grid(step=1):

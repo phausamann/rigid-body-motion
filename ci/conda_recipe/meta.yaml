@@ -1,0 +1,46 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: rigid-body-motion
+  version: {{ data['version'] }}
+
+source:
+  path: ../..
+
+build:
+  noarch: python
+  number: 0
+
+requirements:
+  host:
+    - python
+    - setuptools
+  run:
+    - python >=2.7
+    - numpy
+    - scipy
+    - quaternion
+    - anytree
+
+test:
+  source_files:
+    - tests
+  requires:
+    - numpy
+    - pandas
+    - xarray
+    - scipy
+    - quaternion
+    - numba
+    - anytree
+    - pytest
+  commands:
+    - pytest
+
+about:
+  home: https://github.com/phausamann/rigid-body-motion
+  summary: Python utilities for estimating and transforming rigid body motion.
+
+extra:
+  recipe-maintainers:
+    - phausamann

@@ -42,13 +42,11 @@ rigid-body-motion can be installed via ``pip``:
 
     $ pip install git+https://github.com/phausamann/rigid-body-motion.git
 
-If using the ``conda`` package manager, install these dependencies first:
+or via ``conda``:
 
 .. code-block:: console
 
-    $ conda install numpy quaternion scipy
-
-Afterwards, install the package via ``pip`` as detailed above.
+    $ conda install -c phausamann -c conda-forge rigid-body-motion
 
 
 Examples

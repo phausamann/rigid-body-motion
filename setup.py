@@ -13,14 +13,6 @@ with open("HISTORY.rst") as history_file:
 
 requirements = ["numpy", "numpy-quaternion", "scipy", "anytree"]
 
-setup_requirements = [
-    "pytest-runner",
-]
-
-test_requirements = [
-    "pytest",
-]
-
 setup(
     author="Peter Hausamann",
     author_email="peter.hausamann@tum.de",
@@ -42,9 +34,6 @@ setup(
     keywords="rigid_body_motion",
     name="rigid-body-motion",
     packages=find_packages(exclude=["tests"]),
-    setup_requires=setup_requirements,
-    test_suite="tests",
-    tests_require=test_requirements,
     url="https://github.com/phausamann/rigid-body-motion",
     version="0.1.0",
     zip_safe=False,

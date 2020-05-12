@@ -3,19 +3,24 @@ from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
 
-from rigid_body_motion.ros import Transformer
+
+@pytest.fixture()
+def Transformer():
+    """"""
+    ros = pytest.importorskip("rigid_body_motion.ros")
+    return ros.Transformer
 
 
 class TestTransformer(object):
 
-    def test_can_transform(self):
+    def test_can_transform(self, Transformer):
         """"""
         rf_world, _, _ = get_rf_tree()
         transformer = Transformer.from_reference_frame(rf_world)
         assert transformer.can_transform('child1', 'child2')
 
     @pytest.mark.parametrize('r, rc1, rc2, t, tc1, tc2', rf_test_grid())
-    def test_lookup_transform(self, r, rc1, rc2, t, tc1, tc2):
+    def test_lookup_transform(self, r, rc1, rc2, t, tc1, tc2, Transformer):
         """"""
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
@@ -25,7 +30,9 @@ class TestTransformer(object):
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
-    def test_transform_vector(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_vector(
+        self, o, ot, p, pt, rc1, rc2, tc1, tc2, Transformer
+    ):
         """"""
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
@@ -37,7 +44,9 @@ class TestTransformer(object):
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
-    def test_transform_point(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_point(
+        self, o, ot, p, pt, rc1, rc2, tc1, tc2, Transformer
+    ):
         """"""
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
@@ -46,7 +55,9 @@ class TestTransformer(object):
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
-    def test_transform_quaternion(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_quaternion(
+        self, o, ot, p, pt, rc1, rc2, tc1, tc2, Transformer
+    ):
         """"""
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
@@ -56,7 +67,9 @@ class TestTransformer(object):
 
     @pytest.mark.parametrize('o, ot, p, pt, rc1, rc2, tc1, tc2',
                              transform_test_grid())
-    def test_transform_pose(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_pose(
+        self, o, ot, p, pt, rc1, rc2, tc1, tc2, Transformer
+    ):
         """"""
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)

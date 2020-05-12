@@ -69,6 +69,7 @@ deploy:
     script: bash ci/conda_recipe/conda_upload.sh
     on:
 #      tags: true
+      branch: devel
       repo: phausamann/rigid-body-motion
       condition: "$CONDA_BLD_PATH = $HOME/conda-bld"
     skip_cleanup: true

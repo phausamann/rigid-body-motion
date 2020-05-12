@@ -19,6 +19,8 @@ matrix:
       env: TOXENV=docs
     - python: 3.6
       env: TOXENV=flake8
+    - python: 3.6
+      env: TOXENV=black
     - python: 2.7
       env: RBM_ROS_DEBUG=true
       before_install: bash ci/install_ros.sh

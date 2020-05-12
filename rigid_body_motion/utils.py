@@ -1,8 +1,12 @@
 """"""
 import numpy as np
 
-from quaternion import \
-    quaternion, as_float_array, as_quat_array, rotate_vectors as quat_rv
+from quaternion import (
+    quaternion,
+    as_float_array,
+    as_quat_array,
+    rotate_vectors as quat_rv,
+)
 
 from rigid_body_motion.core import _resolve_axis
 
@@ -28,7 +32,7 @@ def qmean(q, axis=None):
     """
     # TODO 4-arrays instead of quaternions
     if q.dtype != quaternion:
-        raise ValueError('Array dtype must be quaternion.')
+        raise ValueError("Array dtype must be quaternion.")
 
     axis = _resolve_axis(axis, q.ndim)
 
@@ -80,18 +84,23 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
 
     if v.shape[axis] != 3:
         raise ValueError(
-            'Expected axis {} of v to have length 3, got {}'.format(
-                axis, v.shape[axis]))
+            "Expected axis {} of v to have length 3, got {}".format(
+                axis, v.shape[axis]
+            )
+        )
 
     # make sure that non-singleton axes match
     v_shape = list(v.shape)
     v_shape.pop(axis)
     nonmatching_axes = (
-        qs != vs for qs, vs in zip(q.shape, v_shape) if qs != 1 and vs != 1)
+        qs != vs for qs, vs in zip(q.shape, v_shape) if qs != 1 and vs != 1
+    )
     if q.ndim != v.ndim - 1 or any(nonmatching_axes):
         raise ValueError(
-            'Incompatible shapes for q and v: {} and {}.'.format(
-                q.shape, v.shape))
+            "Incompatible shapes for q and v: {} and {}.".format(
+                q.shape, v.shape
+            )
+        )
 
     # compute rotation
     q = as_float_array(q)
@@ -121,7 +130,12 @@ def is_dataarray(obj, require_attrs=None):
         Whether the object is a DataArray or not.
     """
     require_attrs = require_attrs or [
-        'values', 'coords', 'dims', 'name', 'attrs']
+        "values",
+        "coords",
+        "dims",
+        "name",
+        "attrs",
+    ]
 
     return all([hasattr(obj, name) for name in require_attrs])
 
@@ -143,6 +157,10 @@ def is_dataset(obj, require_attrs=None):
         Whether the object is a Dataset or not.
     """
     require_attrs = require_attrs or [
-        'data_vars', 'coords', 'dims', 'to_array']
+        "data_vars",
+        "coords",
+        "dims",
+        "to_array",
+    ]
 
     return all([hasattr(obj, name) for name in require_attrs])

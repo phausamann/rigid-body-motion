@@ -14,15 +14,16 @@ _registry = {}
 def _register(rf, update=False):
     """ Register a reference frame. """
     if rf.name is None:
-        raise ValueError('Reference frame name cannot be None.')
+        raise ValueError("Reference frame name cannot be None.")
     if rf.name in _registry:
         if update:
             # TODO keep children?
             _registry[rf.name].parent = None
         else:
             raise ValueError(
-                'Reference frame with name {} is already registered. Specify '
-                'update=True to overwrite.'.format(rf.name))
+                "Reference frame with name {} is already registered. Specify "
+                "update=True to overwrite.".format(rf.name)
+            )
     # TODO check if name is a cs transform?
     _registry[rf.name] = rf
 
@@ -30,15 +31,22 @@ def _register(rf, update=False):
 def _deregister(name):
     """ Deregister a reference frame. """
     if name not in _registry:
-        raise ValueError('Reference frame with name ' + name +
-                         ' not found in registry')
+        raise ValueError(
+            "Reference frame with name " + name + " not found in registry"
+        )
 
     _registry.pop(name)
 
 
 def register_frame(
-        name, parent=None, translation=None, rotation=None, timestamps=None,
-        inverse=False, update=False):
+    name,
+    parent=None,
+    translation=None,
+    rotation=None,
+    timestamps=None,
+    inverse=False,
+    update=False,
+):
     """ Register a new reference frame in the registry.
 
     Parameters
@@ -74,8 +82,13 @@ def register_frame(
     """
     # TODO make this a class with __call__, from_dataset etc. methods?
     rf = ReferenceFrame(
-        name, parent=parent, translation=translation, rotation=rotation,
-        timestamps=timestamps, inverse=inverse)
+        name,
+        parent=parent,
+        translation=translation,
+        rotation=rotation,
+        timestamps=timestamps,
+        inverse=inverse,
+    )
     _register(rf, update=update)
 
 
@@ -98,8 +111,15 @@ def clear_registry():
 class ReferenceFrame(NodeMixin):
     """ A three-dimensional reference frame. """
 
-    def __init__(self, name=None, parent=None, translation=None, rotation=None,
-                 timestamps=None, inverse=False):
+    def __init__(
+        self,
+        name=None,
+        parent=None,
+        translation=None,
+        rotation=None,
+        timestamps=None,
+        inverse=False,
+    ):
         """ Constructor.
 
         Parameters
@@ -136,8 +156,11 @@ class ReferenceFrame(NodeMixin):
         self.parent = _resolve_rf(parent)
 
         if self.parent is not None:
-            self.translation, self.rotation, self.timestamps = \
-                self._init_arrays(translation, rotation, timestamps, inverse)
+            (
+                self.translation,
+                self.rotation,
+                self.timestamps,
+            ) = self._init_arrays(translation, rotation, timestamps, inverse)
         else:
             self._verify_root(translation, rotation, timestamps)
             self.translation, self.rotation, self.timestamps = None, None, None
@@ -149,7 +172,7 @@ class ReferenceFrame(NodeMixin):
 
     def __str__(self):
         """ String representation. """
-        return '<ReferenceFrame \'{}\'>'.format(self.name)
+        return "<ReferenceFrame '{}'>".format(self.name)
 
     def __repr__(self):
         """ String representation. """
@@ -161,7 +184,7 @@ class ReferenceFrame(NodeMixin):
         if timestamps is not None:
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
-                raise ValueError('timestamps must be one-dimensional.')
+                raise ValueError("timestamps must be one-dimensional.")
             t_shape = (len(timestamps), 3)
             r_shape = (len(timestamps), 4)
         else:
@@ -172,8 +195,10 @@ class ReferenceFrame(NodeMixin):
             translation = np.asarray(translation)
             if translation.shape != t_shape:
                 raise ValueError(
-                    'Expected translation to be of shape {}, got {}'.format(
-                        t_shape, translation.shape))
+                    "Expected translation to be of shape {}, got {}".format(
+                        t_shape, translation.shape
+                    )
+                )
         else:
             translation = np.zeros(t_shape)
 
@@ -181,11 +206,13 @@ class ReferenceFrame(NodeMixin):
             rotation = np.asarray(rotation)
             if rotation.shape != r_shape:
                 raise ValueError(
-                    'Expected rotation to be of shape {}, got {}'.format(
-                        r_shape, rotation.shape))
+                    "Expected rotation to be of shape {}, got {}".format(
+                        r_shape, rotation.shape
+                    )
+                )
         else:
             rotation = np.zeros(r_shape)
-            rotation[..., 0] = 1.
+            rotation[..., 0] = 1.0
 
         if inverse:
             # TODO utils.qinv
@@ -199,11 +226,11 @@ class ReferenceFrame(NodeMixin):
         """ Verify arguments for root node. """
         # TODO test
         if translation is not None:
-            raise ValueError('translation specified without parent frame.')
+            raise ValueError("translation specified without parent frame.")
         if rotation is not None:
-            raise ValueError('rotation specified without parent frame.')
+            raise ValueError("rotation specified without parent frame.")
         if timestamps is not None:
-            raise ValueError('timestamps specified without parent frame.')
+            raise ValueError("timestamps specified without parent frame.")
 
     @classmethod
     def _broadcast(cls, arr, timestamps):
@@ -225,9 +252,9 @@ class ReferenceFrame(NodeMixin):
         # TODO sort somewhere and turn these into assertions or use min/max
         #  with boolean indexing
         if np.any(np.diff(source_ts) < 0):
-            raise ValueError('source_ts is not sorted.')
+            raise ValueError("source_ts is not sorted.")
         if np.any(np.diff(target_ts) < 0):
-            raise ValueError('target_ts is not sorted.')
+            raise ValueError("target_ts is not sorted.")
 
         # TODO raise error when intersection is empty
         if target_ts[0] < source_ts[0]:
@@ -272,9 +299,11 @@ class ReferenceFrame(NodeMixin):
                 ts_new = rf.timestamps
             else:
                 translation, t, ts_new = cls._interpolate(
-                    rf.translation, t, rf.timestamps, ts)
+                    rf.translation, t, rf.timestamps, ts
+                )
                 rotation, r, ts_new = cls._interpolate(
-                    rf.rotation, r, rf.timestamps, ts)
+                    rf.rotation, r, rf.timestamps, ts
+                )
         else:
             translation = rf.translation
             rotation = rf.rotation
@@ -299,17 +328,20 @@ class ReferenceFrame(NodeMixin):
 
         if arr.shape[axis] != n_axis:
             raise ValueError(
-                'Expected array to have length {} along axis {}, '
-                'got {}'.format(n_axis, axis, arr.shape[axis]))
+                "Expected array to have length {} along axis {}, "
+                "got {}".format(n_axis, axis, arr.shape[axis])
+            )
 
         if timestamps is not None:
             # TODO specify time_axis as parameter
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
-                raise ValueError('timestamps must be one-dimensional.')
+                raise ValueError("timestamps must be one-dimensional.")
             if arr.shape[0] != len(timestamps):
-                raise ValueError('The first axis of the array must have the '
-                                 'same length as the timestamps.')
+                raise ValueError(
+                    "The first axis of the array must have the "
+                    "same length as the timestamps."
+                )
 
         return arr, timestamps
 
@@ -322,8 +354,15 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def from_dataset(
-            cls, ds, translation, rotation, timestamps, parent, name=None,
-            inverse=False):
+        cls,
+        ds,
+        translation,
+        rotation,
+        timestamps,
+        parent,
+        name=None,
+        inverse=False,
+    ):
         """ Construct a reference frame from a Dataset.
 
         Parameters
@@ -362,12 +401,18 @@ class ReferenceFrame(NodeMixin):
         """
         # TODO raise errors here if dimensions etc. don't match
         return cls(
-            name, parent, ds[translation].data, ds[rotation].data,
-            ds[timestamps].data, inverse=inverse)
+            name,
+            parent,
+            ds[translation].data,
+            ds[rotation].data,
+            ds[timestamps].data,
+            inverse=inverse,
+        )
 
     @classmethod
     def from_translation_dataarray(
-            cls, da, timestamps, parent, name=None, inverse=False):
+        cls, da, timestamps, parent, name=None, inverse=False
+    ):
         """ Construct a reference frame from a translation DataArray.
 
         Parameters
@@ -398,12 +443,17 @@ class ReferenceFrame(NodeMixin):
         """
         # TODO raise errors here if dimensions etc. don't match
         return cls(
-            name, parent, translation=da.data, timestamps=da[timestamps].data,
-            inverse=inverse)
+            name,
+            parent,
+            translation=da.data,
+            timestamps=da[timestamps].data,
+            inverse=inverse,
+        )
 
     @classmethod
     def from_rotation_dataarray(
-            cls, da, timestamps, parent, name=None, inverse=False):
+        cls, da, timestamps, parent, name=None, inverse=False
+    ):
         """ Construct a reference frame from a rotation DataArray.
 
         Parameters
@@ -434,8 +484,12 @@ class ReferenceFrame(NodeMixin):
         """
         # TODO raise errors here if dimensions etc. don't match
         return cls(
-            name, parent, rotation=da.data, timestamps=da[timestamps].data,
-            inverse=inverse)
+            name,
+            parent,
+            rotation=da.data,
+            timestamps=da[timestamps].data,
+            inverse=inverse,
+        )
 
     @classmethod
     def from_rotation_matrix(cls, mat, parent, name=None, inverse=False):
@@ -466,11 +520,15 @@ class ReferenceFrame(NodeMixin):
         # TODO support moving reference frame
         if mat.shape != (3, 3):
             raise ValueError(
-                'Expected mat to have shape (3, 3), got {}'.format(mat.shape))
+                "Expected mat to have shape (3, 3), got {}".format(mat.shape)
+            )
 
         return cls(
-            name, parent, rotation=as_float_array(from_rotation_matrix(mat)),
-            inverse=inverse)
+            name,
+            parent,
+            rotation=as_float_array(from_rotation_matrix(mat)),
+            inverse=inverse,
+        )
 
     def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
@@ -500,7 +558,7 @@ class ReferenceFrame(NodeMixin):
         up, down = self._walk(to_frame)
 
         t = np.zeros(3)
-        r = np.array((1., 0., 0., 0.))
+        r = np.array((1.0, 0.0, 0.0, 0.0))
         ts = None
 
         for rf in up:
@@ -512,8 +570,8 @@ class ReferenceFrame(NodeMixin):
         return t, r, ts
 
     def transform_vectors(
-            self, arr, to_frame, axis=-1, timestamps=None,
-            return_timestamps=False):
+        self, arr, to_frame, axis=-1, timestamps=None, return_timestamps=False
+    ):
         """ Transform an array of vectors from this frame to another.
 
         Parameters
@@ -558,8 +616,8 @@ class ReferenceFrame(NodeMixin):
             return arr, ts
 
     def transform_points(
-            self, arr, to_frame, axis=-1, timestamps=None,
-            return_timestamps=False):
+        self, arr, to_frame, axis=-1, timestamps=None, return_timestamps=False
+    ):
         """ Transform an array of points from this frame to another.
 
         Parameters
@@ -605,8 +663,8 @@ class ReferenceFrame(NodeMixin):
             return arr, ts
 
     def transform_quaternions(
-            self, arr, to_frame, axis=-1, timestamps=None,
-            return_timestamps=False):
+        self, arr, to_frame, axis=-1, timestamps=None, return_timestamps=False
+    ):
         """ Transform an array of quaternions from this frame to another.
 
         Parameters

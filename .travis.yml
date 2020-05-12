@@ -41,6 +41,8 @@ jobs:
         - conda config --set anaconda_upload no
       script:
         - conda build -c conda-forge ci/conda_recipe
+      after_success:
+        - chmod +x ci/conda_recipe/conda_upload.sh
   allow_failures:
     - python: 2.7
       env: RBM_ROS_DEBUG=true
@@ -71,7 +73,7 @@ deploy:
   # and add the generated token as $ANACONDA_TOKEN to the repo's env variables
   # on travis
   - provider: script
-    script: bash ci/conda_recipe/conda_upload.sh
+    script: ci/conda_recipe/conda_upload.sh
     on:
 #      tags: true
       branch: devel

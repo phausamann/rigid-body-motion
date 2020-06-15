@@ -5,11 +5,6 @@ from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 import numpy as np
 import pandas as pd
 
-try:
-    import xarray as xr
-except ImportError:
-    xr = None
-
 import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _register, _deregister
 
@@ -174,34 +169,59 @@ class TestReferenceFrame(object):
         # scalar input
         arr_scalar = (0.0, 0.0, 0.0)
         arr_val, _ = rbm.ReferenceFrame._validate_input(
-            arr_scalar, -1, 3, None
+            arr_scalar, -1, 3, None, 0
         )
         assert isinstance(arr_val, np.ndarray)
         npt.assert_equal(arr_val, np.zeros(3))
 
         # wrong axis length
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._validate_input(arr_scalar, -1, 4, None)
+            rbm.ReferenceFrame._validate_input(arr_scalar, -1, 4, None, 0)
 
         # array with timestamps
         arr = np.ones((10, 3))
         timestamps = range(10)
         arr_val, ts_val = rbm.ReferenceFrame._validate_input(
-            arr, -1, 3, timestamps
+            arr, -1, 3, timestamps, 0
         )
         assert isinstance(ts_val, np.ndarray)
 
+        # time axis not first axis
+        arr = np.ones((5, 10, 3))
+        timestamps = range(10)
+        arr_val, ts_val = rbm.ReferenceFrame._validate_input(
+            arr, -1, 3, timestamps, 1
+        )
+        assert arr_val.shape == (10, 5, 3)
+
         # timestamps not 1D
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._validate_input(arr, -1, 3, np.ones((10, 10)))
+            rbm.ReferenceFrame._validate_input(
+                arr, -1, 3, np.ones((10, 10)), 0
+            )
 
         # first axis doesn't match timestamps
         with pytest.raises(ValueError):
-            rbm.ReferenceFrame._validate_input(arr[:-1], -1, 3, timestamps)
+            rbm.ReferenceFrame._validate_input(arr[:-1], -1, 3, timestamps, 0)
 
-    @pytest.mark.skipif(xr is None, reason="xarray not installed")
+    def test_expand_singleton_axes(self):
+        """"""
+        # single translation
+        t = np.zeros(3)
+        assert rbm.ReferenceFrame._expand_singleton_axes(t, 2).shape == (3,)
+
+        # multiple translations
+        t = np.zeros((10, 3))
+        assert rbm.ReferenceFrame._expand_singleton_axes(t, 2).shape == (10, 3)
+        assert rbm.ReferenceFrame._expand_singleton_axes(t, 3).shape == (
+            10,
+            1,
+            3,
+        )
+
     def test_from_dataset(self):
         """"""
+        xr = pytest.importorskip("xarray")
         ds = xr.Dataset(
             {
                 "t": (["time", "cartesian_axis"], np.ones((10, 3))),
@@ -219,9 +239,9 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.rotation, np.ones((10, 4)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
-    @pytest.mark.skipif(xr is None, reason="xarray not installed")
     def test_from_translation_datarray(self):
         """"""
+        xr = pytest.importorskip("xarray")
         da = xr.DataArray(
             np.ones((10, 3)), {"time": np.arange(10)}, ("time", "axis")
         )
@@ -234,9 +254,9 @@ class TestReferenceFrame(object):
         npt.assert_equal(rf_child.translation, np.ones((10, 3)))
         npt.assert_equal(rf_child.timestamps, np.arange(10))
 
-    @pytest.mark.skipif(xr is None, reason="xarray not installed")
     def test_from_rotation_datarray(self):
         """"""
+        xr = pytest.importorskip("xarray")
         da = xr.DataArray(
             np.ones((10, 4)), {"time": np.arange(10)}, ("time", "axis")
         )
@@ -372,6 +392,17 @@ class TestReferenceFrame(object):
         vt = np.tile(pt, (5, 1)) - np.array(v0t)
         np.testing.assert_allclose(vt_act, vt, rtol=1.0)
 
+        # moving reference frame + multiple n-dimensional vectors
+        vt_act = rf_child3.transform_vectors(
+            np.tile(p, (10, 10, 1)),
+            rf_child2,
+            timestamps=np.arange(10),
+            time_axis=1,
+        )
+        v0t = rf_child3.transform_points((0.0, 0.0, 0.0), rf_child2)
+        vt = np.tile(pt, (10, 5, 1)) - np.array(v0t[np.newaxis, :, :])
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+
     @pytest.mark.parametrize(
         "o, ot, p, pt, rc1, rc2, tc1, tc2", transform_test_grid()
     )
@@ -390,11 +421,20 @@ class TestReferenceFrame(object):
         pt_act = rf_child3.transform_points(p, rf_child2)
         np.testing.assert_allclose(pt_act, np.tile(pt, (5, 1)), rtol=1.0)
 
-        # moving reference frame + multiple vectors
+        # moving reference frame + multiple points
         pt_act = rf_child3.transform_points(
             np.tile(p, (10, 1)), rf_child2, timestamps=np.arange(10)
         )
         np.testing.assert_allclose(pt_act, np.tile(pt, (5, 1)), rtol=1.0)
+
+        # moving reference frame + multiple n-dimensional points
+        pt_act = rf_child3.transform_points(
+            np.tile(p, (10, 10, 1)),
+            rf_child2,
+            timestamps=np.arange(10),
+            time_axis=1,
+        )
+        np.testing.assert_allclose(pt_act, np.tile(pt, (10, 5, 1)), rtol=1.0)
 
     @pytest.mark.parametrize(
         "o, ot, p, pt, rc1, rc2, tc1, tc2", transform_test_grid()
@@ -422,4 +462,15 @@ class TestReferenceFrame(object):
         )
         np.testing.assert_allclose(
             np.abs(ot_act), np.tile(np.abs(ot), (5, 1)), rtol=1.0
+        )
+
+        # moving reference frame + multiple n-dimensional points
+        ot_act = rf_child3.transform_quaternions(
+            np.tile(o, (10, 10, 1)),
+            rf_child2,
+            timestamps=np.arange(10),
+            time_axis=1,
+        )
+        np.testing.assert_allclose(
+            ot_act, np.tile(np.abs(ot), (10, 5, 1)), rtol=1.0
         )

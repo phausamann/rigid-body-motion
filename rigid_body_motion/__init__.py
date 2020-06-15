@@ -63,7 +63,13 @@ _cs_funcs = {
 
 
 def transform_vectors(
-    arr, outof=None, into=None, dim=None, axis=None, timestamps=None
+    arr,
+    outof=None,
+    into=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
 ):
     """ Transform an array of vectors between reference frames.
 
@@ -89,10 +95,15 @@ def transform_vectors(
         Defaults to the last axis of the array.
 
     timestamps: array_like or str, optional
-        The timestamps of the vectors, corresponding to the first axis
+        The timestamps of the points, corresponding to the `time_axis`
         of the array. If str and the array is a DataArray, the name of the
-        coordinate with the timestamps. The first axis of the array will be
-        re-sampled to the timestamps for which the transformation is defined.
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the points.
+        Defaults to the first axis of the array.
 
     Returns
     -------
@@ -106,12 +117,26 @@ def transform_vectors(
     --------
     transform_quaternions, transform_points, ReferenceFrame
     """
-    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, timestamps=timestamps
+    (
+        arr,
+        axis,
+        time_axis,
+        ts_in,
+        coords,
+        dims,
+        name,
+        attrs,
+    ) = _maybe_unpack_dataarray(
+        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
     )
 
     arr, ts_out = _resolve_rf(outof).transform_vectors(
-        arr, into, axis=axis, timestamps=ts_in, return_timestamps=True
+        arr,
+        into,
+        axis=axis,
+        time_axis=time_axis,
+        timestamps=ts_in,
+        return_timestamps=True,
     )
 
     if coords is not None:
@@ -127,7 +152,13 @@ def transform_vectors(
 
 
 def transform_points(
-    arr, outof=None, into=None, dim=None, axis=None, timestamps=None
+    arr,
+    outof=None,
+    into=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
 ):
     """ Transform an array of points between reference frames.
 
@@ -153,10 +184,15 @@ def transform_points(
         Defaults to the last axis of the array.
 
     timestamps: array_like or str, optional
-        The timestamps of the points, corresponding to the first axis
+        The timestamps of the points, corresponding to the `time_axis`
         of the array. If str and the array is a DataArray, the name of the
-        coordinate with the timestamps. The first axis of the array will be
-        re-sampled to the timestamps for which the transformation is defined.
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the points.
+        Defaults to the first axis of the array.
 
     Returns
     -------
@@ -170,12 +206,26 @@ def transform_points(
     --------
     transform_vectors, transform_quaternions, ReferenceFrame
     """
-    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, timestamps=timestamps
+    (
+        arr,
+        axis,
+        time_axis,
+        ts_in,
+        coords,
+        dims,
+        name,
+        attrs,
+    ) = _maybe_unpack_dataarray(
+        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
     )
 
     arr, ts_out = _resolve_rf(outof).transform_points(
-        arr, into, axis=axis, timestamps=ts_in, return_timestamps=True
+        arr,
+        into,
+        axis=axis,
+        time_axis=time_axis,
+        timestamps=ts_in,
+        return_timestamps=True,
     )
 
     if coords is not None:
@@ -191,7 +241,13 @@ def transform_points(
 
 
 def transform_quaternions(
-    arr, outof=None, into=None, dim=None, axis=None, timestamps=None
+    arr,
+    outof=None,
+    into=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
 ):
     """ Transform an array of quaternions between reference frames.
 
@@ -217,10 +273,15 @@ def transform_quaternions(
         Defaults to the last axis of the array.
 
     timestamps: array_like or str, optional
-        The timestamps of the quaternions, corresponding to the first axis
+        The timestamps of the points, corresponding to the `time_axis`
         of the array. If str and the array is a DataArray, the name of the
-        coordinate with the timestamps. The first axis of the array will be
-        re-sampled to the timestamps for which the transformation is defined.
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the points.
+        Defaults to the first axis of the array.
 
     Returns
     -------
@@ -234,12 +295,26 @@ def transform_quaternions(
     --------
     transform_vectors, transform_points, ReferenceFrame
     """
-    arr, axis, ts_in, coords, dims, name, attrs = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, timestamps=timestamps
+    (
+        arr,
+        axis,
+        time_axis,
+        ts_in,
+        coords,
+        dims,
+        name,
+        attrs,
+    ) = _maybe_unpack_dataarray(
+        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
     )
 
     arr, ts_out = _resolve_rf(outof).transform_quaternions(
-        arr, into, axis=axis, timestamps=ts_in, return_timestamps=True
+        arr,
+        into,
+        axis=axis,
+        time_axis=time_axis,
+        timestamps=ts_in,
+        return_timestamps=True,
     )
 
     if coords is not None:
@@ -283,8 +358,9 @@ def transform_coordinates(
     replace_dim: bool, default True
         If True and the array is a DataArray, replace the dimension
         representing the coordinates by a new dimension that describes the
-        new coordinate system and its axes (e.g. ``cartesian_axis: [x, y, z]``.
-        All coordinates that contained the original dimension will be dropped.
+        new coordinate system and its axes (e.g.
+        ``cartesian_axis: [x, y, z]``). All coordinates that contained the
+        original dimension will be dropped.
 
     Returns
     -------
@@ -303,7 +379,7 @@ def transform_coordinates(
             "Unsupported transformation: {} to {}.".format(outof, into)
         )
 
-    arr, axis, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
+    arr, axis, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim, axis
     )
 

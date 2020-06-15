@@ -35,14 +35,17 @@ def _resolve_rf(rf):
         return rf
 
 
-def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
+def _maybe_unpack_dataarray(
+    arr, dim=None, axis=None, time_axis=None, timestamps=None
+):
     """ If input is DataArray, unpack into data, coords and dims. """
     from rigid_body_motion.utils import is_dataarray
 
     if not is_dataarray(arr):
         if dim is not None:
-            raise ValueError("dim argument specified without DataArray input.")
+            raise ValueError("dim argument specified without DataArray input")
         axis = axis or -1
+        time_axis = time_axis or 0
         coords = None
         dims = None
         name = None
@@ -50,21 +53,21 @@ def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
     else:
         if dim is not None and axis is not None:
             raise ValueError(
-                "You can either specify the dim or the axis "
-                "argument, not both."
+                "You can either specify the dim or the axis argument, not both"
             )
         elif dim is not None:
             axis = arr.dims.index(dim)
         else:
             axis = axis or -1
         if isinstance(timestamps, str):
-            # TODO transpose if time dim is not first?
             # TODO convert datetimeindex?
+            time_axis = arr.dims.index(timestamps)
             timestamps = arr[timestamps].data
-        elif timestamps is not None:
-            # TODO time_dim argument
+        elif timestamps is None:
+            time_axis = 0
+        else:
             raise NotImplementedError(
-                "timestamps argument must be dimension name or None."
+                "timestamps argument must be dimension name or None"
             )
         coords = dict(arr.coords)
         dims = arr.dims
@@ -72,7 +75,7 @@ def _maybe_unpack_dataarray(arr, dim=None, axis=None, timestamps=None):
         attrs = arr.attrs
         arr = arr.data
 
-    return arr, axis, timestamps, coords, dims, name, attrs
+    return arr, axis, time_axis, timestamps, coords, dims, name, attrs
 
 
 def _make_dataarray(arr, coords, dims, name, attrs, ts_arg, ts_out):

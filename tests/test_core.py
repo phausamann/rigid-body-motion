@@ -3,11 +3,6 @@ import numpy.testing as npt
 
 import numpy as np
 
-try:
-    import xarray as xr
-except ImportError:
-    xr = None
-
 from rigid_body_motion.core import (
     _resolve_axis,
     _maybe_unpack_dataarray,
@@ -28,14 +23,16 @@ class TestCore(object):
         with pytest.raises(IndexError):
             _resolve_axis((-2, 0), 1)
 
-    @pytest.mark.skipif(xr is None, reason="xarray not installed")
-    def test_maybe_unpack_datarray(self):
+    def test_maybe_unpack_dataarray(self):
         """"""
+        xr = pytest.importorskip("xarray")
+
         # ndarray
         arr = np.ones((10, 3))
         (
             arr_out,
             axis,
+            time_axis,
             timestamps,
             coords,
             dims,
@@ -44,6 +41,7 @@ class TestCore(object):
         ) = _maybe_unpack_dataarray(arr)
         assert arr_out is arr
         assert axis == -1
+        assert time_axis == 0
         assert timestamps is None
         assert coords is None
         assert dims is None
@@ -65,6 +63,7 @@ class TestCore(object):
         (
             arr_out,
             axis,
+            time_axis,
             timestamps,
             coords,
             dims,
@@ -75,6 +74,7 @@ class TestCore(object):
         )
         npt.assert_equal(arr_out, arr)
         assert axis == 1
+        assert time_axis == 0
         npt.assert_equal(timestamps, np.arange(10))
         assert all(c in da.coords for c in coords)
         assert dims is da.dims
@@ -86,6 +86,7 @@ class TestCore(object):
         (
             arr_out,
             axis,
+            time_axis,
             timestamps,
             coords,
             dims,
@@ -100,9 +101,9 @@ class TestCore(object):
         with pytest.raises(ValueError):
             _maybe_unpack_dataarray(da, dim="cartesian_axis", axis=-1)
 
-    @pytest.mark.skipif(xr is None, reason="xarray not installed")
     def test_make_dataarray(self):
         """"""
+        xr = pytest.importorskip("xarray")
         arr = np.ones((10, 3))
 
         # no input timestamps

@@ -321,7 +321,7 @@ class ReferenceFrame(NodeMixin):
         return t, as_float_array(q * as_quat_array(r)), ts_new
 
     @classmethod
-    def _validate_input(cls, arr, axis, n_axis, timestamps):
+    def _validate_input(cls, arr, axis, n_axis, timestamps, time_axis):
         """ Validate shape of array and timestamps. """
         # TODO process DataArray (dim=str, timestamps=str)
         arr = np.asarray(arr)
@@ -333,17 +333,26 @@ class ReferenceFrame(NodeMixin):
             )
 
         if timestamps is not None:
-            # TODO specify time_axis as parameter
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
-                raise ValueError("timestamps must be one-dimensional.")
-            if arr.shape[0] != len(timestamps):
+                raise ValueError("timestamps must be one-dimensional")
+            if arr.shape[time_axis] != len(timestamps):
                 raise ValueError(
-                    "The first axis of the array must have the "
-                    "same length as the timestamps."
+                    "Axis {} of the array must have the "
+                    "same length as the timestamps".format(time_axis)
                 )
+            arr = np.swapaxes(arr, 0, time_axis)
 
         return arr, timestamps
+
+    @classmethod
+    def _expand_singleton_axes(cls, t_or_r, ndim):
+        """ Expand singleton axes for correct broadcasting with array. """
+        if t_or_r.ndim > 1:
+            for _ in range(ndim - 2):
+                t_or_r = np.expand_dims(t_or_r, 1)
+
+        return t_or_r
 
     def _walk(self, to_rf):
         """ Walk from this frame to a target frame along the tree. """
@@ -570,7 +579,13 @@ class ReferenceFrame(NodeMixin):
         return t, r, ts
 
     def transform_vectors(
-        self, arr, to_frame, axis=-1, timestamps=None, return_timestamps=False
+        self,
+        arr,
+        to_frame,
+        axis=-1,
+        time_axis=0,
+        timestamps=None,
+        return_timestamps=False,
     ):
         """ Transform an array of vectors from this frame to another.
 
@@ -586,9 +601,12 @@ class ReferenceFrame(NodeMixin):
         axis: int, default -1
             The axis of the array representing the coordinates of the vectors.
 
+        time_axis: int, default 0
+            The axis of the array representing the timestamps of the points.
+
         timestamps: array_like, optional
-            The timestamps of the vectors, corresponding to the first axis
-            of the array. If not None, the first axis of the array will be
+            The timestamps of the points, corresponding to the `time_axis`
+            of the array. If not None, the axis defined by `time_axis` will be
             re-sampled to the timestamps for which the transformation is
             defined.
 
@@ -603,12 +621,16 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
-        arr, arr_ts = self._validate_input(arr, axis, 3, timestamps)
+        arr, arr_ts = self._validate_input(arr, axis, 3, timestamps, time_axis)
 
         t, r, rf_ts = self.get_transformation(to_frame)
 
         arr, _, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
+        r = self._expand_singleton_axes(r, arr.ndim)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
+
+        # undo time axis swap
+        arr = np.swapaxes(arr, 0, time_axis)
 
         if not return_timestamps:
             return arr
@@ -616,7 +638,13 @@ class ReferenceFrame(NodeMixin):
             return arr, ts
 
     def transform_points(
-        self, arr, to_frame, axis=-1, timestamps=None, return_timestamps=False
+        self,
+        arr,
+        to_frame,
+        axis=-1,
+        time_axis=0,
+        timestamps=None,
+        return_timestamps=False,
     ):
         """ Transform an array of points from this frame to another.
 
@@ -632,9 +660,12 @@ class ReferenceFrame(NodeMixin):
         axis: int, default -1
             The axis of the array representing the coordinates of the points.
 
+        time_axis: int, default 0
+            The axis of the array representing the timestamps of the points.
+
         timestamps: array_like, optional
-            The timestamps of the points, corresponding to the first axis
-            of the array. If not None, the first axis of the array will be
+            The timestamps of the points, corresponding to the `time_axis`
+            of the array. If not None, the axis defined by `time_axis` will be
             re-sampled to the timestamps for which the transformation is
             defined.
 
@@ -649,13 +680,18 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
-        arr, arr_ts = self._validate_input(arr, axis, 3, timestamps)
+        arr, arr_ts = self._validate_input(arr, axis, 3, timestamps, time_axis)
 
         t, r, rf_ts = self.get_transformation(to_frame)
 
         arr, t, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
+        t = self._expand_singleton_axes(t, arr.ndim)
+        r = self._expand_singleton_axes(r, arr.ndim)
         arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
         arr = arr + np.array(t)
+
+        # undo time axis swap
+        arr = np.swapaxes(arr, 0, time_axis)
 
         if not return_timestamps:
             return arr
@@ -663,7 +699,13 @@ class ReferenceFrame(NodeMixin):
             return arr, ts
 
     def transform_quaternions(
-        self, arr, to_frame, axis=-1, timestamps=None, return_timestamps=False
+        self,
+        arr,
+        to_frame,
+        axis=-1,
+        time_axis=0,
+        timestamps=None,
+        return_timestamps=False,
     ):
         """ Transform an array of quaternions from this frame to another.
 
@@ -680,9 +722,12 @@ class ReferenceFrame(NodeMixin):
             The axis of the array representing the coordinates of the
             quaternions.
 
+        time_axis: int, default 0
+            The axis of the array representing the timestamps of the points.
+
         timestamps: array_like, optional
-            The timestamps of the quaternions, corresponding to the first axis
-            of the array. If not None, the first axis of the array will be
+            The timestamps of the points, corresponding to the `time_axis`
+            of the array. If not None, the axis defined by `time_axis` will be
             re-sampled to the timestamps for which the transformation is
             defined.
 
@@ -697,14 +742,18 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
-        arr, arr_ts = self._validate_input(arr, axis, 4, timestamps)
+        arr, arr_ts = self._validate_input(arr, axis, 4, timestamps, time_axis)
 
         t, r, rf_ts = self.get_transformation(to_frame)
 
         arr, _, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
+        r = self._expand_singleton_axes(r, arr.ndim)
         arr = np.swapaxes(arr, axis, -1)
         arr = as_quat_array(r) * as_quat_array(arr)
         arr = np.swapaxes(as_float_array(arr), -1, axis)
+
+        # undo time axis swap
+        arr = np.swapaxes(arr, 0, time_axis)
 
         if not return_timestamps:
             return arr

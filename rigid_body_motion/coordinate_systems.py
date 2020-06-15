@@ -4,6 +4,7 @@ import numpy as np
 
 def _replace_dim(coords, dims, axis, into, dimensionality):
     """ Replace the dimension after coordinate transformation """
+    # TODO can we improve this with assign_coords / swap_dims?
     old_dim = dims[axis]
 
     if dimensionality == 2:

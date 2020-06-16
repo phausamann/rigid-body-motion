@@ -9,8 +9,9 @@ from rigid_body_motion.reference_frames import ReferenceFrame
 
 try:
     import rospy
+    import rospkg
     import tf2_ros
-    import tf2_geometry_msgs
+    import PyKDL
     from geometry_msgs.msg import (
         TransformStamped,
         Vector3Stamped,
@@ -22,31 +23,96 @@ try:
         PoseStamped,
     )
 except ImportError:
-    # try to import pyros_setup instead
-    try:
-        import pyros_setup
-
-        pyros_setup.configurable_import().configure().activate()
-        import rospy
-        import tf2_ros
-        import tf2_geometry_msgs
-        from geometry_msgs.msg import (
-            TransformStamped,
-            Vector3Stamped,
-            Vector3,
-            PointStamped,
-            Point,
-            QuaternionStamped,
-            Quaternion,
+    if os.environ.get("RBM_ROS_DEBUG"):
+        raise
+    else:
+        raise ImportError(
+            "A ROS environment including rospy, tf2_ros and "
+            "tf2_geometry_msgs is required for this module"
         )
-    except ImportError:
-        if os.environ.get("RBM_ROS_DEBUG"):
-            raise
-        else:
-            raise ImportError(
-                "A ROS environment including rospy, tf2_ros and "
-                "tf2_geometry_msgs is required for this module"
-            )
+except rospkg.common.ResourceNotFound:
+    if os.environ.get("RBM_ROS_DEBUG"):
+        raise
+    else:
+        raise ImportError(
+            "A ROS environment including rospy, tf2_ros and "
+            "tf2_geometry_msgs is required for this module"
+        )
+
+
+class tf2_geometry_msgs:
+    """ Copied routines from tf2_geometry_msgs. """
+
+    @classmethod
+    def transform_to_kdl(cls, t):
+        return PyKDL.Frame(
+            PyKDL.Rotation.Quaternion(
+                t.transform.rotation.x,
+                t.transform.rotation.y,
+                t.transform.rotation.z,
+                t.transform.rotation.w,
+            ),
+            PyKDL.Vector(
+                t.transform.translation.x,
+                t.transform.translation.y,
+                t.transform.translation.z,
+            ),
+        )
+
+    @classmethod
+    def do_transform_point(cls, point, transform):
+        p = cls.transform_to_kdl(transform) * PyKDL.Vector(
+            point.point.x, point.point.y, point.point.z
+        )
+        res = PointStamped()
+        res.point.x = p[0]
+        res.point.y = p[1]
+        res.point.z = p[2]
+        res.header = transform.header
+        return res
+
+    @classmethod
+    def do_transform_vector3(cls, vector3, transform):
+        transform.transform.translation.x = 0
+        transform.transform.translation.y = 0
+        transform.transform.translation.z = 0
+        p = cls.transform_to_kdl(transform) * PyKDL.Vector(
+            vector3.vector.x, vector3.vector.y, vector3.vector.z
+        )
+        res = Vector3Stamped()
+        res.vector.x = p[0]
+        res.vector.y = p[1]
+        res.vector.z = p[2]
+        res.header = transform.header
+        return res
+
+    @classmethod
+    def do_transform_pose(cls, pose, transform):
+        f = cls.transform_to_kdl(transform) * PyKDL.Frame(
+            PyKDL.Rotation.Quaternion(
+                pose.pose.orientation.x,
+                pose.pose.orientation.y,
+                pose.pose.orientation.z,
+                pose.pose.orientation.w,
+            ),
+            PyKDL.Vector(
+                pose.pose.position.x,
+                pose.pose.position.y,
+                pose.pose.position.z,
+            ),
+        )
+        res = PoseStamped()
+        res.pose.position.x = f.p[0]
+        res.pose.position.y = f.p[1]
+        res.pose.position.z = f.p[2]
+        (
+            res.pose.orientation.x,
+            res.pose.orientation.y,
+            res.pose.orientation.z,
+            res.pose.orientation.w,
+        ) = f.M.GetQuaternion()
+        res.header = transform.header
+        return res
 
 
 def make_transform_msg(t, r, frame_id, child_frame_id, time=0.0):
@@ -157,12 +223,14 @@ class Transformer(object):
         root = reference_frame.root
 
         # get the first and last timestamps for all moving reference frames
-        t_start_end = zip(
-            *[
-                (node.timestamps[0], node.timestamps[-1])
-                for node in PreOrderIter(root)
-                if node.timestamps is not None
-            ]
+        t_start_end = list(
+            zip(
+                *[
+                    (node.timestamps[0], node.timestamps[-1])
+                    for node in PreOrderIter(root)
+                    if node.timestamps is not None
+                ]
+            )
         )
 
         if len(t_start_end) == 0:

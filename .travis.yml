@@ -21,14 +21,6 @@ jobs:
       env: TOXENV=flake8
     - python: 3.6
       env: TOXENV=black
-    - python: 2.7
-      env: RBM_ROS_DEBUG=true
-      before_install: bash ci/install_ros.sh
-      install:
-        - pip install -U -r ci/requirements_ros.txt
-        - python setup.py install
-      before_script: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ros/melodic/lib
-      script: py.test --basetemp=/tmp
     - env: CONDA_BLD_PATH=~/conda-bld
       install:
         - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -40,12 +32,9 @@ jobs:
         - conda install conda-build anaconda-client
         - conda config --set anaconda_upload no
       script:
-        - conda build -c conda-forge ci/conda_recipe
+        - conda build -c conda-forge -c RoboStack -c phausamann ci/conda_recipe
       after_success:
         - chmod +x ci/conda_recipe/conda_upload.sh
-  allow_failures:
-    - python: 2.7
-      env: RBM_ROS_DEBUG=true
 
 # Command to install build system dependencies
 install: pip install -U tox-travis

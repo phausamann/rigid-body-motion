@@ -84,9 +84,7 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
 
     if v.shape[axis] != 3:
         raise ValueError(
-            "Expected axis {} of v to have length 3, got {}".format(
-                axis, v.shape[axis]
-            )
+            f"Expected axis {axis} of v to have length 3, got {v.shape[axis]}"
         )
 
     # make sure that non-singleton axes match
@@ -97,9 +95,7 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
     )
     if q.ndim != v.ndim - 1 or any(nonmatching_axes):
         raise ValueError(
-            "Incompatible shapes for q and v: {} and {}.".format(
-                q.shape, v.shape
-            )
+            f"Incompatible shapes for q and v: {q.shape} and {v.shape}."
         )
 
     # compute rotation

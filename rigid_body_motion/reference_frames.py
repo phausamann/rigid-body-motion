@@ -21,8 +21,8 @@ def _register(rf, update=False):
             _registry[rf.name].parent = None
         else:
             raise ValueError(
-                "Reference frame with name {} is already registered. Specify "
-                "update=True to overwrite.".format(rf.name)
+                f"Reference frame with name {rf.name} is already registered. "
+                f"Specify update=True to overwrite."
             )
     # TODO check if name is a cs transform?
     _registry[rf.name] = rf
@@ -172,7 +172,7 @@ class ReferenceFrame(NodeMixin):
 
     def __str__(self):
         """ String representation. """
-        return "<ReferenceFrame '{}'>".format(self.name)
+        return f"<ReferenceFrame '{self.name}'>"
 
     def __repr__(self):
         """ String representation. """
@@ -195,9 +195,8 @@ class ReferenceFrame(NodeMixin):
             translation = np.asarray(translation)
             if translation.shape != t_shape:
                 raise ValueError(
-                    "Expected translation to be of shape {}, got {}".format(
-                        t_shape, translation.shape
-                    )
+                    f"Expected translation to be of shape {t_shape}, got "
+                    f"{translation.shape}"
                 )
         else:
             translation = np.zeros(t_shape)
@@ -206,9 +205,8 @@ class ReferenceFrame(NodeMixin):
             rotation = np.asarray(rotation)
             if rotation.shape != r_shape:
                 raise ValueError(
-                    "Expected rotation to be of shape {}, got {}".format(
-                        r_shape, rotation.shape
-                    )
+                    f"Expected rotation to be of shape {r_shape}, got "
+                    f"{rotation.shape}"
                 )
         else:
             rotation = np.zeros(r_shape)
@@ -328,8 +326,8 @@ class ReferenceFrame(NodeMixin):
 
         if arr.shape[axis] != n_axis:
             raise ValueError(
-                "Expected array to have length {} along axis {}, "
-                "got {}".format(n_axis, axis, arr.shape[axis])
+                f"Expected array to have length {n_axis} along axis {axis}, "
+                f"got {arr.shape[axis]}"
             )
 
         if timestamps is not None:
@@ -338,8 +336,8 @@ class ReferenceFrame(NodeMixin):
                 raise ValueError("timestamps must be one-dimensional")
             if arr.shape[time_axis] != len(timestamps):
                 raise ValueError(
-                    "Axis {} of the array must have the "
-                    "same length as the timestamps".format(time_axis)
+                    f"Axis {time_axis} of the array must have the same length "
+                    f"as the timestamps"
                 )
             arr = np.swapaxes(arr, 0, time_axis)
 
@@ -529,7 +527,7 @@ class ReferenceFrame(NodeMixin):
         # TODO support moving reference frame
         if mat.shape != (3, 3):
             raise ValueError(
-                "Expected mat to have shape (3, 3), got {}".format(mat.shape)
+                f"Expected mat to have shape (3, 3), got {mat.shape}"
             )
 
         return cls(

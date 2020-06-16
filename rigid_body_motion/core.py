@@ -91,9 +91,7 @@ def _make_dataarray(arr, coords, dims, name, attrs, ts_arg, ts_out):
         # timestamps specified as coord
         # TODO transpose if time dim is not first?
         if ts_arg not in coords:
-            raise ValueError(
-                "{} is not a coordinate of this DataArray".format(ts_arg)
-            )
+            raise ValueError(f"{ts_arg} is not a coordinate of this DataArray")
         assert ts_out is not None
         if len(coords[ts_arg]) != len(ts_out) or np.any(
             coords[ts_arg] != ts_out

@@ -51,9 +51,8 @@ def cartesian_to_polar(arr, axis=-1):
     """
     if arr.shape[axis] != 2:
         raise ValueError(
-            "Expected length of axis {} to be 2, got {} instead.".format(
-                axis, arr.shape[axis]
-            )
+            f"Expected length of axis {axis} to be 2, got {arr.shape[axis]} "
+            f"instead."
         )
 
     r = np.linalg.norm(arr, axis=axis)
@@ -79,9 +78,8 @@ def polar_to_cartesian(arr, axis=-1):
     """
     if arr.shape[axis] != 2:
         raise ValueError(
-            "Expected length of axis {} to be 2, got {} instead.".format(
-                axis, arr.shape[axis]
-            )
+            f"Expected length of axis {axis} to be 2, got {arr.shape[axis]} "
+            f"instead."
         )
 
     x = np.take(arr, 0, axis=axis) * np.cos(np.take(arr, 1, axis=axis))
@@ -109,9 +107,8 @@ def cartesian_to_spherical(arr, axis=-1):
     """
     if arr.shape[axis] != 3:
         raise ValueError(
-            "Expected length of axis {} to be 3, got {} instead.".format(
-                axis, arr.shape[axis]
-            )
+            f"Expected length of axis {axis} to be 3, got {arr.shape[axis]} "
+            f"instead."
         )
 
     r = np.linalg.norm(arr, axis=axis)
@@ -140,9 +137,8 @@ def spherical_to_cartesian(arr, axis=-1):
     """
     if arr.shape[axis] != 3:
         raise ValueError(
-            "Expected length of axis {} to be 3, got {} instead.".format(
-                axis, arr.shape[axis]
-            )
+            f"Expected length of axis {axis} to be 3, got {arr.shape[axis]} "
+            f"instead."
         )
 
     x = (

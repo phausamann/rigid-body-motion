@@ -375,9 +375,7 @@ def transform_coordinates(
     try:
         transform_func = _cs_funcs[outof][into]
     except KeyError:
-        raise ValueError(
-            "Unsupported transformation: {} to {}.".format(outof, into)
-        )
+        raise ValueError(f"Unsupported transformation: {outof} to {into}.")
 
     arr, axis, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim, axis

@@ -15,7 +15,7 @@ dependencies:
   - tox
   - virtualenv
   - sip
-  - sphinx=1.8.5
+  - sphinx=2.4.4
   - sphinx_rtd_theme
   - numpydoc
   - pip:

@@ -59,7 +59,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"rigid-body-motion"
-copyright = u"2019, Peter Hausamann"
+copyright = u"2020, Peter Hausamann"
 author = u"Peter Hausamann"
 
 # The version info for the project you're documenting, acts as replacement
@@ -177,3 +177,8 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+
+# -- Extension configuration -------------------------------------------------
+def setup(app):
+    app.add_javascript("copybutton.js")

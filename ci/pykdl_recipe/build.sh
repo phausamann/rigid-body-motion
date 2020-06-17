@@ -18,11 +18,10 @@ cmake \
 make -j$CPU_COUNT
 make install -j$CPU_COUNT
 
-
+# PyKDL
 cd "${SRC_DIR}/python_orocos_kdl"
 mkdir build && cd build
 
-# PyKDL
 cmake -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSION=3 ..
 
 make -j$CPU_COUNT

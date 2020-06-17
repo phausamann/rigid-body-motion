@@ -9,15 +9,16 @@ source:
 
 build:
   noarch: python
-  number: 1
-  string: py{{ python_version | replace('.', '') }}_{{ PKG_BUILDNUM }}
+  number: 2
+  ignore_run_exports:
+    - python_abi
 
 requirements:
   host:
-    - python {{ python_version }}
+    - python >=3.6
     - setuptools
   run:
-    - python {{ python_version }}
+    - python >=3.6
     - numpy
     - scipy
     - quaternion
@@ -27,21 +28,18 @@ test:
   source_files:
     - tests
   requires:
-    - python {{ python_version }}
-    - numpy
+    - python 3.6
     - pandas
     - xarray
-    - scipy
-    - quaternion
     - numba
-    - anytree
-    - ros-melodic-rospy # [py36 and linux and x86_64]
-    - ros-melodic-tf2-ros # [py36 and linux and x86_64]
-    - ros-melodic-geometry-msgs # [py36 and linux and x86_64]
-    - pykdl 1.4.0 # [py36 and linux and x86_64]
+    - ros-melodic-rospy # [linux and x86_64]
+    - ros-melodic-tf2-ros # [linux and x86_64]
+    - ros-melodic-geometry-msgs # [linux and x86_64]
+    - pykdl 1.4.0 # [linux and x86_64]
     - pytest
+    - pytest-cov
   commands:
-    - pytest
+    - pytest --cov=rigid_body_motion
 
 about:
   home: https://github.com/phausamann/rigid-body-motion

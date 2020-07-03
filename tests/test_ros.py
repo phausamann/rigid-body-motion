@@ -1,4 +1,5 @@
 import pytest
+
 from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
@@ -7,8 +8,8 @@ import numpy as np
 @pytest.fixture()
 def Transformer():
     """"""
-    ros = pytest.importorskip("rigid_body_motion.ros")
-    return ros.Transformer
+    tf = pytest.importorskip("rigid_body_motion.ros.transformer")
+    return tf.Transformer
 
 
 class TestTransformer(object):
@@ -80,3 +81,23 @@ class TestTransformer(object):
         np.testing.assert_allclose(pt_act, pt)
         # large relative differences at machine precision
         np.testing.assert_allclose(ot_act, ot, rtol=1.0)
+
+
+class TestVisualization:
+    def test_hex_to_rgba(self):
+        """"""
+        from rigid_body_motion.ros.visualization import hex_to_rgba
+
+        color_msg = hex_to_rgba("#ffffffff")
+        assert color_msg.r == 1.0
+        assert color_msg.g == 1.0
+        assert color_msg.b == 1.0
+        assert color_msg.a == 1.0
+
+    def test_get_marker(self):
+        """"""
+        from rigid_body_motion.ros.visualization import get_marker
+
+        marker_msg = get_marker()
+        assert marker_msg.type == 4
+        assert marker_msg.header.frame_id == "world"

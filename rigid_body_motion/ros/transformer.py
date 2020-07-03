@@ -1,43 +1,30 @@
-""""""
-import os
-
 import numpy as np
-
 from anytree import PreOrderIter
 
-from rigid_body_motion.reference_frames import ReferenceFrame
+import PyKDL
+import rospy
+from geometry_msgs.msg import PointStamped, Vector3Stamped, PoseStamped
 
 try:
-    import rospy
     import rospkg
     import tf2_ros
-    import PyKDL
-    from geometry_msgs.msg import (
-        TransformStamped,
-        Vector3Stamped,
-        Vector3,
-        PointStamped,
-        Point,
-        QuaternionStamped,
-        Quaternion,
-        PoseStamped,
+except rospkg.ResourceNotFound:
+    raise ImportError(
+        "The rospkg module was found but tf2_ros failed to import, "
+        "make sure you've set up the necessary environment variables"
     )
-except ImportError:
-    if os.environ.get("RBM_ROS_DEBUG"):
-        raise
-    else:
-        raise ImportError(
-            "A ROS environment including rospy, tf2_ros and "
-            "tf2_geometry_msgs is required for this module"
-        )
-except rospkg.common.ResourceNotFound:
-    if os.environ.get("RBM_ROS_DEBUG"):
-        raise
-    else:
-        raise ImportError(
-            "A ROS environment including rospy, tf2_ros and "
-            "tf2_geometry_msgs is required for this module"
-        )
+
+from rigid_body_motion.reference_frames import ReferenceFrame
+from .msg import (
+    make_transform_msg,
+    unpack_transform_msg,
+    make_vector_msg,
+    unpack_vector_msg,
+    make_point_msg,
+    unpack_point_msg,
+    make_pose_msg,
+    unpack_pose_msg,
+)
 
 
 class tf2_geometry_msgs:
@@ -115,93 +102,22 @@ class tf2_geometry_msgs:
         return res
 
 
-def make_transform_msg(t, r, frame_id, child_frame_id, time=0.0):
-    """"""
-    msg = TransformStamped()
-    msg.header.stamp = rospy.Time.from_sec(time)
-    msg.header.frame_id = frame_id
-    msg.child_frame_id = child_frame_id
-    msg.transform.translation = Vector3(*t)
-    msg.transform.rotation = Quaternion(r[1], r[2], r[3], r[0])
-
-    return msg
-
-
-def unpack_transform_msg(msg):
-    """"""
-    t = msg.transform.translation
-    r = msg.transform.rotation
-    return (t.x, t.y, t.z), (r.w, r.x, r.y, r.z)
-
-
-def make_pose_msg(p, o, frame_id, time=0.0):
-    """"""
-    msg = PoseStamped()
-    msg.header.stamp = rospy.Time.from_sec(time)
-    msg.header.frame_id = frame_id
-    msg.pose.position = Point(*p)
-    msg.pose.orientation = Quaternion(o[1], o[2], o[3], o[0])
-
-    return msg
-
-
-def unpack_pose_msg(msg):
-    """"""
-    p = msg.pose.position
-    o = msg.pose.orientation
-    return (p.x, p.y, p.z), (o.w, o.x, o.y, o.z)
-
-
-def make_vector_msg(v, frame_id, time=0.0):
-    """"""
-    msg = Vector3Stamped()
-    msg.header.stamp = rospy.Time.from_sec(time)
-    msg.header.frame_id = frame_id
-    msg.vector = Vector3(*v)
-
-    return msg
-
-
-def unpack_vector_msg(msg):
-    """"""
-    v = msg.vector
-    return v.x, v.y, v.z
-
-
-def make_point_msg(p, frame_id, time=0.0):
-    """"""
-    msg = PointStamped()
-    msg.header.stamp = rospy.Time.from_sec(time)
-    msg.header.frame_id = frame_id
-    msg.point = Point(*p)
-
-    return msg
-
-
-def unpack_point_msg(msg):
-    """"""
-    p = msg.point
-    return p.x, p.y, p.z
-
-
-def make_quaternion_msg(q, frame_id, time=0.0):
-    """"""
-    msg = QuaternionStamped()
-    msg.header.stamp = rospy.Time.from_sec(time)
-    msg.header.frame_id = frame_id
-    msg.quaternion = Quaternion(q[1], q[2], q[3], q[0])
-
-    return msg
-
-
-def unpack_quaternion_msg(msg):
-    """"""
-    q = msg.quaternion
-    return q.w, q.x, q.y, q.z
-
-
 def static_rf_to_transform_msg(rf, time=0.0):
-    """"""
+    """ Convert a static ReferenceFrame to a TransformStamped message.
+
+    Parameters
+    ----------
+    rf : ReferenceFrame
+        Static reference frame.
+
+    time : float, default 0.0
+        The time of the message.
+
+    Returns
+    -------
+    msg : TransformStamped
+        TransformStamped message.
+    """
     return make_transform_msg(
         rf.translation, rf.rotation, rf.parent.name, rf.name, time=time
     )
@@ -209,7 +125,13 @@ def static_rf_to_transform_msg(rf, time=0.0):
 
 class Transformer(object):
     def __init__(self, cache_time=None):
-        """"""
+        """ Constructor.
+
+        Parameters
+        ----------
+        cache_time : float
+            Cache time of the buffer in seconds.
+        """
         if cache_time is not None:
             self._buffer = tf2_ros.Buffer(
                 cache_time=rospy.Duration.from_sec(cache_time), debug=False
@@ -219,7 +141,18 @@ class Transformer(object):
 
     @staticmethod
     def from_reference_frame(reference_frame):
-        """"""
+        """ Construct Transformer instance from static reference frame tree.
+
+        Parameters
+        ----------
+        reference_frame : ReferenceFrame
+            Reference frame instance from which to construct the transformer.
+
+        Returns
+        -------
+        Transformer
+            Transformer instance.
+        """
         root = reference_frame.root
 
         # get the first and last timestamps for all moving reference frames
@@ -250,19 +183,62 @@ class Transformer(object):
         return transformer
 
     def set_transform_static(self, reference_frame):
-        """"""
+        """ Add static transform from reference frame to buffer.
+
+        Parameters
+        ----------
+        reference_frame : ReferenceFrame
+            Static reference frame to add.
+        """
         self._buffer.set_transform_static(
             static_rf_to_transform_msg(reference_frame), "default_authority"
         )
 
     def can_transform(self, target_frame, source_frame, time=0.0):
-        """"""
+        """ Check if transform from source to target frame is possible.
+
+        Parameters
+        ----------
+        target_frame : str
+            Name of the frame to transform into.
+
+        source_frame : str
+            Name of the input frame.
+
+        time : float, default 0.0
+            Time at which to get the transform. (0 will get the latest)
+
+        Returns
+        -------
+        bool
+            True if the transform is possible, false otherwise.
+        """
         return self._buffer.can_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
 
     def lookup_transform(self, target_frame, source_frame, time=0.0):
-        """"""
+        """ Get the transform from the source frame to the target frame.
+
+        Parameters
+        ----------
+        target_frame : str
+            Name of the frame to transform into.
+
+        source_frame : str
+            Name of the input frame.
+
+        time : float, default 0.0
+            Time at which to get the transform. (0 will get the latest)
+
+        Returns
+        -------
+        t : tuple, len 3
+            The translation between the frames.
+
+        r : tuple, len 4
+            The rotation between the frames.
+        """
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -270,7 +246,27 @@ class Transformer(object):
         return unpack_transform_msg(transform)
 
     def transform_vector(self, v, target_frame, source_frame, time=0.0):
-        """"""
+        """ Transform a vector from the source frame to the target frame.
+
+        Parameters
+        ----------
+        v : iterable, len 3
+            Input vector in source frame.
+
+        target_frame : str
+            Name of the frame to transform into.
+
+        source_frame : str
+            Name of the input frame.
+
+        time : float, default 0.0
+            Time at which to get the transform. (0 will get the latest)
+
+        Returns
+        -------
+        tuple, len 3
+            Transformed vector in target frame.
+        """
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -280,7 +276,27 @@ class Transformer(object):
         return unpack_vector_msg(vt_msg)
 
     def transform_point(self, p, target_frame, source_frame, time=0.0):
-        """"""
+        """ Transform a point from the source frame to the target frame.
+
+        Parameters
+        ----------
+        p : iterable, len 3
+            Input point in source frame.
+
+        target_frame : str
+            Name of the frame to transform into.
+
+        source_frame : str
+            Name of the input frame.
+
+        time : float, default 0.0
+            Time at which to get the transform. (0 will get the latest)
+
+        Returns
+        -------
+        tuple, len 3
+            Transformed point in target frame.
+        """
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -290,7 +306,27 @@ class Transformer(object):
         return unpack_point_msg(pt_msg)
 
     def transform_quaternion(self, q, target_frame, source_frame, time=0.0):
-        """"""
+        """ Transform a quaternion from the source frame to the target frame.
+
+        Parameters
+        ----------
+        q : iterable, len 4
+            Input quaternion in source frame.
+
+        target_frame : str
+            Name of the frame to transform into.
+
+        source_frame : str
+            Name of the input frame.
+
+        time : float, default 0.0
+            Time at which to get the transform. (0 will get the latest)
+
+        Returns
+        -------
+        tuple, len 4
+            Transformed quaternion in target frame.
+        """
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -300,7 +336,33 @@ class Transformer(object):
         return unpack_pose_msg(pt_msg)[1]
 
     def transform_pose(self, p, o, target_frame, source_frame, time=0.0):
-        """"""
+        """ Transform a pose from the source frame to the target frame.
+
+        Parameters
+        ----------
+        p : iterable, len 3
+            Input position in source frame.
+
+        o : iterable, len 3
+            Input orientation in source frame.
+
+        target_frame : str
+            Name of the frame to transform into.
+
+        source_frame : str
+            Name of the input frame.
+
+        time : float, default 0.0
+            Time at which to get the transform. (0 will get the latest)
+
+        Returns
+        -------
+        pt : tuple, len 3
+            Transformed position in target frame.
+
+        ot : tuple, len 4
+            Transformed orientation in target frame.
+        """
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )

@@ -25,10 +25,7 @@ from rigid_body_motion.reference_frames import (
 from rigid_body_motion.estimators import shortest_arc_rotation
 from rigid_body_motion.utils import qmean, rotate_vectors
 
-try:
-    import rigid_body_motion.ros as ros  # noqa
-except ImportError:
-    pass
+import rigid_body_motion.ros as ros  # noqa
 
 __all__ = [
     "transform_points",

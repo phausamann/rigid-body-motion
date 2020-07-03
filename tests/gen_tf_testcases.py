@@ -2,7 +2,7 @@
 
 This script requires a Python 2.7 ROS enviroment in order to run properly.
 """
-from helpers import test_data_dir, mock_quaternion
+from .helpers import test_data_dir, mock_quaternion
 
 import os
 from itertools import product

@@ -600,7 +600,7 @@ class ReferenceFrame(NodeMixin):
             The axis of the array representing the coordinates of the vectors.
 
         time_axis: int, default 0
-            The axis of the array representing the timestamps of the points.
+            The axis of the array representing the timestamps of the vectors.
 
         timestamps: array_like, optional
             The timestamps of the points, corresponding to the `time_axis`
@@ -721,7 +721,8 @@ class ReferenceFrame(NodeMixin):
             quaternions.
 
         time_axis: int, default 0
-            The axis of the array representing the timestamps of the points.
+            The axis of the array representing the timestamps of the
+            quaternions.
 
         timestamps: array_like, optional
             The timestamps of the points, corresponding to the `time_axis`

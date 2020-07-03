@@ -1,7 +1,7 @@
 name: rbm
 channels:
   - conda-forge
-  - RoboStack
+  - robostack
   - phausamann
 dependencies:
   - python=3.6
@@ -22,7 +22,10 @@ dependencies:
   - bump2version=1.0.0
   - flake8=3.5.0
   - tox=3.5.2
-  - ros-melodic-rospy=1.14.5 # [linux and x86_64]
-  - ros-melodic-tf2-ros=0.6.5 # [linux and x86_64]
-  - ros-melodic-geometry-msgs=1.12.7 # [linux and x86_64]
-  - pykdl=1.4.0 # [linux and x86_64]
+  {% if "RBM_ROS" in os.environ %}
+  - ros-melodic-rospy=1.14.5
+  - ros-melodic-tf2-ros=0.6.5
+  - ros-melodic-geometry-msgs=1.12.7
+  - ros-melodic-visualization-msgs=1.12.7
+  - pykdl=1.4.0
+  {% endif %}

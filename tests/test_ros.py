@@ -12,6 +12,12 @@ def Transformer():
     return tf.Transformer
 
 
+@pytest.fixture()
+def visualization():
+    """"""
+    return pytest.importorskip("rigid_body_motion.ros.visualization")
+
+
 class TestTransformer(object):
     def test_can_transform(self, Transformer):
         """"""
@@ -84,20 +90,16 @@ class TestTransformer(object):
 
 
 class TestVisualization:
-    def test_hex_to_rgba(self):
+    def test_hex_to_rgba(self, visualization):
         """"""
-        from rigid_body_motion.ros.visualization import hex_to_rgba
-
-        color_msg = hex_to_rgba("#ffffffff")
+        color_msg = visualization.hex_to_rgba("#ffffffff")
         assert color_msg.r == 1.0
         assert color_msg.g == 1.0
         assert color_msg.b == 1.0
         assert color_msg.a == 1.0
 
-    def test_get_marker(self):
+    def test_get_marker(self, visualization):
         """"""
-        from rigid_body_motion.ros.visualization import get_marker
-
-        marker_msg = get_marker()
+        marker_msg = visualization.get_marker()
         assert marker_msg.type == 4
         assert marker_msg.header.frame_id == "world"

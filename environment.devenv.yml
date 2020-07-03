@@ -22,6 +22,7 @@ dependencies:
   - bump2version=1.0.0
   - flake8=3.5.0
   - tox=3.5.2
+  - pre-commit=2.5.1
   {% if "RBM_ROS" in os.environ %}
   - ros-melodic-rospy=1.14.5
   - ros-melodic-tf2-ros=0.6.5

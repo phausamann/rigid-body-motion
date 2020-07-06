@@ -84,7 +84,7 @@ def get_marker(
 class BaseMarkerPublisher:
     """ Base class for Marker publishers. """
 
-    def __init__(self, marker, topic, publish_interval=1.0):
+    def __init__(self, marker, topic, publish_interval=1.0, verbose=False):
         """ Constructor.
 
         Parameters
@@ -107,7 +107,8 @@ class BaseMarkerPublisher:
         self.publisher = rospy.Publisher(
             self.topic, Marker, queue_size=1, latch=True
         )
-        rospy.loginfo("Created marker publisher")
+        if verbose:
+            rospy.loginfo("Created marker publisher")
 
         self.stopped = False
         self._thread = None
@@ -163,7 +164,13 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
     """ Publisher for the translation of a reference frame wrt another. """
 
     def __init__(
-        self, frame, topic, base=None, max_points=1000, publish_interval=1.0
+        self,
+        frame,
+        base=None,
+        topic=None,
+        max_points=1000,
+        publish_interval=1.0,
+        verbose=False,
     ):
         """ Constructor.
 
@@ -172,12 +179,12 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         frame : str or ReferenceFrame
             Reference frame for which to publish the translation.
 
-        topic : str
-            Name of the topic on which to publish.
-
         base : str or ReferenceFrame, optional
             Base reference wrt to which the translation is published. Defaults
             to the parent reference frame.
+
+        topic : str, optional
+            Name of the topic on which to publish. Defaults to "/<frame>/path".
 
         max_points : int, default 1000
             Maximum number of points to add to the marker. Actual translation
@@ -186,12 +193,43 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         publish_interval : float, default 1.0
             Time in seconds between publishing when calling ``spin``.
         """
-        frame = _resolve_rf(frame)
-        base = _resolve_rf(base or frame.parent)
-        t, _, _ = frame.get_transformation(base)
+        self.frame = _resolve_rf(frame)
+        self.base = _resolve_rf(base or frame.parent)
+        self.translation, _, _ = self.frame.get_transformation(self.base)
 
-        marker = get_marker(frame_id=base.name)
-        show_every = t.shape[0] // max_points
-        marker.points = [Point(*row) for row in t[::show_every]]
+        marker = get_marker(frame_id=self.base.name)
+        show_every = self.translation.shape[0] // max_points
+        marker.points = [Point(*row) for row in self.translation[::show_every]]
 
-        super().__init__(marker, topic, publish_interval=publish_interval)
+        topic = topic or f"/{self.frame.name}/path"
+
+        super().__init__(
+            marker, topic, publish_interval=publish_interval, verbose=verbose
+        )
+
+    def get_ros3d_widget(self, ros=None, tf_client=None):
+        """ Get a ros3d.Marker widget to display in a ros3d.Viewer.
+
+        Parameters
+        ----------
+        ros : jupyros.ros3d.ROSConnection, optional
+            ros3d ROS connection instance.
+
+        tf_client : jupyros.ros3d.TFClient, optional
+            ros3d TF client instance.
+
+        Returns
+        -------
+        jupyros.ros3d.Marker
+            ros3d marker widget.
+        """
+        from jupyros import ros3d
+
+        ros = ros or ros3d.ROSConnection()
+        tf_client = tf_client or ros3d.TFClient(
+            ros=ros, fixed_frame=self.base.name
+        )
+
+        return ros3d.Marker(
+            ros=ros, tf_client=tf_client, topic=self.topic, path=""
+        )

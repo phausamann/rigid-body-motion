@@ -1,9 +1,13 @@
+from threading import Thread
+
 import numpy as np
 from anytree import PreOrderIter
 
 import PyKDL
 import rospy
 from geometry_msgs.msg import PointStamped, Vector3Stamped, PoseStamped
+
+from .msg import static_rf_to_transform_msg
 
 try:
     import rospkg
@@ -14,6 +18,7 @@ except rospkg.ResourceNotFound:
         "make sure you've set up the necessary environment variables"
     )
 
+from rigid_body_motion.core import _resolve_rf
 from rigid_body_motion.reference_frames import ReferenceFrame
 from .msg import (
     make_transform_msg,
@@ -100,27 +105,6 @@ class tf2_geometry_msgs:
         ) = f.M.GetQuaternion()
         res.header = transform.header
         return res
-
-
-def static_rf_to_transform_msg(rf, time=0.0):
-    """ Convert a static ReferenceFrame to a TransformStamped message.
-
-    Parameters
-    ----------
-    rf : ReferenceFrame
-        Static reference frame.
-
-    time : float, default 0.0
-        The time of the message.
-
-    Returns
-    -------
-    msg : TransformStamped
-        TransformStamped message.
-    """
-    return make_transform_msg(
-        rf.translation, rf.rotation, rf.parent.name, rf.name, time=time
-    )
 
 
 class Transformer(object):
@@ -370,3 +354,107 @@ class Transformer(object):
         pt_msg = tf2_geometry_msgs.do_transform_pose(p_msg, transform)
 
         return unpack_pose_msg(pt_msg)
+
+
+class ReferenceFrameTransformBroadcaster:
+    """ TF broadcaster for the transform of a reference frame wrt another. """
+
+    def __init__(self, frame, base=None):
+        """ Constructor.
+
+        Parameters
+        ----------
+        frame : str or ReferenceFrame
+            Reference frame for which to publish the transform.
+
+        base : str or ReferenceFrame, optional
+            Base reference wrt to which the translation is published. Defaults
+            to the parent reference frame.
+
+        topic : str, optional
+            Name of the topic on which to publish. Defaults to "/<frame>/pose".
+        """
+        self.frame = _resolve_rf(frame)
+        self.base = _resolve_rf(base or self.frame.parent)
+        (
+            self.translation,
+            self.rotation,
+            self.timestamps,
+        ) = self.frame.get_transformation(self.base)
+
+        if self.timestamps is None:
+            self.broadcaster = tf2_ros.TransformBroadcaster()
+        else:
+            self.broadcaster = tf2_ros.StaticTransformBroadcaster()
+
+        self.idx = 0
+
+    def publish(self, idx=None):
+        """ Publish a transform message.
+
+        Parameters
+        ----------
+        idx : int, optional
+            Index of the transform to publish for a moving reference frame.
+            Uses ``self.idx`` as default.
+        """
+        if self.timestamps is None:
+            transform = make_transform_msg(
+                self.translation,
+                self.rotation,
+                self.base.name,
+                self.frame.name,
+            )
+        else:
+            transform = make_transform_msg(
+                self.translation[idx or self.idx],
+                self.rotation[idx or self.idx],
+                self.base.name,
+                self.frame.name,
+            )
+
+        self.broadcaster.sendTransform(transform)
+
+    def _spin_blocking(self):
+        """ Continuously publish messages. """
+        self.stopped = False
+
+        while not rospy.is_shutdown() and not self.stopped:
+            self.publish()
+            self.idx = (self.idx + 1) % len(self.timestamps)
+            dt = (
+                self.timestamps[self.idx].astype(float) / 1e9
+                - self.timestamps[self.idx - 1].astype(float) / 1e9
+                if self.idx > 0
+                else 0.0
+            )
+            rospy.sleep(dt)
+
+        self.stopped = True
+
+    def spin(self, block=False):
+        """ Continuously publish messages.
+
+        Parameters
+        ----------
+        block: bool, default False
+            If True, this method will block until the publisher is stopped,
+            e.g. by calling stop(). Otherwise, the main loop is
+            dispatched to a separate thread which is returned by this
+            function.
+
+        Returns
+        -------
+        thread: threading.Thread
+            If `block=True`, the Thread instance that runs the loop.
+        """
+        if block:
+            return self._spin_blocking()
+        else:
+            self._thread = Thread(target=self._spin_blocking)
+            self._thread.start()
+            return self._thread
+
+    def stop(self):
+        """ Stop publishing. """
+        self.stopped = True

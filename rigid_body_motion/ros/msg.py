@@ -94,3 +94,24 @@ def unpack_quaternion_msg(msg):
     """ Get coordinates from a QuaternionStamped message. """
     q = msg.quaternion
     return q.w, q.x, q.y, q.z
+
+
+def static_rf_to_transform_msg(rf, time=0.0):
+    """ Convert a static ReferenceFrame to a TransformStamped message.
+
+    Parameters
+    ----------
+    rf : ReferenceFrame
+        Static reference frame.
+
+    time : float, default 0.0
+        The time of the message.
+
+    Returns
+    -------
+    msg : TransformStamped
+        TransformStamped message.
+    """
+    return make_transform_msg(
+        rf.translation, rf.rotation, rf.parent.name, rf.name, time=time
+    )

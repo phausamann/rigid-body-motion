@@ -2,7 +2,10 @@
 import os
 
 try:
-    from .transformer import static_rf_to_transform_msg, Transformer  # noqa
+    from .transformer import (  # noqa
+        Transformer,
+        ReferenceFrameTransformBroadcaster,
+    )
 except ImportError:
     if os.environ.get("RBM_ROS_DEBUG"):
         raise

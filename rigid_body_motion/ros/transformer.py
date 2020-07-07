@@ -430,7 +430,9 @@ class ReferenceFrameTransformBroadcaster:
         for transform in msg.transforms:
             if transform.child_frame_id == self.base.name:
                 if self.timestamps is not None:
-                    ts = rospy.Time.to_sec(transform.header.stamp)
+                    ts = pd.to_datetime(
+                        rospy.Time.to_sec(transform.header.stamp), unit="s"
+                    )
                     idx = self.timestamps.get_loc(ts, method="nearest")
                     self.publish(idx)
                 else:

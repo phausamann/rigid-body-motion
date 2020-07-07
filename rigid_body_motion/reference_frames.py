@@ -1,9 +1,8 @@
 """"""
 import numpy as np
-from scipy.interpolate import interp1d
-
 from anytree import NodeMixin, Walker
-from quaternion import as_quat_array, as_float_array, from_rotation_matrix
+from quaternion import as_float_array, as_quat_array, from_rotation_matrix
+from scipy.interpolate import interp1d
 
 from rigid_body_motion.core import _resolve_rf
 from rigid_body_motion.utils import rotate_vectors

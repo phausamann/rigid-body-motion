@@ -1,11 +1,10 @@
-import pytest
-import numpy.testing as npt
-
 import numpy as np
 import pandas as pd
+import pytest
+from numpy import testing as npt
 
 import rigid_body_motion as rbm
-from rigid_body_motion.reference_frames import _register, _deregister
+from rigid_body_motion.reference_frames import _deregister, _register
 
 
 class TestReferenceFrameRegistry(object):

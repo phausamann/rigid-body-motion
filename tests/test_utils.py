@@ -1,9 +1,7 @@
+import numpy as np
 import pytest
 from numpy import testing as npt
-
-import numpy as np
-
-from quaternion import quaternion, as_float_array, from_euler_angles
+from quaternion import as_float_array, from_euler_angles, quaternion
 
 from rigid_body_motion.utils import qmean, rotate_vectors
 

@@ -1,6 +1,5 @@
-import pytest
-
 import numpy as np
+import pytest
 
 
 @pytest.fixture()
@@ -78,15 +77,6 @@ class TestTransformer(object):
         np.testing.assert_allclose(pt_act, pt)
         # large relative differences at machine precision
         np.testing.assert_allclose(ot_act, ot, rtol=1.0)
-
-
-class TestReferenceFrameTransformBroadcaster:
-    def test_handle_incoming_msg(
-        self, ReferenceFrameTransformBroadcaster, get_rf_tree
-    ):
-        """"""
-        _, rf_child1, _ = get_rf_tree()
-        ReferenceFrameTransformBroadcaster(rf_child1)
 
 
 class TestVisualization:

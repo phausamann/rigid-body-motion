@@ -1,22 +1,18 @@
 from threading import Thread
 
 import numpy as np
-from anytree import PreOrderIter
-
+import pandas as pd
 import PyKDL
 import rospy
-from geometry_msgs.msg import (
-    PointStamped,
-    Vector3Stamped,
-    PoseStamped,
-    TransformStamped,
-)
+from anytree import PreOrderIter
+from geometry_msgs.msg import PointStamped, PoseStamped, Vector3Stamped
 
 from .msg import static_rf_to_transform_msg
 
 try:
     import rospkg
     import tf2_ros
+    from tf.msg import tfMessage
 except rospkg.ResourceNotFound:
     raise ImportError(
         "The rospkg module was found but tf2_ros failed to import, "
@@ -25,15 +21,16 @@ except rospkg.ResourceNotFound:
 
 from rigid_body_motion.core import _resolve_rf
 from rigid_body_motion.reference_frames import ReferenceFrame
+
 from .msg import (
-    make_transform_msg,
-    unpack_transform_msg,
-    make_vector_msg,
-    unpack_vector_msg,
     make_point_msg,
-    unpack_point_msg,
     make_pose_msg,
+    make_transform_msg,
+    make_vector_msg,
+    unpack_point_msg,
     unpack_pose_msg,
+    unpack_transform_msg,
+    unpack_vector_msg,
 )
 
 
@@ -364,13 +361,7 @@ class Transformer(object):
 class ReferenceFrameTransformBroadcaster:
     """ TF broadcaster for the transform of a reference frame wrt another. """
 
-    def __init__(
-        self,
-        frame,
-        base=None,
-        subscribe_to=None,
-        subscriber_msg_type=TransformStamped,
-    ):
+    def __init__(self, frame, base=None, subscribe=False):
         """ Constructor.
 
         Parameters
@@ -391,14 +382,17 @@ class ReferenceFrameTransformBroadcaster:
         ) = self.frame.get_transformation(self.base)
 
         if self.timestamps is None:
-            self.broadcaster = tf2_ros.TransformBroadcaster()
-        else:
             self.broadcaster = tf2_ros.StaticTransformBroadcaster()
+        else:
+            self.timestamps = pd.Index(self.timestamps)
+            self.broadcaster = tf2_ros.TransformBroadcaster()
 
-        if subscribe_to is not None:
+        if subscribe:
             self.subscriber = rospy.Subscriber(
-                subscribe_to, subscriber_msg_type
+                "/tf", tfMessage, self.handle_incoming_msg
             )
+        else:
+            self.subscriber = None
 
         self.idx = 0
         self.stopped = False
@@ -426,28 +420,39 @@ class ReferenceFrameTransformBroadcaster:
                 self.rotation[idx or self.idx],
                 self.base.name,
                 self.frame.name,
-                self.timestamps[idx or self.idx].astype(float) / 1e9,
+                self.timestamps.values[idx or self.idx].astype(float) / 1e9,
             )
 
         self.broadcaster.sendTransform(transform)
 
     def handle_incoming_msg(self, msg):
         """ Publish on incoming message. """
+        for transform in msg.transforms:
+            if transform.child_frame_id == self.base.name:
+                if self.timestamps is not None:
+                    ts = rospy.Time.to_sec(transform.header.stamp)
+                    idx = self.timestamps.get_loc(ts, method="nearest")
+                    self.publish(idx)
+                else:
+                    self.publish()
 
     def _spin_blocking(self):
         """ Continuously publish messages. """
         self.stopped = False
 
-        while not rospy.is_shutdown() and not self.stopped:
-            self.publish()
-            self.idx = (self.idx + 1) % len(self.timestamps)
-            dt = (
-                self.timestamps[self.idx].astype(float) / 1e9
-                - self.timestamps[self.idx - 1].astype(float) / 1e9
-                if self.idx > 0
-                else 0.0
-            )
-            rospy.sleep(dt)
+        if self.subscriber is None:
+            while not rospy.is_shutdown() and not self.stopped:
+                self.publish()
+                self.idx = (self.idx + 1) % len(self.timestamps)
+                dt = (
+                    self.timestamps[self.idx].astype(float) / 1e9
+                    - self.timestamps[self.idx - 1].astype(float) / 1e9
+                    if self.idx > 0
+                    else 0.0
+                )
+                rospy.sleep(dt)
+        else:
+            rospy.spin()
 
         self.stopped = True
 
@@ -468,11 +473,10 @@ class ReferenceFrameTransformBroadcaster:
             If `block=True`, the Thread instance that runs the loop.
         """
         if block:
-            return self._spin_blocking()
+            self._spin_blocking()
         else:
             self._thread = Thread(target=self._spin_blocking)
             self._thread.start()
-            return self._thread
 
     def stop(self):
         """ Stop publishing. """

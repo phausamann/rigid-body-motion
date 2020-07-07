@@ -1,12 +1,11 @@
-import pytest
-import numpy.testing as npt
-
 import numpy as np
+import pytest
+from numpy import testing as npt
 
 from rigid_body_motion.core import (
-    _resolve_axis,
-    _maybe_unpack_dataarray,
     _make_dataarray,
+    _maybe_unpack_dataarray,
+    _resolve_axis,
 )
 
 

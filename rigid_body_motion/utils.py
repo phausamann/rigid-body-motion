@@ -1,12 +1,7 @@
 """"""
 import numpy as np
-
-from quaternion import (
-    quaternion,
-    as_float_array,
-    as_quat_array,
-    rotate_vectors as quat_rv,
-)
+from quaternion import as_float_array, as_quat_array, quaternion
+from quaternion import rotate_vectors as quat_rv
 
 from rigid_body_motion.core import _resolve_axis
 

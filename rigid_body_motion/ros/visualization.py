@@ -2,8 +2,8 @@ from io import BytesIO
 from threading import Thread
 
 import rospy
+from geometry_msgs.msg import Point, Quaternion, Vector3
 from std_msgs.msg import ColorRGBA
-from geometry_msgs.msg import Vector3, Point, Quaternion
 from visualization_msgs.msg import Marker
 
 from rigid_body_motion.core import _resolve_rf
@@ -149,11 +149,10 @@ class BaseMarkerPublisher:
             If `block=True`, the Thread instance that runs the loop.
         """
         if block:
-            return self._spin_blocking()
+            self._spin_blocking()
         else:
             self._thread = Thread(target=self._spin_blocking)
             self._thread.start()
-            return self._thread
 
     def stop(self):
         """ Stop publishing. """

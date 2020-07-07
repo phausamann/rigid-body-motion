@@ -19,10 +19,16 @@ dependencies:
   - sphinx_rtd_theme=0.4.3
   - numpydoc=0.9.1
   - coverage=4.5.3
-  - bump2version=1.0.0
-  - flake8=3.5.0
+  # additional dev tools
+  {% if "RBM_DEV_TOOLS" in os.environ %}
   - tox=3.5.2
+  - bump2version=1.0.0
+  - flake8=3.7.9
   - pre-commit=2.5.1
+  - black=19.10b0
+  - isort=5.0.4
+  {% endif %}
+  # ROS dependencies
   {% if "RBM_ROS" in os.environ %}
   - ros-melodic-rospy=1.14.5
   - ros-melodic-tf=1.12.1

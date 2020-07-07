@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
-
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -25,7 +24,8 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
-    description="Python utilities for estimating and transforming rigid body motion.",
+    description="Python utilities for estimating and transforming "
+    "rigid body motion.",
     install_requires=requirements,
     license="MIT license",
     long_description=readme + "\n\n" + history,

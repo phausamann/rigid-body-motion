@@ -1,7 +1,6 @@
-import pytest
-import numpy.testing as npt
-
 import numpy as np
+import pytest
+from numpy import testing as npt
 
 from rigid_body_motion.estimators import shortest_arc_rotation
 

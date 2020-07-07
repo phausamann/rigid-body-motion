@@ -3,8 +3,8 @@ import os
 
 try:
     from .transformer import (  # noqa
-        Transformer,
         ReferenceFrameTransformBroadcaster,
+        Transformer,
     )
 except ImportError:
     if os.environ.get("RBM_ROS_DEBUG"):

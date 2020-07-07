@@ -1,7 +1,6 @@
-import pytest
-import numpy.testing as npt
-
 import numpy as np
+import pytest
+from numpy import testing as npt
 
 import rigid_body_motion as rbm
 from rigid_body_motion.coordinate_systems import _replace_dim

@@ -1,8 +1,5 @@
 pip==18.1
-bump2version==1.0.0
 wheel==0.32.1
-flake8==3.5.0
-tox==3.5.2
 coverage==4.5.1
 Sphinx==2.4.4
 sphinx_rtd_theme==0.4

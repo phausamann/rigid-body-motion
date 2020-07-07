@@ -25,6 +25,7 @@ dependencies:
   - pre-commit=2.5.1
   {% if "RBM_ROS" in os.environ %}
   - ros-melodic-rospy=1.14.5
+  - ros-melodic-tf=1.12.1
   - ros-melodic-tf2-ros=0.6.5
   - ros-melodic-geometry-msgs=1.12.7
   - ros-melodic-visualization-msgs=1.12.7

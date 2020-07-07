@@ -3,11 +3,6 @@ import numpy.testing as npt
 
 import numpy as np
 
-try:
-    import xarray as xr
-except ImportError:
-    xr = None
-
 from rigid_body_motion.estimators import shortest_arc_rotation
 
 
@@ -23,9 +18,10 @@ class TestEstimators(object):
 
         npt.assert_allclose(shortest_arc_rotation(v1, v2), q_exp)
 
-    @pytest.mark.skipif(xr is None, reason="xarray not installed")
     def test_shortest_arc_rotation_xr(self):
         """"""
+        xr = pytest.importorskip("xarray")
+
         v1 = np.zeros((10, 3))
         v1[:, 0] = 1.0
         v2 = np.zeros((10, 3))

@@ -1,6 +1,5 @@
 import pytest
 import numpy.testing as npt
-from .helpers import rf_test_grid, transform_test_grid, get_rf_tree
 
 import numpy as np
 import pandas as pd
@@ -323,9 +322,9 @@ class TestReferenceFrame(object):
         with pytest.raises(ValueError):
             rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
 
-    @pytest.mark.parametrize("r, rc1, rc2, t, tc1, tc2", rf_test_grid())
-    def test_get_transformation(self, r, rc1, rc2, t, tc1, tc2):
+    def test_get_transformation(self, rf_grid, get_rf_tree):
         """"""
+        r, rc1, rc2, t, tc1, tc2 = rf_grid
         rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
 
         # child1 to world
@@ -362,11 +361,9 @@ class TestReferenceFrame(object):
         npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
         npt.assert_equal(ts, np.arange(5) + 2.5)
 
-    @pytest.mark.parametrize(
-        "o, ot, p, pt, rc1, rc2, tc1, tc2", transform_test_grid()
-    )
-    def test_transform_vectors(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_vectors(self, transform_grid, get_rf_tree):
         """"""
+        o, ot, p, pt, rc1, rc2, tc1, tc2 = transform_grid
         _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
         rf_child3 = rbm.ReferenceFrame(
             "child3", rf_child1, timestamps=np.arange(5) + 2.5
@@ -403,11 +400,9 @@ class TestReferenceFrame(object):
         vt = np.tile(pt, (10, 5, 1)) - np.array(v0t[np.newaxis, :, :])
         np.testing.assert_allclose(vt_act, vt, rtol=1.0)
 
-    @pytest.mark.parametrize(
-        "o, ot, p, pt, rc1, rc2, tc1, tc2", transform_test_grid()
-    )
-    def test_transform_points(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_points(self, transform_grid, get_rf_tree):
         """"""
+        o, ot, p, pt, rc1, rc2, tc1, tc2 = transform_grid
         rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
         rf_child3 = rbm.ReferenceFrame(
             "child3", rf_child1, timestamps=np.arange(5) + 2.5
@@ -436,11 +431,9 @@ class TestReferenceFrame(object):
         )
         np.testing.assert_allclose(pt_act, np.tile(pt, (10, 5, 1)), rtol=1.0)
 
-    @pytest.mark.parametrize(
-        "o, ot, p, pt, rc1, rc2, tc1, tc2", transform_test_grid()
-    )
-    def test_transform_quaternions(self, o, ot, p, pt, rc1, rc2, tc1, tc2):
+    def test_transform_quaternions(self, transform_grid, get_rf_tree):
         """"""
+        o, ot, p, pt, rc1, rc2, tc1, tc2 = transform_grid
         _, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
         rf_child3 = rbm.ReferenceFrame(
             "child3", rf_child1, timestamps=np.arange(5) + 2.5
@@ -472,5 +465,5 @@ class TestReferenceFrame(object):
             time_axis=1,
         )
         np.testing.assert_allclose(
-            ot_act, np.tile(np.abs(ot), (10, 5, 1)), rtol=1.0
+            np.abs(ot_act), np.tile(np.abs(ot), (10, 5, 1)), rtol=1.0
         )

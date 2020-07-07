@@ -5,7 +5,12 @@ from anytree import PreOrderIter
 
 import PyKDL
 import rospy
-from geometry_msgs.msg import PointStamped, Vector3Stamped, PoseStamped
+from geometry_msgs.msg import (
+    PointStamped,
+    Vector3Stamped,
+    PoseStamped,
+    TransformStamped,
+)
 
 from .msg import static_rf_to_transform_msg
 
@@ -359,7 +364,13 @@ class Transformer(object):
 class ReferenceFrameTransformBroadcaster:
     """ TF broadcaster for the transform of a reference frame wrt another. """
 
-    def __init__(self, frame, base=None):
+    def __init__(
+        self,
+        frame,
+        base=None,
+        subscribe_to=None,
+        subscriber_msg_type=TransformStamped,
+    ):
         """ Constructor.
 
         Parameters
@@ -368,11 +379,8 @@ class ReferenceFrameTransformBroadcaster:
             Reference frame for which to publish the transform.
 
         base : str or ReferenceFrame, optional
-            Base reference wrt to which the translation is published. Defaults
+            Base reference wrt to which the transform is published. Defaults
             to the parent reference frame.
-
-        topic : str, optional
-            Name of the topic on which to publish. Defaults to "/<frame>/pose".
         """
         self.frame = _resolve_rf(frame)
         self.base = _resolve_rf(base or self.frame.parent)
@@ -387,7 +395,14 @@ class ReferenceFrameTransformBroadcaster:
         else:
             self.broadcaster = tf2_ros.StaticTransformBroadcaster()
 
+        if subscribe_to is not None:
+            self.subscriber = rospy.Subscriber(
+                subscribe_to, subscriber_msg_type
+            )
+
         self.idx = 0
+        self.stopped = False
+        self._thread = None
 
     def publish(self, idx=None):
         """ Publish a transform message.
@@ -411,9 +426,13 @@ class ReferenceFrameTransformBroadcaster:
                 self.rotation[idx or self.idx],
                 self.base.name,
                 self.frame.name,
+                self.timestamps[idx or self.idx].astype(float) / 1e9,
             )
 
         self.broadcaster.sendTransform(transform)
+
+    def handle_incoming_msg(self, msg):
+        """ Publish on incoming message. """
 
     def _spin_blocking(self):
         """ Continuously publish messages. """

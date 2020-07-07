@@ -33,6 +33,7 @@ test:
     - xarray
     - numba
     - ros-melodic-rospy # [linux and x86_64]
+    - ros-melodic-tf # [linux and x86_64]
     - ros-melodic-tf2-ros # [linux and x86_64]
     - ros-melodic-geometry-msgs # [linux and x86_64]
     - ros-melodic-visualization-msgs # [linux and x86_64]

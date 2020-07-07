@@ -1,21 +1,44 @@
 """ Generate test cases for reference frame transforms.
 
-This script requires a Python 2.7 ROS enviroment in order to run properly.
+This script requires a ROS environment in order to run properly.
 """
-from .helpers import test_data_dir, mock_quaternion
-
-import os
 from itertools import product
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 import rospy
 import tf
+from quaternion import as_float_array, from_euler_angles
 
 import rigid_body_motion as rbm
-from rigid_body_motion.ros import Transformer, static_rf_to_transform_msg
-from tests.helpers import get_rf_tree
+from rigid_body_motion.ros import Transformer
+from rigid_body_motion.ros.msg import static_rf_to_transform_msg
+
+test_data_dir = Path(__file__).parent / "test_data"
+
+
+def mock_quaternion(*angles):
+    """"""
+    return as_float_array(from_euler_angles(*angles))
+
+
+def get_rf_tree(
+    tc1=(0.0, 0.0, 0.0),
+    rc1=(1.0, 0.0, 0.0, 0.0),
+    tc2=(0.0, 0.0, 0.0),
+    rc2=(1.0, 0.0, 0.0, 0.0),
+):
+    """"""
+    rf_world = rbm.ReferenceFrame("world")
+    rf_child1 = rbm.ReferenceFrame(
+        "child1", parent=rf_world, translation=tc1, rotation=rc1
+    )
+    rf_child2 = rbm.ReferenceFrame(
+        "child2", parent=rf_world, translation=tc2, rotation=rc2
+    )
+
+    return rf_world, rf_child1, rf_child2
 
 
 def get_transformer(
@@ -98,7 +121,6 @@ def get_twist(
 
 
 if __name__ == "__main__":
-
     rg = np.arange(2)
     it = list(
         product(rg, rg, rg, rg * np.pi / 3, rg * np.pi / 3, rg * np.pi / 3)
@@ -115,7 +137,7 @@ if __name__ == "__main__":
         for x, y, z, rx, ry, rz in it
     )
 
-    df.to_csv(os.path.join(test_data_dir, "rf_test_grid.csv"))
+    df.to_csv(test_data_dir / "rf_test_grid.csv")
 
     # transformed poses
     df = pd.DataFrame(
@@ -130,14 +152,14 @@ if __name__ == "__main__":
         for x, y, z, rx, ry, rz in it
     )
 
-    df.to_csv(os.path.join(test_data_dir, "transform_test_grid.csv"))
+    df.to_csv(test_data_dir / "transform_test_grid.csv")
 
     # twist sequences
     twist_rg = np.linspace(0.0, 10.0, 100)
     it = list(
         product(twist_rg, (0.0,), (0.0,), rg * np.pi / 3, (0.0,), (0.0,))
     )
-    times = range(len(it))
+    times = np.arange(len(it))
 
     rf_world = rbm.ReferenceFrame("world")
     transformer = tf.TransformerROS(True)
@@ -153,4 +175,4 @@ if __name__ == "__main__":
     )
     df.index = pd.to_datetime(times, unit="s")
 
-    df.to_csv(os.path.join(test_data_dir, "twist_test_grid.csv"))
+    df.to_csv(test_data_dir / "twist_test_grid.csv")

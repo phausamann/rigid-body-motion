@@ -1,6 +1,5 @@
 import pytest
 import numpy.testing as npt
-from .helpers import mock_quaternion, register_rf_tree
 
 import numpy as np
 
@@ -17,7 +16,7 @@ class TestTopLevel(object):
         yield
 
     @pytest.fixture()
-    def rf_tree(self):
+    def rf_tree(self, register_rf_tree, mock_quaternion):
         """"""
         register_rf_tree(
             tc1=(1.0, 0.0, 0.0),
@@ -74,7 +73,7 @@ class TestTopLevel(object):
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
-    def test_transform_quaternions(self, rf_tree):
+    def test_transform_quaternions(self, rf_tree, mock_quaternion):
         """"""
         arr_child2 = (1.0, 0.0, 0.0, 0.0)
         arr_exp = mock_quaternion(np.pi, 0.0, 0.0)
@@ -85,7 +84,7 @@ class TestTopLevel(object):
         )
         npt.assert_almost_equal(arr_child1, arr_exp)
 
-    def test_transform_quaternions_xr(self, rf_tree):
+    def test_transform_quaternions_xr(self, rf_tree, mock_quaternion):
         """"""
         xr = pytest.importorskip("xarray")
         arr_child2 = (1.0, 0.0, 0.0, 0.0)

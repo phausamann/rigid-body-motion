@@ -84,7 +84,7 @@ def get_marker(
 class BaseMarkerPublisher:
     """ Base class for Marker publishers. """
 
-    def __init__(self, marker, topic, publish_interval=1.0, verbose=False):
+    def __init__(self, marker, topic, publish_interval=0.0, verbose=False):
         """ Constructor.
 
         Parameters
@@ -95,7 +95,7 @@ class BaseMarkerPublisher:
         topic : str
             Name of the topic on which to publish.
 
-        publish_interval : float, default 1.0
+        publish_interval : float, default 0.0
             Time in seconds between publishing when calling ``spin``.
         """
         self.marker = marker
@@ -169,7 +169,7 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         base=None,
         topic=None,
         max_points=1000,
-        publish_interval=1.0,
+        publish_interval=0.0,
         verbose=False,
     ):
         """ Constructor.
@@ -190,7 +190,7 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
             Maximum number of points to add to the marker. Actual translation
             array will be sub-sampled to this number of points.
 
-        publish_interval : float, default 1.0
+        publish_interval : float, default 0.0
             Time in seconds between publishing when calling ``spin``.
         """
         self.frame = _resolve_rf(frame)

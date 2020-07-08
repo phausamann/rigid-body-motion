@@ -5,7 +5,14 @@ import pandas as pd
 import PyKDL
 import rospy
 from anytree import PreOrderIter
-from geometry_msgs.msg import PointStamped, PoseStamped, Vector3Stamped
+from geometry_msgs.msg import (
+    PointStamped,
+    PoseStamped,
+    TwistStamped,
+    Vector3Stamped,
+)
+from quaternion import as_quat_array, as_rotation_vector
+from scipy.signal import butter, filtfilt
 
 try:
     import rospkg
@@ -24,6 +31,7 @@ from .msg import (
     make_point_msg,
     make_pose_msg,
     make_transform_msg,
+    make_twist_msg,
     make_vector_msg,
     static_rf_to_transform_msg,
     unpack_point_msg,
@@ -360,7 +368,15 @@ class Transformer(object):
 class ReferenceFrameTransformBroadcaster:
     """ TF broadcaster for the transform of a reference frame wrt another. """
 
-    def __init__(self, frame, base=None, publish_pose=False, subscribe=False):
+    def __init__(
+        self,
+        frame,
+        base=None,
+        publish_pose=False,
+        publish_twist=False,
+        subscribe=False,
+        twist_filter_cutoff=0.1,
+    ):
         """ Constructor.
 
         Parameters
@@ -375,6 +391,11 @@ class ReferenceFrameTransformBroadcaster:
         publish_pose : bool, default False
             If True, also publish a PoseStamped message on the topic
             "/<frame>/pose".
+
+        publish_twist : bool, default False
+            If True, also publish a TwistStamped message with the linear and
+            angular velocity of the frame wrt the base on the topic
+            "/<frame>/twist".
 
         subscribe : bool or str, default False
             If True, subscribe to the "/tf" topic and publish transforms
@@ -409,6 +430,19 @@ class ReferenceFrameTransformBroadcaster:
         else:
             self.pose_publisher = None
 
+        if publish_twist:
+            self.linear, self.angular = self._estimate_twist(
+                filter_cutoff=twist_filter_cutoff
+            )
+            self.twist_publisher = rospy.Publisher(
+                f"/{self.frame.name}/twist",
+                TwistStamped,
+                queue_size=1,
+                latch=True,
+            )
+        else:
+            self.twist_publisher = None
+
         if subscribe:
             self.subscriber = rospy.Subscriber(
                 "/tf", tfMessage, self.handle_incoming_msg
@@ -423,6 +457,38 @@ class ReferenceFrameTransformBroadcaster:
         self.idx = 0
         self.stopped = False
         self._thread = None
+
+    def _estimate_twist(self, filter_cutoff=0.1):
+        """ Estimate twist of frame wrt base, expressed in frame. """
+        if self.timestamps is None:
+            raise ValueError(
+                "Twist cannot be estimated for static transforms."
+            )
+
+        translation = filtfilt(
+            *butter(7, filter_cutoff), self.translation, axis=0
+        )
+        linear = np.gradient(
+            translation, self.timestamps.values.astype(float) / 1e9, axis=0,
+        )
+        linear = self.base.transform_vectors(
+            linear, self.frame, timestamps=self.timestamps
+        )
+
+        rotation = filtfilt(
+            *butter(7, filter_cutoff),
+            as_rotation_vector(as_quat_array(self.rotation)),
+            axis=0
+        )
+        angular = np.gradient(
+            rotation, self.timestamps.values.astype(float) / 1e9, axis=0,
+        )
+
+        angular = self.base.transform_vectors(
+            angular, self.frame, timestamps=self.timestamps
+        )
+
+        return linear, angular
 
     def publish(self, idx=None):
         """ Publish a transform message.
@@ -466,6 +532,13 @@ class ReferenceFrameTransformBroadcaster:
 
         if self.pose_publisher is not None:
             self.pose_publisher.publish(pose)
+
+        if self.twist_publisher is not None:
+            self.twist_publisher.publish(
+                make_twist_msg(
+                    self.linear[idx], self.angular[idx], self.frame.name
+                )
+            )
 
     def handle_incoming_msg(self, msg):
         """ Publish on incoming message. """

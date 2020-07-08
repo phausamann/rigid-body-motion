@@ -6,6 +6,7 @@ from geometry_msgs.msg import (
     Quaternion,
     QuaternionStamped,
     TransformStamped,
+    TwistStamped,
     Vector3,
     Vector3Stamped,
 )
@@ -27,6 +28,7 @@ def unpack_transform_msg(msg):
     """ Get translation and rotation from a TransformStamped message. """
     t = msg.transform.translation
     r = msg.transform.rotation
+
     return (t.x, t.y, t.z), (r.w, r.x, r.y, r.z)
 
 
@@ -45,7 +47,27 @@ def unpack_pose_msg(msg):
     """ Get position and orientation from a PoseStamped message. """
     p = msg.pose.position
     o = msg.pose.orientation
+
     return (p.x, p.y, p.z), (o.w, o.x, o.y, o.z)
+
+
+def make_twist_msg(v, w, frame_id, time=0.0):
+    """ Create a TwistStamped message. """
+    msg = TwistStamped()
+    msg.header.stamp = rospy.Time.from_sec(time)
+    msg.header.frame_id = frame_id
+    msg.twist.linear = Vector3(*v)
+    msg.twist.angular = Vector3(*w)
+
+    return msg
+
+
+def unpack_twist_msg(msg):
+    """ Get linear and angular velocity from a TwistStamped message. """
+    v = msg.twist.linear
+    w = msg.twist.angular
+
+    return (v.x, v.y, v.z), (w.x, w.y, w.z)
 
 
 def make_vector_msg(v, frame_id, time=0.0):
@@ -61,6 +83,7 @@ def make_vector_msg(v, frame_id, time=0.0):
 def unpack_vector_msg(msg):
     """ Get coordinates from a Vector3Stamped message. """
     v = msg.vector
+
     return v.x, v.y, v.z
 
 
@@ -77,6 +100,7 @@ def make_point_msg(p, frame_id, time=0.0):
 def unpack_point_msg(msg):
     """ Get coordinates from a PointStamped message. """
     p = msg.point
+
     return p.x, p.y, p.z
 
 
@@ -93,6 +117,7 @@ def make_quaternion_msg(q, frame_id, time=0.0):
 def unpack_quaternion_msg(msg):
     """ Get coordinates from a QuaternionStamped message. """
     q = msg.quaternion
+
     return q.w, q.x, q.y, q.z
 
 

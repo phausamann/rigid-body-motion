@@ -7,8 +7,6 @@ import rospy
 from anytree import PreOrderIter
 from geometry_msgs.msg import PointStamped, PoseStamped, Vector3Stamped
 
-from .msg import static_rf_to_transform_msg
-
 try:
     import rospkg
     import tf2_ros
@@ -27,6 +25,7 @@ from .msg import (
     make_pose_msg,
     make_transform_msg,
     make_vector_msg,
+    static_rf_to_transform_msg,
     unpack_point_msg,
     unpack_pose_msg,
     unpack_transform_msg,
@@ -361,7 +360,7 @@ class Transformer(object):
 class ReferenceFrameTransformBroadcaster:
     """ TF broadcaster for the transform of a reference frame wrt another. """
 
-    def __init__(self, frame, base=None, subscribe=False):
+    def __init__(self, frame, base=None, publish_pose=False, subscribe=False):
         """ Constructor.
 
         Parameters
@@ -372,6 +371,19 @@ class ReferenceFrameTransformBroadcaster:
         base : str or ReferenceFrame, optional
             Base reference wrt to which the transform is published. Defaults
             to the parent reference frame.
+
+        publish_pose : bool, default False
+            If True, also publish a PoseStamped message on the topic
+            "/<frame>/pose".
+
+        subscribe : bool or str, default False
+            If True, subscribe to the "/tf" topic and publish transforms
+            when messages are broadcast whose `child_frame_id` is the name of
+            the base frame. If the frame is a moving reference frame, the
+            transform whose timestamp is the closest to the broadcast timestamp
+            is published. `subscribe` can also be a string, in which case this
+            broadcaster will be listening for TF messages with this
+            `child_frame_id`.
         """
         self.frame = _resolve_rf(frame)
         self.base = _resolve_rf(base or self.frame.parent)
@@ -387,10 +399,24 @@ class ReferenceFrameTransformBroadcaster:
             self.timestamps = pd.Index(self.timestamps)
             self.broadcaster = tf2_ros.TransformBroadcaster()
 
+        if publish_pose:
+            self.pose_publisher = rospy.Publisher(
+                f"/{self.frame.name}/pose",
+                PoseStamped,
+                queue_size=1,
+                latch=True,
+            )
+        else:
+            self.pose_publisher = None
+
         if subscribe:
             self.subscriber = rospy.Subscriber(
                 "/tf", tfMessage, self.handle_incoming_msg
             )
+            if isinstance(subscribe, str):
+                self.subscribe_to_frame = subscribe
+            else:
+                self.subscribe_to_frame = self.base.name
         else:
             self.subscriber = None
 
@@ -414,21 +440,37 @@ class ReferenceFrameTransformBroadcaster:
                 self.base.name,
                 self.frame.name,
             )
+            if self.pose_publisher is not None:
+                pose = make_pose_msg(
+                    self.translation, self.rotation, self.base.name,
+                )
         else:
+            idx = idx or self.idx
+            ts = self.timestamps.values[idx].astype(float) / 1e9
             transform = make_transform_msg(
-                self.translation[idx or self.idx],
-                self.rotation[idx or self.idx],
+                self.translation[idx],
+                self.rotation[idx],
                 self.base.name,
                 self.frame.name,
-                self.timestamps.values[idx or self.idx].astype(float) / 1e9,
+                ts,
             )
+            if self.pose_publisher is not None:
+                pose = make_pose_msg(
+                    self.translation[idx],
+                    self.rotation[idx],
+                    self.base.name,
+                    ts,
+                )
 
         self.broadcaster.sendTransform(transform)
+
+        if self.pose_publisher is not None:
+            self.pose_publisher.publish(pose)
 
     def handle_incoming_msg(self, msg):
         """ Publish on incoming message. """
         for transform in msg.transforms:
-            if transform.child_frame_id == self.base.name:
+            if transform.child_frame_id == self.subscribe_to_frame:
                 if self.timestamps is not None:
                     ts = pd.to_datetime(
                         rospy.Time.to_sec(transform.header.stamp), unit="s"
@@ -442,7 +484,7 @@ class ReferenceFrameTransformBroadcaster:
         """ Continuously publish messages. """
         self.stopped = False
 
-        if self.subscriber is None:
+        if self.subscriber is None and self.timestamps is not None:
             while not rospy.is_shutdown() and not self.stopped:
                 self.publish()
                 self.idx = (self.idx + 1) % len(self.timestamps)

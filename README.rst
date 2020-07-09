@@ -28,8 +28,9 @@ Overview
 This package provides a high-level interface for transforming arrays
 describing motion of rigid bodies between different coordinate systems and
 reference frames. The core of the reference frame handling is a fast
-re-implementation of ROS's ``tf2`` library in pure Python. The package also
-provides first-class support for xarray_ data types.
+re-implementation of ROS's ``tf2`` library using ``numpy`` and
+``numpy-quaternion``. The package also provides first-class support for
+xarray_ data types.
 
 .. _xarray: https://xarray.pydata.org
 

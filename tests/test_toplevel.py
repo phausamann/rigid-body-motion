@@ -30,13 +30,14 @@ class TestTopLevel(object):
 
         # tuple
         arr_child1 = rbm.transform_points(
-            arr_child2, outof="child2", into="child1"
+            arr_child2, into="child1", outof="child2"
         )
         npt.assert_almost_equal(arr_child1, arr_exp)
 
     def test_transform_points_xr(self, rf_tree):
         """"""
         xr = pytest.importorskip("xarray")
+
         arr_child2 = (1.0, 1.0, 1.0)
         arr_exp = (-3.0, -1.0, 1.0)
 
@@ -47,8 +48,8 @@ class TestTopLevel(object):
         )
         da_child1 = rbm.transform_points(
             da_child2,
-            outof="child2",
             into="child1",
+            outof="child2",
             dim="cartesian_axis",
             timestamps="time",
         )
@@ -60,16 +61,14 @@ class TestTopLevel(object):
             np.tile(arr_child2, (5, 10, 1)),
             {"time": np.arange(10)},
             ("extra_dim", "time", "cartesian_axis"),
+            attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_points(
-            da_child2,
-            outof="child2",
-            into="child1",
-            dim="cartesian_axis",
-            timestamps="time",
+            da_child2, into="child1", dim="cartesian_axis", timestamps="time",
         )
         assert da_child1.shape == (5, 10, 3)
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
+        assert da_child1.attrs["reference_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
     def test_transform_quaternions(self, rf_tree, mock_quaternion):
@@ -79,13 +78,14 @@ class TestTopLevel(object):
 
         # tuple
         arr_child1 = rbm.transform_quaternions(
-            arr_child2, outof="child2", into="child1"
+            arr_child2, into="child1", outof="child2"
         )
         npt.assert_almost_equal(arr_child1, arr_exp)
 
     def test_transform_quaternions_xr(self, rf_tree, mock_quaternion):
         """"""
         xr = pytest.importorskip("xarray")
+
         arr_child2 = (1.0, 0.0, 0.0, 0.0)
         arr_exp = mock_quaternion(np.pi, 0.0, 0.0)
 
@@ -93,15 +93,13 @@ class TestTopLevel(object):
             np.tile(arr_child2, (10, 1)),
             {"time": np.arange(10)},
             ("time", "quaternion_axis"),
+            attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_quaternions(
-            da_child2,
-            outof="child2",
-            into="child1",
-            dim="quaternion_axis",
-            timestamps="time",
+            da_child2, into="child1", dim="quaternion_axis", timestamps="time",
         )
         assert da_child1.shape == (10, 4)
+        assert da_child1.attrs["reference_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors
@@ -112,8 +110,8 @@ class TestTopLevel(object):
         )
         da_child1 = rbm.transform_quaternions(
             da_child2,
-            outof="child2",
             into="child1",
+            outof="child2",
             dim="quaternion_axis",
             timestamps="time",
         )
@@ -128,13 +126,14 @@ class TestTopLevel(object):
 
         # tuple
         arr_child1 = rbm.transform_vectors(
-            arr_child2, outof="child2", into="child1"
+            arr_child2, into="child1", outof="child2"
         )
         npt.assert_almost_equal(arr_child1, arr_exp)
 
     def test_transform_vectors_xr(self, rf_tree):
         """"""
         xr = pytest.importorskip("xarray")
+
         arr_child2 = (1.0, 1.0, 1.0)
         arr_exp = (-1.0, -1.0, 1.0)
 
@@ -142,15 +141,13 @@ class TestTopLevel(object):
             np.tile(arr_child2, (10, 1)),
             {"time": np.arange(10)},
             ("time", "cartesian_axis"),
+            attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_vectors(
-            da_child2,
-            outof="child2",
-            into="child1",
-            dim="cartesian_axis",
-            timestamps="time",
+            da_child2, into="child1", dim="cartesian_axis", timestamps="time",
         )
         assert da_child1.shape == (10, 3)
+        assert da_child1.attrs["reference_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors
@@ -161,8 +158,8 @@ class TestTopLevel(object):
         )
         da_child1 = rbm.transform_vectors(
             da_child2,
-            outof="child2",
             into="child1",
+            outof="child2",
             dim="cartesian_axis",
             timestamps="time",
         )
@@ -176,17 +173,17 @@ class TestTopLevel(object):
         arr = np.ones((10, 2))
         expected = np.tile((np.sqrt(2), np.pi / 4), (10, 1))
         actual = rbm.transform_coordinates(
-            arr, outof="cartesian", into="polar", axis=1
+            arr, into="polar", outof="cartesian", axis=1
         )
         npt.assert_equal(actual, expected)
 
         with pytest.raises(ValueError):
             rbm.transform_coordinates(
-                np.ones((10, 3)), outof="cartesian", into="polar"
+                np.ones((10, 3)), into="polar", outof="cartesian"
             )
         with pytest.raises(ValueError):
             rbm.transform_coordinates(
-                np.ones((10, 2)), outof="unsupported", into="polar"
+                np.ones((10, 2)), into="polar", outof="unsupported"
             )
 
     def test_transform_coordinates_xr(self):
@@ -203,8 +200,17 @@ class TestTopLevel(object):
             {"time": np.arange(10), "spherical_axis": ["r", "theta", "phi"]},
             ("time", "spherical_axis"),
         )
-
         actual = rbm.transform_coordinates(
-            da, outof="cartesian", into="spherical"
+            da, into="spherical", outof="cartesian"
         )
         xr.testing.assert_allclose(actual, expected)
+
+        # source coordinate system in attrs:
+        da.attrs = {"coordinate_system": "cartesian"}
+        actual = rbm.transform_coordinates(da, into="spherical")
+        xr.testing.assert_allclose(actual, expected)
+        assert actual.attrs == {"coordinate_system": "spherical"}
+
+        da.attrs = {}
+        with pytest.raises(ValueError):
+            rbm.transform_coordinates(da, into="spherical")

@@ -57,14 +57,84 @@ _cs_funcs = {
 }
 
 
-def transform_vectors(
+def _transform(
+    method,
     arr,
-    outof=None,
-    into=None,
-    dim=None,
-    axis=None,
-    timestamps=None,
-    time_axis=None,
+    into,
+    outof,
+    dim,
+    axis,
+    timestamps,
+    time_axis,
+    represent_in=None,
+):
+    """ Base transform method. """
+    (
+        arr,
+        axis,
+        time_axis,
+        ts_in,
+        coords,
+        dims,
+        name,
+        attrs,
+    ) = _maybe_unpack_dataarray(
+        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
+    )
+
+    if outof is None:
+        if attrs is not None and "reference_frame" in attrs:
+            # TODO warn if outof(.name) != attrs["reference_frame"]
+            outof = attrs["reference_frame"]
+        else:
+            raise ValueError(
+                "'outof' must be specified unless you provide a DataArray "
+                "whose ``attrs`` contain a 'reference_frame' entry with the "
+                "name of a registered frame"
+            )
+
+    if represent_in is None:
+        if attrs is not None and "representation_frame" in attrs:
+            # TODO warn if represent_in(.name) != attrs["representation_frame"]
+            outof = attrs["representation_frame"]
+        else:
+            represent_in = into
+
+    into = _resolve_rf(into)
+    outof = _resolve_rf(outof)
+    represent_in = _resolve_rf(represent_in)
+
+    if attrs is not None and "reference_frame" in attrs:
+        attrs.update(
+            {
+                "reference_frame": into.name,
+                "representation_frame": represent_in.name,
+            }
+        )
+
+    arr, ts_out = getattr(outof, method)(
+        arr,
+        into,
+        axis=axis,
+        timestamps=ts_in,
+        time_axis=time_axis,
+        return_timestamps=True,
+    )
+
+    if coords is not None:
+        return _make_dataarray(
+            arr, coords, dims, name, attrs, timestamps, ts_out
+        )
+    elif ts_out is not None:
+        # TODO not so pretty. Maybe also introduce return_timestamps
+        #  parameter and do this when return_timestamps=None
+        return arr, ts_out
+    else:
+        return arr
+
+
+def transform_vectors(
+    arr, into, outof=None, dim=None, axis=None, timestamps=None, time_axis=None
 ):
     """ Transform an array of vectors between reference frames.
 
@@ -73,13 +143,15 @@ def transform_vectors(
     arr: array_like
         The array to transform.
 
-    outof: str or ReferenceFrame
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented.
-
     into: str or ReferenceFrame
         ReferenceFrame instance or name of a registered reference frame in
         which the array will be represented after the transformation.
+
+    outof: str or ReferenceFrame, optional
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array is currently represented. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "reference_frame" entry with
+        the name of a registered frame.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -112,48 +184,13 @@ def transform_vectors(
     --------
     transform_quaternions, transform_points, ReferenceFrame
     """
-    (
-        arr,
-        axis,
-        time_axis,
-        ts_in,
-        coords,
-        dims,
-        name,
-        attrs,
-    ) = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
+    return _transform(
+        "transform_vectors", arr, into, outof, dim, axis, timestamps, time_axis
     )
-
-    arr, ts_out = _resolve_rf(outof).transform_vectors(
-        arr,
-        into,
-        axis=axis,
-        time_axis=time_axis,
-        timestamps=ts_in,
-        return_timestamps=True,
-    )
-
-    if coords is not None:
-        return _make_dataarray(
-            arr, coords, dims, name, attrs, timestamps, ts_out
-        )
-    elif ts_out is not None:
-        # TODO not so pretty. Maybe also introduce return_timestamps
-        #  parameter and do this when return_timestamps=None
-        return arr, ts_out
-    else:
-        return arr
 
 
 def transform_points(
-    arr,
-    outof=None,
-    into=None,
-    dim=None,
-    axis=None,
-    timestamps=None,
-    time_axis=None,
+    arr, into, outof=None, dim=None, axis=None, timestamps=None, time_axis=None
 ):
     """ Transform an array of points between reference frames.
 
@@ -162,13 +199,15 @@ def transform_points(
     arr: array_like
         The array to transform.
 
-    outof: str or ReferenceFrame
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented.
-
     into: str or ReferenceFrame
         ReferenceFrame instance or name of a registered reference frame in
         which the array will be represented after the transformation.
+
+    outof: str or ReferenceFrame, optional
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array is currently represented. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "reference_frame" entry with
+        the name of a registered frame.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -201,48 +240,13 @@ def transform_points(
     --------
     transform_vectors, transform_quaternions, ReferenceFrame
     """
-    (
-        arr,
-        axis,
-        time_axis,
-        ts_in,
-        coords,
-        dims,
-        name,
-        attrs,
-    ) = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
+    return _transform(
+        "transform_points", arr, into, outof, dim, axis, timestamps, time_axis
     )
-
-    arr, ts_out = _resolve_rf(outof).transform_points(
-        arr,
-        into,
-        axis=axis,
-        time_axis=time_axis,
-        timestamps=ts_in,
-        return_timestamps=True,
-    )
-
-    if coords is not None:
-        return _make_dataarray(
-            arr, coords, dims, name, attrs, timestamps, ts_out
-        )
-    elif ts_out is not None:
-        # TODO not so pretty. Maybe also introduce return_timestamps
-        #  parameter and do this when return_timestamps=None
-        return arr, ts_out
-    else:
-        return arr
 
 
 def transform_quaternions(
-    arr,
-    outof=None,
-    into=None,
-    dim=None,
-    axis=None,
-    timestamps=None,
-    time_axis=None,
+    arr, into, outof=None, dim=None, axis=None, timestamps=None, time_axis=None
 ):
     """ Transform an array of quaternions between reference frames.
 
@@ -251,13 +255,15 @@ def transform_quaternions(
     arr: array_like
         The array to transform.
 
-    outof: str or ReferenceFrame
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented.
-
     into: str or ReferenceFrame
         ReferenceFrame instance or name of a registered reference frame in
         which the array will be represented after the transformation.
+
+    outof: str or ReferenceFrame, optional
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array is currently represented. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "reference_frame" entry with
+        the name of a registered frame.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -290,42 +296,20 @@ def transform_quaternions(
     --------
     transform_vectors, transform_points, ReferenceFrame
     """
-    (
-        arr,
-        axis,
-        time_axis,
-        ts_in,
-        coords,
-        dims,
-        name,
-        attrs,
-    ) = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
-    )
-
-    arr, ts_out = _resolve_rf(outof).transform_quaternions(
+    return _transform(
+        "transform_quaternions",
         arr,
         into,
-        axis=axis,
-        time_axis=time_axis,
-        timestamps=ts_in,
-        return_timestamps=True,
+        outof,
+        dim,
+        axis,
+        timestamps,
+        time_axis,
     )
-
-    if coords is not None:
-        return _make_dataarray(
-            arr, coords, dims, name, attrs, timestamps, ts_out
-        )
-    elif ts_out is not None:
-        # TODO not so pretty. Maybe also introduce return_timestamps
-        #  parameter and do this when return_timestamps=None
-        return arr, ts_out
-    else:
-        return arr
 
 
 def transform_coordinates(
-    arr, outof=None, into=None, dim=None, axis=None, replace_dim=True
+    arr, into, outof=None, dim=None, axis=None, replace_dim=True
 ):
     """ Transform motion between coordinate systems.
 
@@ -334,13 +318,15 @@ def transform_coordinates(
     arr: array_like
         The array to transform.
 
-    outof: str
-        The name of a coordinate system in which the array is currently
-        represented.
-
     into: str
         The name of a coordinate system in which the array will be represented
         after the transformation.
+
+    outof: str, optional
+        The name of a coordinate system in which the array is currently
+        represented. Can be omitted if the array is a DataArray whose ``attrs``
+        contain a "coordinate_system" entry with the name of a valid coordinate
+        system.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension representing
@@ -367,14 +353,28 @@ def transform_coordinates(
     cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical,
     spherical_to_cartesian
     """
+    arr, axis, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
+        arr, dim, axis
+    )
+
+    if outof is None:
+        if attrs is not None and "coordinate_system" in attrs:
+            # TODO warn if outof(.name) != attrs["reference_frame"]
+            outof = attrs["coordinate_system"]
+        else:
+            raise ValueError(
+                "'outof' must be specified unless you provide a DataArray "
+                "whose ``attrs`` contain a 'coordinate_system' entry with the "
+                "name of a valid coordinate system"
+            )
+
     try:
         transform_func = _cs_funcs[outof][into]
     except KeyError:
         raise ValueError(f"Unsupported transformation: {outof} to {into}.")
 
-    arr, axis, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
-        arr, dim, axis
-    )
+    if attrs is not None and "coordinate_system" in attrs:
+        attrs.update({"coordinate_system": into})
 
     arr = transform_func(arr, axis=axis)
 

@@ -23,6 +23,15 @@ class TestTopLevel(object):
             rc2=mock_quaternion(np.pi, 0.0, 0.0),
         )
 
+    def test_example_data(self):
+        """"""
+        xr = pytest.importorskip("xarray")
+        pytest.importorskip("netCDF4")
+
+        xr.load_dataset(rbm.example_data["head"])
+        xr.load_dataset(rbm.example_data["left_eye"])
+        xr.load_dataset(rbm.example_data["right_eye"])
+
     def test_transform_points(self, rf_tree):
         """"""
         arr_child2 = (1.0, 1.0, 1.0)

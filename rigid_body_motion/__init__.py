@@ -2,6 +2,11 @@
 __author__ = """Peter Hausamann"""
 __email__ = "peter@hausamann.de"
 __version__ = "0.1.0"
+
+from pathlib import Path
+
+from pkg_resources import resource_filename
+
 from rigid_body_motion import ros as ros  # noqa
 from rigid_body_motion.coordinate_systems import (
     _replace_dim,
@@ -54,6 +59,17 @@ _cs_funcs = {
     },
     "polar": {"cartesian": polar_to_cartesian},
     "spherical": {"cartesian": spherical_to_cartesian},
+}
+
+
+example_data = {
+    "head": Path(resource_filename("rigid_body_motion", "data/head.nc")),
+    "left_eye": Path(
+        resource_filename("rigid_body_motion", "data/left_eye.nc")
+    ),
+    "right_eye": Path(
+        resource_filename("rigid_body_motion", "data/right_eye.nc")
+    ),
 }
 
 

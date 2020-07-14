@@ -47,7 +47,9 @@ __all__ = [
     "ReferenceFrame",
     # estimators
     "shortest_arc_rotation",
+    "lookup_twist",
     # utils
+    "example_data",
     "qmean",
     "rotate_vectors",
 ]
@@ -395,3 +397,110 @@ def transform_coordinates(
         return _make_dataarray(arr, coords, dims, name, attrs, None, None)
     else:
         return arr
+
+
+def _make_twist_dataset(
+    angular, linear, moving_frame, reference, represent_in, timestamps
+):
+    """ Create Dataset with linear and angular velocity. """
+    import xarray as xr
+
+    twist = xr.Dataset(
+        {
+            "angular_velocity": (["time", "cartesian_axis"], angular),
+            "linear_velocity": (["time", "cartesian_axis"], linear),
+        },
+        {"time": timestamps, "cartesian_axis": ["x", "y", "z"]},
+    )
+
+    twist.angular_velocity.attrs.update(
+        {
+            "representation_frame": represent_in.name,
+            "reference_frame": reference.name,
+            "moving_frame": moving_frame.name,
+            "motion_type": "angular_velocity",
+            "long_name": "Angular velocity",
+            "units": "rad/s",
+        }
+    )
+
+    twist.linear_velocity.attrs.update(
+        {
+            "representation_frame": represent_in.name,
+            "reference_frame": reference.name,
+            "moving_frame": moving_frame.name,
+            "motion_type": "linear_velocity",
+            "long_name": "Linear velocity",
+            "units": "m/s",
+        }
+    )
+
+    return twist
+
+
+def lookup_twist(
+    moving_frame,
+    reference=None,
+    represent_in=None,
+    outlier_thresh=None,
+    cutoff=None,
+    as_dataset=False,
+):
+    """ Estimate linear and angular velocity of this frame wrt a reference.
+
+    Parameters
+    ----------
+    moving_frame: str or ReferenceFrame, optional
+        The reference frame whose twist is estimated.
+
+    reference: str or ReferenceFrame, optional
+        The reference frame wrt which the twist is estimated. Defaults to
+        the parent frame of the moving frame.
+
+    represent_in: str or ReferenceFrame, optional
+        The reference frame in which the twist is represented. Defaults
+        to the moving frame itself.
+
+    outlier_thresh: float, optional
+        Some SLAM-based trackers introduce position corrections when a new
+        camera frame becomes available. This introduces outliers in the
+        linear velocity estimate. The estimation algorithm used here
+        can suppress these outliers by throwing out samples where the
+        norm of the second-order differences of the position is above
+        `outlier_thresh` and interpolating the missing values. For
+        measurements from the Intel RealSense T265 tracker, set this value
+        to 1e-3.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to linear and angular
+        velocity after the estimation as a fraction of the Nyquist
+        frequency.
+
+    as_dataset: bool, default False
+        If True, return an xarray.Dataset. Otherwise, return a tuple of linear
+        and angular velocity and timestamps.
+
+    Returns
+    -------
+    linear, angular, timestamps: each numpy.ndarray
+        Linear and angular velocity and timestamps of moving frame wrt
+        reference frame, represented in representation frame, if `as_dataset`
+        is False.
+
+    ds: xarray.Dataset
+        The above arrays as an xarray.Dataset, if `as_dataset` is True.
+    """
+    moving_frame = _resolve_rf(moving_frame)
+    reference = _resolve_rf(reference or moving_frame.parent)
+    represent_in = _resolve_rf(represent_in or moving_frame)
+
+    linear, angular, timestamps = moving_frame.lookup_twist(
+        reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff
+    )
+
+    if as_dataset:
+        return _make_twist_dataset(
+            angular, linear, moving_frame, reference, represent_in, timestamps
+        )
+    else:
+        return linear, angular, timestamps

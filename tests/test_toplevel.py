@@ -223,3 +223,31 @@ class TestTopLevel(object):
         da.attrs = {}
         with pytest.raises(ValueError):
             rbm.transform_coordinates(da, into="spherical")
+
+    def test_lookup_twist(self, head_dataset):
+        """"""
+        rbm.register_frame("world")
+        rbm.ReferenceFrame.from_dataset(
+            head_dataset, "position", "orientation", "time", "world", "head",
+        ).register(update=True)
+
+        twist = rbm.lookup_twist(
+            "head",
+            "world",
+            "world",
+            outlier_thresh=1e-3,
+            cutoff=0.25,
+            as_dataset=True,
+        )
+
+        err_v = (
+            twist.linear_velocity
+            - head_dataset.interp(time=twist.time).linear_velocity
+        ) ** 2
+        assert err_v.mean() < 1e-4
+
+        err_w = (
+            twist.angular_velocity
+            - head_dataset.interp(time=twist.time).angular_velocity
+        ) ** 2
+        assert err_w.mean() < 1e-3

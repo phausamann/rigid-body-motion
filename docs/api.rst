@@ -51,6 +51,7 @@ Estimators
     :nosignatures:
     :toctree: _generated
 
+    lookup_twist
     shortest_arc_rotation
 
 

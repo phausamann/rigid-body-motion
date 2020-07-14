@@ -1,8 +1,14 @@
 """"""
 import numpy as np
 from anytree import NodeMixin, Walker
-from quaternion import as_float_array, as_quat_array, from_rotation_matrix
+from quaternion import (
+    as_float_array,
+    as_quat_array,
+    derivative,
+    from_rotation_matrix,
+)
 from scipy.interpolate import interp1d
+from scipy.signal import butter, filtfilt
 
 from rigid_body_motion.core import _resolve_rf
 from rigid_body_motion.utils import rotate_vectors
@@ -757,6 +763,119 @@ class ReferenceFrame(NodeMixin):
             return arr
         else:
             return arr, ts
+
+    @classmethod
+    def _estimate_linear_velocity(
+        cls, translation, timestamps, outlier_thresh=None, cutoff=None
+    ):
+        """ Estimate linear velocity of transform. """
+        timestamps = timestamps.astype(float) / 1e9
+
+        linear = np.gradient(translation, timestamps, axis=0)
+
+        if outlier_thresh is not None:
+            dt = np.linalg.norm(np.diff(translation, n=2, axis=0), axis=1)
+            dt = np.hstack((dt, 0.0, 0.0)) + np.hstack((0.0, dt, 0.0))
+            linear = interp1d(
+                timestamps[dt <= outlier_thresh],
+                linear[dt <= outlier_thresh],
+                axis=0,
+            )(timestamps)
+
+        if cutoff is not None:
+            linear = filtfilt(*butter(7, cutoff), linear, axis=0)
+
+        return linear
+
+    @classmethod
+    def _estimate_angular_velocity(cls, rotation, timestamps, cutoff=None):
+        """ Estimate angular velocity of transform. """
+        timestamps = timestamps.astype(float) / 1e9
+
+        dq = derivative(rotation, timestamps)
+        angular = as_float_array(
+            2 * as_quat_array(rotation).conjugate() * as_quat_array(dq)
+        )[:, 1:]
+
+        if cutoff is not None:
+            angular = filtfilt(*butter(7, cutoff), angular, axis=0)
+
+        return angular
+
+    def lookup_twist(
+        self,
+        reference=None,
+        represent_in=None,
+        outlier_thresh=None,
+        cutoff=None,
+    ):
+        """ Estimate linear and angular velocity of this frame wrt a reference.
+
+        Parameters
+        ----------
+        reference: str or ReferenceFrame, optional
+            The reference frame wrt which the twist is estimated. Defaults to
+            the parent frame.
+
+        represent_in: str or ReferenceFrame, optional
+            The reference frame in which the twist is represented. Defaults
+            to the frame itself.
+
+        outlier_thresh: float, optional
+            Some SLAM-based trackers introduce position corrections when a new
+            camera frame becomes available. This introduces outliers in the
+            linear velocity estimate. The estimation algorithm used here
+            can suppress these outliers by throwing out samples where the
+            norm of the second-order differences of the position is above
+            `outlier_thresh` and interpolating the missing values. For
+            measurements from the Intel RealSense T265 tracker, set this value
+            to 1e-3.
+
+        cutoff: float, optional
+            Frequency of a low-pass filter applied to linear and angular
+            velocity after the estimation as a fraction of the Nyquist
+            frequency.
+
+        Returns
+        -------
+        linear: numpy.ndarray, shape (N, 3)
+            Linear velocity of moving frame wrt reference frame, represented
+            in representation frame.
+
+        angular: numpy.ndarray, shape (N, 3)
+            Angular velocity of moving frame wrt reference frame, represented
+            in representation frame.
+
+        timestamps: each numpy.ndarray
+            Timestamps of the twist.
+        """
+        reference = _resolve_rf(reference or self.parent)
+        represent_in = _resolve_rf(represent_in or self)
+
+        translation, rotation, timestamps = self.get_transformation(reference)
+
+        if timestamps is None:
+            raise ValueError("Twist cannot be estimated for static transforms")
+
+        linear = self._estimate_linear_velocity(
+            translation, timestamps, outlier_thresh
+        )
+        angular = self._estimate_angular_velocity(rotation, timestamps, cutoff)
+
+        linear, linear_ts = reference.transform_vectors(
+            linear, represent_in, timestamps=timestamps, return_timestamps=True
+        )
+        angular, angular_ts = self.transform_vectors(
+            angular,
+            represent_in,
+            timestamps=timestamps,
+            return_timestamps=True,
+        )
+        angular, linear, timestamps = self._interpolate(
+            angular, linear, angular_ts, linear_ts
+        )
+
+        return linear, angular, timestamps
 
     def register(self, update=False):
         """ Register this frame in the registry.

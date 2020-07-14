@@ -77,3 +77,12 @@ def register_rf_tree():
         )
 
     return _register_rf_tree
+
+
+@pytest.fixture()
+def head_dataset():
+    """"""
+    xr = pytest.importorskip("xarray")
+    pytest.importorskip("netCDF4")
+
+    return xr.load_dataset(rbm.example_data["head"])

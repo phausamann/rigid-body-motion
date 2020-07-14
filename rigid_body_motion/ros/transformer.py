@@ -122,7 +122,7 @@ class Transformer(object):
 
         Parameters
         ----------
-        cache_time : float
+        cache_time : float, optional
             Cache time of the buffer in seconds.
         """
         if cache_time is not None:
@@ -152,7 +152,10 @@ class Transformer(object):
         t_start_end = list(
             zip(
                 *[
-                    (node.timestamps[0], node.timestamps[-1])
+                    (
+                        node.timestamps[0].astype(float) / 1e9,
+                        node.timestamps[-1].astype(float) / 1e9,
+                    )
                     for node in PreOrderIter(root)
                     if node.timestamps is not None
                 ]
@@ -169,7 +172,10 @@ class Transformer(object):
         for node in PreOrderIter(root):
             if isinstance(node, ReferenceFrame):
                 if node.parent is not None:
-                    transformer.set_transform_static(node)
+                    if node.timestamps is None:
+                        transformer.set_transform_static(node)
+                    else:
+                        transformer.set_transforms(node)
             else:
                 raise NotImplementedError()
 
@@ -186,6 +192,30 @@ class Transformer(object):
         self._buffer.set_transform_static(
             static_rf_to_transform_msg(reference_frame), "default_authority"
         )
+
+    def set_transforms(self, reference_frame):
+        """ Add transforms from moving reference frame to buffer.
+
+        Parameters
+        ----------
+        reference_frame : ReferenceFrame
+            Static reference frame to add.
+        """
+        for translation, rotation, timestamp in zip(
+            reference_frame.translation,
+            reference_frame.rotation,
+            reference_frame.timestamps,
+        ):
+            self._buffer.set_transform(
+                make_transform_msg(
+                    translation,
+                    rotation,
+                    reference_frame.parent.name,
+                    reference_frame.name,
+                    timestamp.astype(float) / 1e9,
+                ),
+                "default_authority",
+            )
 
     def can_transform(self, target_frame, source_frame, time=0.0):
         """ Check if transform from source to target frame is possible.

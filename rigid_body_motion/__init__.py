@@ -1,6 +1,6 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
-__email__ = "peter@hausamann.de"
+__email__ = "peter.hausamann@tum.de"
 __version__ = "0.1.0"
 
 from pathlib import Path

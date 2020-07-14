@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
 
+import rigid_body_motion as rbm
+
 
 @pytest.fixture()
 def Transformer():
@@ -23,6 +25,15 @@ def visualization():
 
 
 class TestTransformer(object):
+    def test_moving_reference_frame(self, Transformer, head_dataset):
+        """"""
+        rbm.register_frame("world")
+        rf_head = rbm.ReferenceFrame.from_dataset(
+            head_dataset, "position", "orientation", "time", "world", "head",
+        )
+
+        Transformer.from_reference_frame(rf_head)
+
     def test_can_transform(self, Transformer, get_rf_tree):
         """"""
         rf_world, _, _ = get_rf_tree()

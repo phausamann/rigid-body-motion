@@ -70,14 +70,14 @@ class TestTopLevel(object):
             np.tile(arr_child2, (5, 10, 1)),
             {"time": np.arange(10)},
             ("extra_dim", "time", "cartesian_axis"),
-            attrs={"reference_frame": "child2"},
+            attrs={"representation_frame": "child2"},
         )
         da_child1 = rbm.transform_points(
             da_child2, into="child1", dim="cartesian_axis", timestamps="time",
         )
         assert da_child1.shape == (5, 10, 3)
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
-        assert da_child1.attrs["reference_frame"] == "child1"
+        assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
     def test_transform_quaternions(self, rf_tree, mock_quaternion):
@@ -102,13 +102,13 @@ class TestTopLevel(object):
             np.tile(arr_child2, (10, 1)),
             {"time": np.arange(10)},
             ("time", "quaternion_axis"),
-            attrs={"reference_frame": "child2"},
+            attrs={"representation_frame": "child2"},
         )
         da_child1 = rbm.transform_quaternions(
             da_child2, into="child1", dim="quaternion_axis", timestamps="time",
         )
         assert da_child1.shape == (10, 4)
-        assert da_child1.attrs["reference_frame"] == "child1"
+        assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors
@@ -150,13 +150,13 @@ class TestTopLevel(object):
             np.tile(arr_child2, (10, 1)),
             {"time": np.arange(10)},
             ("time", "cartesian_axis"),
-            attrs={"reference_frame": "child2"},
+            attrs={"representation_frame": "child2"},
         )
         da_child1 = rbm.transform_vectors(
             da_child2, into="child1", dim="cartesian_axis", timestamps="time",
         )
         assert da_child1.shape == (10, 3)
-        assert da_child1.attrs["reference_frame"] == "child1"
+        assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors

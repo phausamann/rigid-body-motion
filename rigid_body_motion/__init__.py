@@ -74,15 +74,7 @@ example_data = {
 
 
 def _transform(
-    method,
-    arr,
-    into,
-    outof,
-    dim,
-    axis,
-    timestamps,
-    time_axis,
-    represent_in=None,
+    method, arr, into, outof, dim, axis, timestamps, time_axis, reference=None,
 ):
     """ Base transform method. """
     (
@@ -99,32 +91,32 @@ def _transform(
     )
 
     if outof is None:
-        if attrs is not None and "reference_frame" in attrs:
-            # TODO warn if outof(.name) != attrs["reference_frame"]
-            outof = attrs["reference_frame"]
+        if attrs is not None and "representation_frame" in attrs:
+            # TODO warn if outof(.name) != attrs["representation_frame"]
+            outof = attrs["representation_frame"]
         else:
             raise ValueError(
                 "'outof' must be specified unless you provide a DataArray "
-                "whose ``attrs`` contain a 'reference_frame' entry with the "
-                "name of a registered frame"
+                "whose ``attrs`` contain a 'representation_frame' entry with "
+                "the name of a registered frame"
             )
 
-    if represent_in is None:
-        if attrs is not None and "representation_frame" in attrs:
-            # TODO warn if represent_in(.name) != attrs["representation_frame"]
-            outof = attrs["representation_frame"]
+    if reference is None:
+        if attrs is not None and "reference_frame" in attrs:
+            # TODO warn if reference(.name) != attrs["reference_frame"]
+            outof = attrs["reference_frame"]
         else:
-            represent_in = into
+            reference = into
 
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
-    represent_in = _resolve_rf(represent_in)
+    reference = _resolve_rf(reference)
 
-    if attrs is not None and "reference_frame" in attrs:
+    if attrs is not None and "representation_frame" in attrs:
         attrs.update(
             {
-                "reference_frame": into.name,
-                "representation_frame": represent_in.name,
+                "representation_frame": into.name,
+                "reference_frame": reference.name,
             }
         )
 
@@ -166,8 +158,8 @@ def transform_vectors(
     outof: str or ReferenceFrame, optional
         ReferenceFrame instance or name of a registered reference frame in
         which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "reference_frame" entry with
-        the name of a registered frame.
+        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        with the name of a registered frame.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -222,8 +214,8 @@ def transform_points(
     outof: str or ReferenceFrame, optional
         ReferenceFrame instance or name of a registered reference frame in
         which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "reference_frame" entry with
-        the name of a registered frame.
+        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        with the name of a registered frame.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -278,8 +270,8 @@ def transform_quaternions(
     outof: str or ReferenceFrame, optional
         ReferenceFrame instance or name of a registered reference frame in
         which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "reference_frame" entry with
-        the name of a registered frame.
+        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        with the name of a registered frame.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -375,7 +367,7 @@ def transform_coordinates(
 
     if outof is None:
         if attrs is not None and "coordinate_system" in attrs:
-            # TODO warn if outof(.name) != attrs["reference_frame"]
+            # TODO warn if outof(.name) != attrs["coordinate_system"]
             outof = attrs["coordinate_system"]
         else:
             raise ValueError(

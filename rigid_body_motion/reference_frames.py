@@ -590,7 +590,7 @@ class ReferenceFrame(NodeMixin):
         timestamps=None,
         return_timestamps=False,
     ):
-        """ Transform an array of vectors from this frame to another.
+        """ Transform array of vectors from this frame to another.
 
         Parameters
         ----------
@@ -602,13 +602,14 @@ class ReferenceFrame(NodeMixin):
             in the registry under that name.
 
         axis: int, default -1
-            The axis of the array representing the coordinates of the vectors.
+            The axis of the array representing the spatial coordinates of the
+            vectors.
 
         time_axis: int, default 0
             The axis of the array representing the timestamps of the vectors.
 
         timestamps: array_like, optional
-            The timestamps of the points, corresponding to the `time_axis`
+            The timestamps of the vectors, corresponding to the `time_axis`
             of the array. If not None, the axis defined by `time_axis` will be
             re-sampled to the timestamps for which the transformation is
             defined.
@@ -649,7 +650,7 @@ class ReferenceFrame(NodeMixin):
         timestamps=None,
         return_timestamps=False,
     ):
-        """ Transform an array of points from this frame to another.
+        """ Transform array of points from this frame to another.
 
         Parameters
         ----------
@@ -661,13 +662,14 @@ class ReferenceFrame(NodeMixin):
             in the registry under that name.
 
         axis: int, default -1
-            The axis of the array representing the coordinates of the points.
+            The axis of the array representing the spatial coordinates of the
+            points.
 
         time_axis: int, default 0
             The axis of the array representing the timestamps of the points.
 
         timestamps: array_like, optional
-            The timestamps of the points, corresponding to the `time_axis`
+            The timestamps of the vectors, corresponding to the `time_axis`
             of the array. If not None, the axis defined by `time_axis` will be
             re-sampled to the timestamps for which the transformation is
             defined.
@@ -710,7 +712,7 @@ class ReferenceFrame(NodeMixin):
         timestamps=None,
         return_timestamps=False,
     ):
-        """ Transform an array of quaternions from this frame to another.
+        """ Transform array of quaternions from this frame to another.
 
         Parameters
         ----------
@@ -722,7 +724,7 @@ class ReferenceFrame(NodeMixin):
             in the registry under that name.
 
         axis: int, default -1
-            The axis of the array representing the coordinates of the
+            The axis of the array representing the spatial coordinates of the
             quaternions.
 
         time_axis: int, default 0
@@ -730,7 +732,7 @@ class ReferenceFrame(NodeMixin):
             quaternions.
 
         timestamps: array_like, optional
-            The timestamps of the points, corresponding to the `time_axis`
+            The timestamps of the quaternions, corresponding to the `time_axis`
             of the array. If not None, the axis defined by `time_axis` will be
             re-sampled to the timestamps for which the transformation is
             defined.
@@ -763,6 +765,179 @@ class ReferenceFrame(NodeMixin):
             return arr
         else:
             return arr, ts
+
+    def transform_angular_velocity(
+        self,
+        arr,
+        to_frame,
+        moving_frame=None,
+        reference_frame=None,
+        axis=-1,
+        time_axis=0,
+        timestamps=None,
+        return_timestamps=False,
+        cutoff=None,
+    ):
+        """ Transform array of angular velocities from this frame to another.
+
+        The array represents the velocity of a moving body or frame wrt a
+        reference frame, expressed in a representation frame.
+
+        The transformation changes the representation frame of
+        the array, i.e. an array that was represented in this frame will be
+        represented in the target frame after the transformation. Additionally,
+        the velocity is corrected by the velocity of the new representation
+        frame wrt either the reference frame or the moving frame.
+
+        Parameters
+        ----------
+        arr: array_like
+            The array to transform.
+
+        to_frame: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        axis: int, default -1
+            The axis of the array representing the spatial coordinates of the
+            velocities.
+
+        time_axis: int, default 0
+            The axis of the array representing the timestamps of the
+            velocities.
+
+        timestamps: array_like, optional
+            The timestamps of the velocities, corresponding to the `time_axis`
+            of the array. If not None, the axis defined by `time_axis` will be
+            re-sampled to the timestamps for which the transformation is
+            defined.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps after the transformation.
+
+        Returns
+        -------
+        arr_transformed: array_like
+            The transformed array.
+
+        ts: array_like, shape (n_timestamps,) or None
+            The timestamps after the transformation.
+        """
+        arr, ts = self.transform_vectors(
+            arr,
+            to_frame,
+            axis=axis,
+            time_axis=time_axis,
+            timestamps=timestamps,
+            return_timestamps=True,
+        )
+
+        # calculate correction wrt to new reference, which is either the
+        # moving frame, the reference frame or the current representation frame
+        correction_ref = _resolve_rf(moving_frame or reference_frame or self)
+        _, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
+            correction_ref, cutoff=cutoff
+        )
+
+        angular, arr, timestamps = self._interpolate(
+            angular, arr, twist_ts, ts
+        )
+
+        arr += angular
+
+        if return_timestamps:
+            return arr, timestamps
+        else:
+            return arr
+
+    def transform_linear_velocity(
+        self,
+        arr,
+        to_frame,
+        moving_frame=None,
+        reference_frame=None,
+        axis=-1,
+        time_axis=0,
+        timestamps=None,
+        return_timestamps=False,
+        cutoff=None,
+    ):
+        """ Transform array of linear velocities from this frame to another.
+
+        The array represents the velocity of a moving body or frame wrt a
+        reference frame, expressed in a representation frame.
+
+        The transformation changes the representation frame of
+        the array, i.e. an array that was represented in this frame will be
+        represented in the target frame after the transformation. Additionally,
+        the velocity is corrected by the velocity of the new representation
+        frame wrt either the reference frame or the moving frame.
+
+        Parameters
+        ----------
+        arr: array_like
+            The array to transform.
+
+        to_frame: str or ReferenceFrame
+            The target reference frame. If str, the frame will be looked up
+            in the registry under that name.
+
+        axis: int, default -1
+            The axis of the array representing the spatial coordinates of the
+            velocities.
+
+        time_axis: int, default 0
+            The axis of the array representing the timestamps of the
+            velocities.
+
+        timestamps: array_like, optional
+            The timestamps of the velocities, corresponding to the `time_axis`
+            of the array. If not None, the axis defined by `time_axis` will be
+            re-sampled to the timestamps for which the transformation is
+            defined.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps after the transformation.
+
+        Returns
+        -------
+        arr_transformed: array_like
+            The transformed array.
+
+        ts: array_like, shape (n_timestamps,) or None
+            The timestamps after the transformation.
+        """
+        arr, ts = self.transform_vectors(
+            arr,
+            to_frame,
+            axis=axis,
+            time_axis=time_axis,
+            timestamps=timestamps,
+            return_timestamps=True,
+        )
+
+        # calculate correction wrt to new reference, which is either the
+        # moving frame, the reference frame or the current representation frame
+        correction_ref = _resolve_rf(moving_frame or reference_frame or self)
+        linear, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
+            correction_ref, cutoff=cutoff
+        )
+        translation, _, transform_ts = correction_ref.get_transformation(
+            to_frame
+        )
+
+        linear, arr, ts = self._interpolate(linear, arr, twist_ts, ts)
+        angular, _, _ = self._interpolate(angular, arr, twist_ts, ts)
+        translation, _, _ = self._interpolate(
+            translation, arr, transform_ts, ts
+        )
+
+        arr += linear + np.cross(angular, translation)
+
+        if return_timestamps:
+            return arr, ts
+        else:
+            return arr
 
     @classmethod
     def _estimate_linear_velocity(

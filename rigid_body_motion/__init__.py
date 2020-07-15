@@ -76,7 +76,17 @@ example_data = {
 
 
 def _transform(
-    method, arr, into, outof, dim, axis, timestamps, time_axis, reference=None,
+    method,
+    arr,
+    into,
+    outof,
+    dim,
+    axis,
+    timestamps,
+    time_axis,
+    reference_frame=None,
+    moving_frame=None,
+    **kwargs,
 ):
     """ Base transform method. """
     (
@@ -92,6 +102,23 @@ def _transform(
         arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
     )
 
+    if method is None:
+        method_lookup = {
+            "position": "transform_points",
+            "translation": "transform_points",
+            "orientation": "transform_quaternions",
+            "rotation": "transform_quaternions",
+        }
+        try:
+            # TODO warn if method doesn't match attrs["motion_type"]
+            method = method_lookup[attrs["motion_type"]]
+        except (KeyError, TypeError):
+            raise ValueError(
+                f"'method' must be specified unless you provide a DataArray "
+                f"whose ``attrs`` contain a 'motion_type' entry "
+                f"containing any of {method_lookup.keys()}"
+            )
+
     if outof is None:
         if attrs is not None and "representation_frame" in attrs:
             # TODO warn if outof(.name) != attrs["representation_frame"]
@@ -103,24 +130,35 @@ def _transform(
                 "the name of a registered frame"
             )
 
-    if reference is None:
+    if reference_frame is None:
         if attrs is not None and "reference_frame" in attrs:
-            # TODO warn if reference(.name) != attrs["reference_frame"]
-            outof = attrs["reference_frame"]
-        else:
-            reference = into
+            # TODO warn if reference_frame(.name) != attrs["reference_frame"]
+            reference_frame = attrs["reference_frame"]
+            reference_frame = _resolve_rf(reference_frame)
+    else:
+        reference_frame = _resolve_rf(reference_frame)
+
+    if moving_frame is None:
+        if attrs is not None and "moving_frame" in attrs:
+            # TODO warn if moving_frame(.name) != attrs["moving_frame"]
+            moving_frame = attrs["moving_frame"]
+            moving_frame = _resolve_rf(moving_frame)
+    else:
+        moving_frame = _resolve_rf(moving_frame)
 
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
-    reference = _resolve_rf(reference)
 
-    if attrs is not None and "representation_frame" in attrs:
-        attrs.update(
-            {
-                "representation_frame": into.name,
-                "reference_frame": reference.name,
-            }
-        )
+    if method in ("transform_angular_velocity", "transform_linear_velocity"):
+        kwargs["moving_frame"] = moving_frame
+        kwargs["reference_frame"] = reference_frame
+
+    if attrs is not None:
+        attrs["representation_frame"] = into.name
+        if "reference_frame" in kwargs and reference_frame is not None:
+            attrs["reference_frame"] = reference_frame.name
+        if "moving_frame" in kwargs and moving_frame is not None:
+            attrs["moving_frame"] = into.name
 
     arr, ts_out = getattr(outof, method)(
         arr,
@@ -129,6 +167,7 @@ def _transform(
         timestamps=ts_in,
         time_axis=time_axis,
         return_timestamps=True,
+        **kwargs
     )
 
     if coords is not None:
@@ -165,21 +204,21 @@ def transform_vectors(
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
-        representing the coordinates of the vectors.
+        representing the spatial coordinates of the vectors.
 
     axis: int, optional
-        The axis of the array representing the coordinates of the vectors.
-        Defaults to the last axis of the array.
+        The axis of the array representing the spatial coordinates of the
+        vectors. Defaults to the last axis of the array.
 
     timestamps: array_like or str, optional
-        The timestamps of the points, corresponding to the `time_axis`
+        The timestamps of the vectors, corresponding to the `time_axis`
         of the array. If str and the array is a DataArray, the name of the
         coordinate with the timestamps. The axis defined by `time_axis` will
         be re-sampled to the timestamps for which the transformation is
         defined.
 
     time_axis: int, optional
-        The axis of the array representing the timestamps of the points.
+        The axis of the array representing the timestamps of the vectors.
         Defaults to the first axis of the array.
 
     Returns
@@ -221,11 +260,11 @@ def transform_points(
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
-        representing the coordinates of the points.
+        representing the spatial coordinates of the points.
 
     axis: int, optional
-        The axis of the array representing the coordinates of the points.
-        Defaults to the last axis of the array.
+        The axis of the array representing the spatial coordinates of the
+        points. Defaults to the last axis of the array.
 
     timestamps: array_like or str, optional
         The timestamps of the points, corresponding to the `time_axis`
@@ -277,21 +316,21 @@ def transform_quaternions(
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
-        representing the coordinates of the quaternions.
+        representing the spatial coordinates of the quaternions.
 
     axis: int, optional
-        The axis of the array representing the coordinates of the quaternions.
-        Defaults to the last axis of the array.
+        The axis of the array representing the spatial coordinates of the
+        quaternions. Defaults to the last axis of the array.
 
     timestamps: array_like or str, optional
-        The timestamps of the points, corresponding to the `time_axis`
+        The timestamps of the quaternions, corresponding to the `time_axis`
         of the array. If str and the array is a DataArray, the name of the
         coordinate with the timestamps. The axis defined by `time_axis` will
         be re-sampled to the timestamps for which the transformation is
         defined.
 
     time_axis: int, optional
-        The axis of the array representing the timestamps of the points.
+        The axis of the array representing the timestamps of the quaternions.
         Defaults to the first axis of the array.
 
     Returns
@@ -315,6 +354,168 @@ def transform_quaternions(
         axis,
         timestamps,
         time_axis,
+    )
+
+
+def transform_angular_velocity(
+    arr,
+    into,
+    outof=None,
+    moving_frame=None,
+    reference_frame=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    cutoff=None,
+):
+    """ Transform an array of angular velocities between reference frames.
+
+    Parameters
+    ----------
+    arr: array_like
+        The array to transform.
+
+    into: str or ReferenceFrame
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array will be represented after the transformation.
+
+    outof: str or ReferenceFrame, optional
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array is currently represented. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        with the name of a registered frame.
+
+    dim: str, optional
+        If the array is a DataArray, the name of the dimension
+        representing the spatial coordinates of the velocities.
+
+    axis: int, optional
+        The axis of the array representing the spatial coordinates of the
+        velocities. Defaults to the last axis of the array.
+
+    timestamps: array_like or str, optional
+        The timestamps of the velocities, corresponding to the `time_axis`
+        of the array. If str and the array is a DataArray, the name of the
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the velocities.
+        Defaults to the first axis of the array.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to linear and angular
+        velocity after the twist estimation as a fraction of the Nyquist
+        frequency.
+
+    Returns
+    -------
+    arr_transformed: array_like
+        The transformed array.
+
+    ts: array_like
+        The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_linear_velocity, transform_vectors, transform_quaternions,
+    transform_points, ReferenceFrame
+    """
+    return _transform(
+        "transform_angular_velocity",
+        arr,
+        into,
+        outof,
+        dim,
+        axis,
+        timestamps,
+        time_axis,
+        moving_frame=moving_frame,
+        reference_frame=reference_frame,
+        cutoff=cutoff,
+    )
+
+
+def transform_linear_velocity(
+    arr,
+    into,
+    outof=None,
+    moving_frame=None,
+    reference_frame=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    cutoff=None,
+):
+    """ Transform an array of linear velocities between reference frames.
+
+    Parameters
+    ----------
+    arr: array_like
+        The array to transform.
+
+    into: str or ReferenceFrame
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array will be represented after the transformation.
+
+    outof: str or ReferenceFrame, optional
+        ReferenceFrame instance or name of a registered reference frame in
+        which the array is currently represented. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        with the name of a registered frame.
+
+    dim: str, optional
+        If the array is a DataArray, the name of the dimension
+        representing the spatial coordinates of the velocities.
+
+    axis: int, optional
+        The axis of the array representing the spatial coordinates of the
+        velocities. Defaults to the last axis of the array.
+
+    timestamps: array_like or str, optional
+        The timestamps of the velocities, corresponding to the `time_axis`
+        of the array. If str and the array is a DataArray, the name of the
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the velocities.
+        Defaults to the first axis of the array.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to linear and angular
+        velocity after the twist estimation as a fraction of the Nyquist
+        frequency.
+
+    Returns
+    -------
+    arr_transformed: array_like
+        The transformed array.
+
+    ts: array_like
+        The timestamps after the transformation.
+
+    See Also
+    --------
+    transform_angular_velocity, transform_vectors, transform_quaternions,
+    transform_points, ReferenceFrame
+    """
+    return _transform(
+        "transform_linear_velocity",
+        arr,
+        into,
+        outof,
+        dim,
+        axis,
+        timestamps,
+        time_axis,
+        moving_frame=moving_frame,
+        reference_frame=reference_frame,
+        cutoff=cutoff,
     )
 
 

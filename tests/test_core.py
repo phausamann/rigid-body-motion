@@ -78,7 +78,8 @@ class TestCore(object):
         assert all(c in da.coords for c in coords)
         assert dims is da.dims
         assert name is da.name
-        assert attrs is da.attrs
+        assert attrs is not da.attrs
+        assert attrs == da.attrs
 
         # static DataArray
         da = xr.DataArray(arr[0], dims=("cartesian_axis",))

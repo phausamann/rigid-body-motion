@@ -72,7 +72,7 @@ def _maybe_unpack_dataarray(
         coords = dict(arr.coords)
         dims = arr.dims
         name = arr.name
-        attrs = arr.attrs
+        attrs = arr.attrs.copy()
         arr = arr.data
 
     return arr, axis, time_axis, timestamps, coords, dims, name, attrs

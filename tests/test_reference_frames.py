@@ -466,3 +466,16 @@ class TestReferenceFrame(object):
         np.testing.assert_allclose(
             np.abs(ot_act), np.tile(np.abs(ot), (10, 5, 1)), rtol=1.0
         )
+
+    def test_lookup_twist(self, compensated_tree):
+        """"""
+        v_head_world, w_head_world, ts = rbm.registry["head"].lookup_twist()
+        v_eyes_head, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist()
+        v_eyes_world, w_eyes_world, ts = rbm.registry["eyes"].lookup_twist(
+            "world"
+        )
+
+        npt.assert_allclose(v_head_world, -v_eyes_head, rtol=2e-3)
+        npt.assert_allclose(w_head_world, -w_eyes_head, rtol=2e-3)
+        assert (v_eyes_world < 1e-10).all()
+        assert (w_eyes_world < 1e-10).all()

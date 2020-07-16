@@ -592,8 +592,8 @@ class ReferenceFrameTransformBroadcaster:
                 self.publish()
                 self.idx = (self.idx + 1) % len(self.timestamps)
                 dt = (
-                    self.timestamps[self.idx].astype(float) / 1e9
-                    - self.timestamps[self.idx - 1].astype(float) / 1e9
+                    self.timestamps.values[self.idx].astype(float) / 1e9
+                    - self.timestamps.values[self.idx - 1].astype(float) / 1e9
                     if self.idx > 0
                     else 0.0
                 )

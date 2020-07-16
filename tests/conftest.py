@@ -5,6 +5,7 @@ import pytest
 from quaternion import as_float_array, from_euler_angles
 
 import rigid_body_motion as rbm
+from rigid_body_motion.testing import make_test_motion
 
 test_data_dir = Path(__file__).parent / "test_data"
 
@@ -77,6 +78,24 @@ def register_rf_tree():
         )
 
     return _register_rf_tree
+
+
+@pytest.fixture()
+def compensated_tree():
+    """"""
+    n_samples = 1000
+
+    rbm.register_frame("world", update=True)
+
+    t, r, ts = make_test_motion(n_samples, stack=False)
+    rbm.ReferenceFrame(
+        translation=t, rotation=r, timestamps=ts, parent="world", name="head",
+    ).register(update=True)
+
+    it, ir, _ = make_test_motion(n_samples, inverse=True, stack=False)
+    rbm.ReferenceFrame(
+        translation=it, rotation=ir, timestamps=ts, parent="head", name="eyes",
+    ).register(update=True)
 
 
 @pytest.fixture()

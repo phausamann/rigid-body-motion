@@ -19,6 +19,8 @@ Transformations
     transform_points
     transform_quaternions
     transform_coordinates
+    transform_angular_velocity
+    transform_linear_velocity
 
 Reference Frames
 ~~~~~~~~~~~~~~~~

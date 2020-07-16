@@ -84,7 +84,7 @@ def _transform(
     axis,
     timestamps,
     time_axis,
-    reference_frame=None,
+    what="reference_frame",
     moving_frame=None,
     **kwargs,
 ):
@@ -120,23 +120,15 @@ def _transform(
             )
 
     if outof is None:
-        if attrs is not None and "representation_frame" in attrs:
-            # TODO warn if outof(.name) != attrs["representation_frame"]
-            outof = attrs["representation_frame"]
+        if attrs is not None and "reference_frame" in attrs:
+            # TODO warn if outof(.name) != attrs["reference_frame"]
+            outof = attrs["reference_frame"]
         else:
             raise ValueError(
                 "'outof' must be specified unless you provide a DataArray "
-                "whose ``attrs`` contain a 'representation_frame' entry with "
+                "whose ``attrs`` contain a 'reference_frame' entry with "
                 "the name of a registered frame"
             )
-
-    if reference_frame is None:
-        if attrs is not None and "reference_frame" in attrs:
-            # TODO warn if reference_frame(.name) != attrs["reference_frame"]
-            reference_frame = attrs["reference_frame"]
-            reference_frame = _resolve_rf(reference_frame)
-    else:
-        reference_frame = _resolve_rf(reference_frame)
 
     if moving_frame is None:
         if attrs is not None and "moving_frame" in attrs:
@@ -150,15 +142,14 @@ def _transform(
     outof = _resolve_rf(outof)
 
     if method in ("transform_angular_velocity", "transform_linear_velocity"):
+        kwargs["what"] = what
         kwargs["moving_frame"] = moving_frame
-        kwargs["reference_frame"] = reference_frame
 
     if attrs is not None:
-        attrs["representation_frame"] = into.name
-        if "reference_frame" in kwargs and reference_frame is not None:
-            attrs["reference_frame"] = reference_frame.name
         if "moving_frame" in kwargs and moving_frame is not None:
             attrs["moving_frame"] = into.name
+        else:
+            attrs["reference_frame"] = into.name
 
     arr, ts_out = getattr(outof, method)(
         arr,
@@ -361,8 +352,8 @@ def transform_angular_velocity(
     arr,
     into,
     outof=None,
+    what="reference_frame",
     moving_frame=None,
-    reference_frame=None,
     dim=None,
     axis=None,
     timestamps=None,
@@ -432,8 +423,8 @@ def transform_angular_velocity(
         axis,
         timestamps,
         time_axis,
+        what=what,
         moving_frame=moving_frame,
-        reference_frame=reference_frame,
         cutoff=cutoff,
     )
 
@@ -442,8 +433,8 @@ def transform_linear_velocity(
     arr,
     into,
     outof=None,
+    what="reference_frame",
     moving_frame=None,
-    reference_frame=None,
     dim=None,
     axis=None,
     timestamps=None,
@@ -513,8 +504,8 @@ def transform_linear_velocity(
         axis,
         timestamps,
         time_axis,
+        what=what,
         moving_frame=moving_frame,
-        reference_frame=reference_frame,
         cutoff=cutoff,
     )
 
@@ -660,7 +651,7 @@ def lookup_twist(
 
     represent_in: str or ReferenceFrame, optional
         The reference frame in which the twist is represented. Defaults
-        to the moving frame itself.
+        to parent frame of the moving frame.
 
     outlier_thresh: float, optional
         Some SLAM-based trackers introduce position corrections when a new
@@ -693,7 +684,7 @@ def lookup_twist(
     """
     moving_frame = _resolve_rf(moving_frame)
     reference = _resolve_rf(reference or moving_frame.parent)
-    represent_in = _resolve_rf(represent_in or moving_frame)
+    represent_in = _resolve_rf(represent_in or moving_frame.parent)
 
     linear, angular, timestamps = moving_frame.lookup_twist(
         reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff

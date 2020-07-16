@@ -70,14 +70,14 @@ class TestTopLevel(object):
             np.tile(arr_child2, (5, 10, 1)),
             {"time": np.arange(10)},
             ("extra_dim", "time", "cartesian_axis"),
-            attrs={"representation_frame": "child2"},
+            attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_points(
             da_child2, into="child1", dim="cartesian_axis", timestamps="time",
         )
         assert da_child1.shape == (5, 10, 3)
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
-        assert da_child1.attrs["representation_frame"] == "child1"
+        assert da_child1.attrs["reference_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
     def test_transform_quaternions(self, rf_tree, mock_quaternion):
@@ -102,13 +102,13 @@ class TestTopLevel(object):
             np.tile(arr_child2, (10, 1)),
             {"time": np.arange(10)},
             ("time", "quaternion_axis"),
-            attrs={"representation_frame": "child2"},
+            attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_quaternions(
             da_child2, into="child1", dim="quaternion_axis", timestamps="time",
         )
         assert da_child1.shape == (10, 4)
-        assert da_child1.attrs["representation_frame"] == "child1"
+        assert da_child1.attrs["reference_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors
@@ -150,13 +150,13 @@ class TestTopLevel(object):
             np.tile(arr_child2, (10, 1)),
             {"time": np.arange(10)},
             ("time", "cartesian_axis"),
-            attrs={"representation_frame": "child2"},
+            attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_vectors(
             da_child2, into="child1", dim="cartesian_axis", timestamps="time",
         )
         assert da_child1.shape == (10, 3)
-        assert da_child1.attrs["representation_frame"] == "child1"
+        assert da_child1.attrs["reference_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors
@@ -175,6 +175,60 @@ class TestTopLevel(object):
         assert da_child1.shape == (5, 10, 3)
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
+
+    def test_transform_angular_velocity_xr(self, compensated_tree):
+        """"""
+        pytest.importorskip("xarray")
+
+        head_twist = rbm.lookup_twist("head", as_dataset=True)
+        gaze_twist = rbm.lookup_twist("eyes", as_dataset=True)
+
+        eye_angular_rf = rbm.transform_angular_velocity(
+            gaze_twist.angular_velocity,
+            outof="head",
+            into="world",
+            timestamps="time",
+        )
+
+        assert (eye_angular_rf < 1e-10).all()
+
+        eye_angular_mf = rbm.transform_angular_velocity(
+            head_twist.angular_velocity,
+            outof="world",
+            into="eyes",
+            what="moving_frame",
+            moving_frame="head",
+            timestamps="time",
+        )
+
+        assert (eye_angular_mf < 1e-10).all()
+
+    def test_transform_linear_velocity_xr(self, compensated_tree):
+        """"""
+        pytest.importorskip("xarray")
+
+        head_twist = rbm.lookup_twist("head", as_dataset=True)
+        gaze_twist = rbm.lookup_twist("eyes", as_dataset=True)
+
+        eye_linear_rf = rbm.transform_linear_velocity(
+            gaze_twist.linear_velocity,
+            outof="head",
+            into="world",
+            timestamps="time",
+        )
+
+        assert (eye_linear_rf < 1e-10).all()
+
+        eye_linear_mf = rbm.transform_linear_velocity(
+            head_twist.linear_velocity,
+            outof="world",
+            into="eyes",
+            what="moving_frame",
+            moving_frame="head",
+            timestamps="time",
+        )
+
+        assert (eye_linear_mf < 1e-10).all()
 
     def test_transform_coordinates(self):
         """"""
@@ -198,6 +252,7 @@ class TestTopLevel(object):
     def test_transform_coordinates_xr(self):
         """"""
         xr = pytest.importorskip("xarray")
+
         # DataArray
         da = xr.DataArray(
             np.ones((10, 3)),
@@ -224,7 +279,7 @@ class TestTopLevel(object):
         with pytest.raises(ValueError):
             rbm.transform_coordinates(da, into="spherical")
 
-    def test_lookup_twist(self, head_dataset):
+    def test_lookup_twist_xr(self, head_dataset):
         """"""
         rbm.register_frame("world")
         rbm.ReferenceFrame.from_dataset(

@@ -158,15 +158,16 @@ class ReferenceFrame(NodeMixin):
 
         # TODO check name requirement
         self.name = name
-        self.parent = _resolve_rf(parent)
 
-        if self.parent is not None:
+        if parent is not None:
+            self.parent = _resolve_rf(parent)
             (
                 self.translation,
                 self.rotation,
                 self.timestamps,
             ) = self._init_arrays(translation, rotation, timestamps, inverse)
         else:
+            self.parent = None
             self._verify_root(translation, rotation, timestamps)
             self.translation, self.rotation, self.timestamps = None, None, None
 
@@ -770,8 +771,8 @@ class ReferenceFrame(NodeMixin):
         self,
         arr,
         to_frame,
+        what="reference_frame",
         moving_frame=None,
-        reference_frame=None,
         axis=-1,
         time_axis=0,
         timestamps=None,
@@ -783,11 +784,9 @@ class ReferenceFrame(NodeMixin):
         The array represents the velocity of a moving body or frame wrt a
         reference frame, expressed in a representation frame.
 
-        The transformation changes the representation frame of
-        the array, i.e. an array that was represented in this frame will be
-        represented in the target frame after the transformation. Additionally,
-        the velocity is corrected by the velocity of the new representation
-        frame wrt either the reference frame or the moving frame.
+        By default, the transformation changes the reference frame of the
+        velocity from this frame to another and assumes that the array is
+        represented in the same frame.
 
         Parameters
         ----------
@@ -823,20 +822,33 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
+        if what == "reference_frame":
+            represent_in = to_frame
+            _, angular, twist_ts = self.lookup_twist(
+                to_frame, to_frame, cutoff=cutoff
+            )
+        elif what == "moving_frame":
+            if moving_frame is None:
+                raise ValueError(
+                    "'moving_frame' must be specified for what='moving_frame'"
+                )
+            represent_in = self
+            _, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
+                moving_frame, self, cutoff=cutoff
+            )
+        else:
+            raise ValueError(
+                f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
+                f"got {what}"
+            )
+
         arr, ts = self.transform_vectors(
             arr,
-            to_frame,
+            represent_in,
             axis=axis,
             time_axis=time_axis,
             timestamps=timestamps,
             return_timestamps=True,
-        )
-
-        # calculate correction wrt to new reference, which is either the
-        # moving frame, the reference frame or the current representation frame
-        correction_ref = _resolve_rf(moving_frame or reference_frame or self)
-        _, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
-            correction_ref, cutoff=cutoff
         )
 
         angular, arr, timestamps = self._interpolate(
@@ -854,8 +866,8 @@ class ReferenceFrame(NodeMixin):
         self,
         arr,
         to_frame,
+        what="reference_frame",
         moving_frame=None,
-        reference_frame=None,
         axis=-1,
         time_axis=0,
         timestamps=None,
@@ -867,11 +879,9 @@ class ReferenceFrame(NodeMixin):
         The array represents the velocity of a moving body or frame wrt a
         reference frame, expressed in a representation frame.
 
-        The transformation changes the representation frame of
-        the array, i.e. an array that was represented in this frame will be
-        represented in the target frame after the transformation. Additionally,
-        the velocity is corrected by the velocity of the new representation
-        frame wrt either the reference frame or the moving frame.
+        By default, the transformation changes the reference frame of the
+        velocity from this frame to another and assumes that the array is
+        represented in the same frame.
 
         Parameters
         ----------
@@ -907,23 +917,37 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
+        if what == "reference_frame":
+            represent_in = to_frame
+            linear, angular, twist_ts = self.lookup_twist(
+                to_frame, to_frame, cutoff=cutoff
+            )
+            translation, _, transform_ts = self.get_transformation(to_frame)
+        elif what == "moving_frame":
+            if moving_frame is None:
+                raise ValueError(
+                    "'moving_frame' must be specified for what='moving_frame'"
+                )
+            represent_in = self
+            linear, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
+                moving_frame, self, cutoff=cutoff
+            )
+            translation, _, transform_ts = _resolve_rf(
+                to_frame
+            ).get_transformation(moving_frame)
+        else:
+            raise ValueError(
+                f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
+                f"got {what}"
+            )
+
         arr, ts = self.transform_vectors(
             arr,
-            to_frame,
+            represent_in,
             axis=axis,
             time_axis=time_axis,
             timestamps=timestamps,
             return_timestamps=True,
-        )
-
-        # calculate correction wrt to new reference, which is either the
-        # moving frame, the reference frame or the current representation frame
-        correction_ref = _resolve_rf(moving_frame or reference_frame or self)
-        linear, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
-            correction_ref, cutoff=cutoff
-        )
-        translation, _, transform_ts = correction_ref.get_transformation(
-            to_frame
         )
 
         linear, arr, ts = self._interpolate(linear, arr, twist_ts, ts)
@@ -994,7 +1018,7 @@ class ReferenceFrame(NodeMixin):
 
         represent_in: str or ReferenceFrame, optional
             The reference frame in which the twist is represented. Defaults
-            to the frame itself.
+            to the parent frame.
 
         outlier_thresh: float, optional
             Some SLAM-based trackers introduce position corrections when a new
@@ -1024,8 +1048,11 @@ class ReferenceFrame(NodeMixin):
         timestamps: each numpy.ndarray
             Timestamps of the twist.
         """
-        reference = _resolve_rf(reference or self.parent)
-        represent_in = _resolve_rf(represent_in or self)
+        try:
+            reference = _resolve_rf(reference or self.parent)
+            represent_in = _resolve_rf(represent_in or self.parent)
+        except TypeError:
+            raise ValueError(f"Frame {self.name} has no parent frame")
 
         translation, rotation, timestamps = self.get_transformation(reference)
 

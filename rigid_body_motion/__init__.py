@@ -420,6 +420,7 @@ def transform_angular_velocity(
 def transform_linear_velocity(
     arr,
     into,
+    moving_frame,
     outof=None,
     what="reference_frame",
     dim=None,
@@ -492,6 +493,7 @@ def transform_linear_velocity(
         timestamps,
         time_axis,
         what=what,
+        moving_frame=moving_frame,
         cutoff=cutoff,
     )
 

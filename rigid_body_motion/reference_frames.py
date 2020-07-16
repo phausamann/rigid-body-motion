@@ -823,15 +823,15 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
+        to_frame = _resolve_rf(to_frame)
+
         if what == "reference_frame":
-            represent_in = to_frame
             _, angular, twist_ts = self.lookup_twist(
                 to_frame, to_frame, cutoff=cutoff
             )
         elif what == "moving_frame":
-            represent_in = self
             _, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
-                self, self, cutoff=cutoff
+                self, to_frame, cutoff=cutoff
             )
         else:
             raise ValueError(
@@ -841,7 +841,7 @@ class ReferenceFrame(NodeMixin):
 
         arr, ts = self.transform_vectors(
             arr,
-            represent_in,
+            to_frame,
             axis=axis,
             time_axis=time_axis,
             timestamps=timestamps,
@@ -863,7 +863,9 @@ class ReferenceFrame(NodeMixin):
         self,
         arr,
         to_frame,
+        moving_frame,
         what="reference_frame",
+        reference_frame=None,
         axis=-1,
         time_axis=0,
         timestamps=None,
@@ -915,20 +917,30 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
+        to_frame = _resolve_rf(to_frame)
+        moving_frame = _resolve_rf(moving_frame)
+
         if what == "reference_frame":
-            represent_in = to_frame
-            linear, angular, twist_ts = self.lookup_twist(
+            linear, angular, linear_ts = self.lookup_twist(
                 to_frame, to_frame, cutoff=cutoff
             )
-            translation, _, transform_ts = self.get_transformation(to_frame)
-        elif what == "moving_frame":
-            represent_in = self
-            linear, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
-                self, self, cutoff=cutoff
+            angular_ts = linear_ts
+            translation, _, transform_ts = self.get_transformation(
+                moving_frame
             )
-            translation, _, transform_ts = _resolve_rf(
-                to_frame
-            ).get_transformation(self)
+        elif what == "moving_frame":
+            linear, _, linear_ts = to_frame.lookup_twist(
+                self, to_frame, cutoff=cutoff
+            )
+            _, angular, angular_ts = self.lookup_twist(
+                reference_frame, to_frame, cutoff=cutoff
+            )
+            translation, _, transform_ts = to_frame.get_transformation(
+                moving_frame
+            )
+            translation = moving_frame.transform_vectors(
+                translation, to_frame, timestamps=transform_ts
+            )
         else:
             raise ValueError(
                 f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
@@ -937,18 +949,19 @@ class ReferenceFrame(NodeMixin):
 
         arr, ts = self.transform_vectors(
             arr,
-            represent_in,
+            to_frame,
             axis=axis,
             time_axis=time_axis,
             timestamps=timestamps,
             return_timestamps=True,
         )
 
-        linear, arr, ts = self._interpolate(linear, arr, twist_ts, ts)
-        angular, _, _ = self._interpolate(angular, arr, twist_ts, ts)
-        translation, _, _ = self._interpolate(
-            translation, arr, transform_ts, ts
-        )
+        linear, arr, ts = self._interpolate(linear, arr, linear_ts, ts)
+        angular, _, _ = self._interpolate(angular, arr, angular_ts, ts)
+        if transform_ts is not None:
+            translation, _, _ = self._interpolate(
+                translation, arr, transform_ts, ts
+            )
 
         arr += linear + np.cross(angular, translation)
 

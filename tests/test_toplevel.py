@@ -215,6 +215,7 @@ class TestTopLevel(object):
 
         eye_linear_rf = rbm.transform_linear_velocity(
             gaze_twist.linear_velocity,
+            moving_frame="eyes",
             outof="head",
             into="world",
             timestamps="time",
@@ -224,6 +225,7 @@ class TestTopLevel(object):
 
         eye_linear_mf = rbm.transform_linear_velocity(
             head_twist.linear_velocity,
+            moving_frame="head",
             outof="head",
             into="eyes",
             what="moving_frame",

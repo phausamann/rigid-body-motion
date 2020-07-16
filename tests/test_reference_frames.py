@@ -508,12 +508,32 @@ class TestReferenceFrame(object):
 
         # transform reference frame
         v_eyes_world_rf = rbm.registry["head"].transform_linear_velocity(
-            v_eyes_head, "world", timestamps=ts,
+            v_eyes_head, "world", moving_frame="eyes", timestamps=ts,
         )
         assert (v_eyes_world_rf < 1e-10).all()
 
+        v_eyes_world_shifted = rbm.registry["head"].transform_linear_velocity(
+            v_eyes_head, "world_shifted", moving_frame="eyes", timestamps=ts,
+        )
+        assert (v_eyes_world_shifted < 1e-10).all()
+
         # transform moving frame
         v_eyes_world_mf = rbm.registry["head"].transform_linear_velocity(
-            v_head_world, "eyes", what="moving_frame", timestamps=ts,
+            v_head_world,
+            "eyes",
+            what="moving_frame",
+            moving_frame="head",
+            reference_frame="world",
+            timestamps=ts,
         )
         assert (v_eyes_world_mf < 1e-10).all()
+
+        v_gaze_point_world = rbm.registry["head"].transform_linear_velocity(
+            v_head_world,
+            "gaze_point",
+            what="moving_frame",
+            moving_frame="head",
+            reference_frame="world",
+            timestamps=ts,
+        )
+        assert (v_gaze_point_world[1:-1] < 0.06).all()

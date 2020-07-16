@@ -101,6 +101,10 @@ def compensated_tree():
         translation=(0.0, 0.0, 1.0), parent="eyes", name="gaze_point"
     ).register(update=True)
 
+    rbm.ReferenceFrame(
+        translation=(1.0, 0.0, 0.0), parent="world", name="world_shifted"
+    ).register(update=True)
+
 
 @pytest.fixture()
 def head_dataset():

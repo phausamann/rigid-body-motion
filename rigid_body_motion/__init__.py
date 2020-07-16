@@ -85,7 +85,6 @@ def _transform(
     timestamps,
     time_axis,
     what="reference_frame",
-    moving_frame=None,
     **kwargs,
 ):
     """ Base transform method. """
@@ -130,23 +129,14 @@ def _transform(
                 "the name of a registered frame"
             )
 
-    if moving_frame is None:
-        if attrs is not None and "moving_frame" in attrs:
-            # TODO warn if moving_frame(.name) != attrs["moving_frame"]
-            moving_frame = attrs["moving_frame"]
-            moving_frame = _resolve_rf(moving_frame)
-    else:
-        moving_frame = _resolve_rf(moving_frame)
-
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
 
     if method in ("transform_angular_velocity", "transform_linear_velocity"):
         kwargs["what"] = what
-        kwargs["moving_frame"] = moving_frame
 
     if attrs is not None:
-        if "moving_frame" in kwargs and moving_frame is not None:
+        if "what" in kwargs and kwargs["what"] == "moving_frame":
             attrs["moving_frame"] = into.name
         else:
             attrs["reference_frame"] = into.name
@@ -353,7 +343,6 @@ def transform_angular_velocity(
     into,
     outof=None,
     what="reference_frame",
-    moving_frame=None,
     dim=None,
     axis=None,
     timestamps=None,
@@ -424,7 +413,6 @@ def transform_angular_velocity(
         timestamps,
         time_axis,
         what=what,
-        moving_frame=moving_frame,
         cutoff=cutoff,
     )
 
@@ -434,7 +422,6 @@ def transform_linear_velocity(
     into,
     outof=None,
     what="reference_frame",
-    moving_frame=None,
     dim=None,
     axis=None,
     timestamps=None,
@@ -505,7 +492,6 @@ def transform_linear_velocity(
         timestamps,
         time_axis,
         what=what,
-        moving_frame=moving_frame,
         cutoff=cutoff,
     )
 

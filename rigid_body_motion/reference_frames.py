@@ -772,7 +772,6 @@ class ReferenceFrame(NodeMixin):
         arr,
         to_frame,
         what="reference_frame",
-        moving_frame=None,
         axis=-1,
         time_axis=0,
         timestamps=None,
@@ -784,9 +783,11 @@ class ReferenceFrame(NodeMixin):
         The array represents the velocity of a moving body or frame wrt a
         reference frame, expressed in a representation frame.
 
-        By default, the transformation changes the reference frame of the
-        velocity from this frame to another and assumes that the array is
-        represented in the same frame.
+        The transformation changes either the reference frame or the moving
+        frame of the velocity from this frame to another. In either case, it
+        is assumed that the array is represented in the frame that is being
+        changed and will be represented in the new frame after the
+        transformation.
 
         Parameters
         ----------
@@ -828,13 +829,9 @@ class ReferenceFrame(NodeMixin):
                 to_frame, to_frame, cutoff=cutoff
             )
         elif what == "moving_frame":
-            if moving_frame is None:
-                raise ValueError(
-                    "'moving_frame' must be specified for what='moving_frame'"
-                )
             represent_in = self
             _, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
-                moving_frame, self, cutoff=cutoff
+                self, self, cutoff=cutoff
             )
         else:
             raise ValueError(
@@ -867,7 +864,6 @@ class ReferenceFrame(NodeMixin):
         arr,
         to_frame,
         what="reference_frame",
-        moving_frame=None,
         axis=-1,
         time_axis=0,
         timestamps=None,
@@ -879,9 +875,11 @@ class ReferenceFrame(NodeMixin):
         The array represents the velocity of a moving body or frame wrt a
         reference frame, expressed in a representation frame.
 
-        By default, the transformation changes the reference frame of the
-        velocity from this frame to another and assumes that the array is
-        represented in the same frame.
+        The transformation changes either the reference frame or the moving
+        frame of the velocity from this frame to another. In either case, it
+        is assumed that the array is represented in the frame that is being
+        changed and will be represented in the new frame after the
+        transformation.
 
         Parameters
         ----------
@@ -924,17 +922,13 @@ class ReferenceFrame(NodeMixin):
             )
             translation, _, transform_ts = self.get_transformation(to_frame)
         elif what == "moving_frame":
-            if moving_frame is None:
-                raise ValueError(
-                    "'moving_frame' must be specified for what='moving_frame'"
-                )
             represent_in = self
             linear, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
-                moving_frame, self, cutoff=cutoff
+                self, self, cutoff=cutoff
             )
             translation, _, transform_ts = _resolve_rf(
                 to_frame
-            ).get_transformation(moving_frame)
+            ).get_transformation(self)
         else:
             raise ValueError(
                 f"Expected 'what' to be 'reference_frame' or 'moving_frame', "

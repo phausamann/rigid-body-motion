@@ -483,8 +483,9 @@ class TestReferenceFrame(object):
     def test_transform_angular_velocity(self, compensated_tree):
         """"""
         _, w_head_world, ts = rbm.registry["head"].lookup_twist()
-        _, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist()
-        _, w_eyes_world, ts = rbm.registry["eyes"].lookup_twist("world")
+        _, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist(
+            represent_in="eyes"
+        )
 
         # transform reference frame
         w_eyes_world_rf = rbm.registry["head"].transform_angular_velocity(
@@ -493,20 +494,17 @@ class TestReferenceFrame(object):
         assert (w_eyes_world_rf < 1e-10).all()
 
         # transform moving frame
-        w_eyes_world_mf = rbm.registry["eyes"].transform_angular_velocity(
-            w_head_world,
-            "eyes",
-            what="moving_frame",
-            moving_frame="head",
-            timestamps=ts,
+        w_eyes_world_mf = rbm.registry["head"].transform_angular_velocity(
+            w_head_world, "eyes", what="moving_frame", timestamps=ts,
         )
         assert (w_eyes_world_mf < 1e-10).all()
 
     def test_transform_linear_velocity(self, compensated_tree):
         """"""
         v_head_world, _, ts = rbm.registry["head"].lookup_twist()
-        v_eyes_head, _, ts = rbm.registry["eyes"].lookup_twist()
-        v_eyes_world, _, ts = rbm.registry["eyes"].lookup_twist("world")
+        v_eyes_head, _, ts = rbm.registry["eyes"].lookup_twist(
+            represent_in="eyes"
+        )
 
         # transform reference frame
         v_eyes_world_rf = rbm.registry["head"].transform_linear_velocity(
@@ -515,11 +513,7 @@ class TestReferenceFrame(object):
         assert (v_eyes_world_rf < 1e-10).all()
 
         # transform moving frame
-        v_eyes_world_mf = rbm.registry["eyes"].transform_linear_velocity(
-            v_head_world,
-            "eyes",
-            what="moving_frame",
-            moving_frame="head",
-            timestamps=ts,
+        v_eyes_world_mf = rbm.registry["head"].transform_linear_velocity(
+            v_head_world, "eyes", what="moving_frame", timestamps=ts,
         )
         assert (v_eyes_world_mf < 1e-10).all()

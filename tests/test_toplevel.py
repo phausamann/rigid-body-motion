@@ -180,7 +180,9 @@ class TestTopLevel(object):
         """"""
         pytest.importorskip("xarray")
 
-        head_twist = rbm.lookup_twist("head", as_dataset=True)
+        head_twist = rbm.lookup_twist(
+            "head", represent_in="head", as_dataset=True
+        )
         gaze_twist = rbm.lookup_twist("eyes", as_dataset=True)
 
         eye_angular_rf = rbm.transform_angular_velocity(
@@ -194,10 +196,9 @@ class TestTopLevel(object):
 
         eye_angular_mf = rbm.transform_angular_velocity(
             head_twist.angular_velocity,
-            outof="world",
+            outof="head",
             into="eyes",
             what="moving_frame",
-            moving_frame="head",
             timestamps="time",
         )
 
@@ -207,7 +208,9 @@ class TestTopLevel(object):
         """"""
         pytest.importorskip("xarray")
 
-        head_twist = rbm.lookup_twist("head", as_dataset=True)
+        head_twist = rbm.lookup_twist(
+            "head", represent_in="head", as_dataset=True
+        )
         gaze_twist = rbm.lookup_twist("eyes", as_dataset=True)
 
         eye_linear_rf = rbm.transform_linear_velocity(
@@ -221,10 +224,9 @@ class TestTopLevel(object):
 
         eye_linear_mf = rbm.transform_linear_velocity(
             head_twist.linear_velocity,
-            outof="world",
+            outof="head",
             into="eyes",
             what="moving_frame",
-            moving_frame="head",
             timestamps="time",
         )
 

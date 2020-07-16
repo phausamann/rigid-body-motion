@@ -169,6 +169,8 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         topic=None,
         max_points=1000,
         publish_interval=0.0,
+        scale=0.1,
+        color="#ffffffff",
         verbose=False,
     ):
         """ Constructor.
@@ -193,10 +195,12 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
             Time in seconds between publishing when calling ``spin``.
         """
         self.frame = _resolve_rf(frame)
-        self.base = _resolve_rf(base or frame.parent)
+        self.base = _resolve_rf(base or self.frame.parent)
         self.translation, _, _ = self.frame.get_transformation(self.base)
 
-        marker = get_marker(frame_id=self.base.name, scale=(0.1, 0.0, 0.0))
+        marker = get_marker(
+            frame_id=self.base.name, scale=(scale, 0.0, 0.0), color=color
+        )
         show_every = self.translation.shape[0] // max_points
         marker.points = [Point(*row) for row in self.translation[::show_every]]
 

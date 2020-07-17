@@ -119,15 +119,26 @@ def _transform(
             )
 
     if outof is None:
-        if attrs is not None and "reference_frame" in attrs:
-            # TODO warn if outof(.name) != attrs["reference_frame"]
-            outof = attrs["reference_frame"]
+        if what == "moving_frame":
+            if attrs is not None and "moving" in attrs:
+                # TODO warn if outof(.name) != attrs["moving_frame"]
+                outof = attrs["moving_frame"]
+            else:
+                raise ValueError(
+                    "'outof' must be specified unless you provide a DataArray "
+                    "whose ``attrs`` contain a 'moving_frame' entry with "
+                    "the name of a registered frame"
+                )
         else:
-            raise ValueError(
-                "'outof' must be specified unless you provide a DataArray "
-                "whose ``attrs`` contain a 'reference_frame' entry with "
-                "the name of a registered frame"
-            )
+            if attrs is not None and "reference_frame" in attrs:
+                # TODO warn if outof(.name) != attrs["reference_frame"]
+                outof = attrs["reference_frame"]
+            else:
+                raise ValueError(
+                    "'outof' must be specified unless you provide a DataArray "
+                    "whose ``attrs`` contain a 'reference_frame' entry with "
+                    "the name of a registered frame"
+                )
 
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
@@ -136,7 +147,7 @@ def _transform(
         kwargs["what"] = what
 
     if attrs is not None:
-        if "what" in kwargs and kwargs["what"] == "moving_frame":
+        if what == "moving_frame":
             attrs["moving_frame"] = into.name
         else:
             attrs["reference_frame"] = into.name
@@ -420,9 +431,10 @@ def transform_angular_velocity(
 def transform_linear_velocity(
     arr,
     into,
-    moving_frame,
     outof=None,
     what="reference_frame",
+    moving_frame=None,
+    reference_frame=None,
     dim=None,
     axis=None,
     timestamps=None,
@@ -494,6 +506,7 @@ def transform_linear_velocity(
         time_axis,
         what=what,
         moving_frame=moving_frame,
+        reference_frame=reference_frame,
         cutoff=cutoff,
     )
 

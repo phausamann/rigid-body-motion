@@ -215,24 +215,24 @@ class TestTopLevel(object):
 
         eye_linear_rf = rbm.transform_linear_velocity(
             gaze_twist.linear_velocity,
-            moving_frame="eyes",
             outof="head",
             into="world",
+            moving_frame="eyes",
             timestamps="time",
         )
 
-        assert (eye_linear_rf < 1e-10).all()
+        assert (eye_linear_rf[1:-1] < 0.06).all()
 
         eye_linear_mf = rbm.transform_linear_velocity(
             head_twist.linear_velocity,
-            moving_frame="head",
             outof="head",
             into="eyes",
             what="moving_frame",
+            reference_frame="world",
             timestamps="time",
         )
 
-        assert (eye_linear_mf < 1e-10).all()
+        assert (eye_linear_mf[1:-1] < 0.06).all()
 
     def test_transform_coordinates(self):
         """"""

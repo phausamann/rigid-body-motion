@@ -84,26 +84,29 @@ def register_rf_tree():
 def compensated_tree():
     """"""
     n_samples = 1000
+    stack = False
 
     rbm.register_frame("world", update=True)
 
-    t, r, ts = make_test_motion(n_samples, stack=False)
+    t, r, ts = make_test_motion(n_samples, stack=stack)
     rbm.ReferenceFrame(
         translation=t, rotation=r, timestamps=ts, parent="world", name="head",
     ).register(update=True)
 
-    it, ir, _ = make_test_motion(n_samples, inverse=True, stack=False)
+    it, ir, _ = make_test_motion(
+        n_samples, inverse=True, stack=stack, offset=(1.0, 0.0, 0.0)
+    )
     rbm.ReferenceFrame(
         translation=it, rotation=ir, timestamps=ts, parent="head", name="eyes",
     ).register(update=True)
 
-    rbm.ReferenceFrame(
-        translation=(0.0, 0.0, 1.0), parent="eyes", name="gaze_point"
-    ).register(update=True)
-
-    rbm.ReferenceFrame(
-        translation=(1.0, 0.0, 0.0), parent="world", name="world_shifted"
-    ).register(update=True)
+    # rbm.ReferenceFrame(
+    #     translation=(0.0, 0.0, 1.0), parent="eyes", name="gaze_point"
+    # ).register(update=True)
+    #
+    # rbm.ReferenceFrame(
+    #     translation=(1.0, 0.0, 0.0), parent="world", name="world_shifted"
+    # ).register(update=True)
 
 
 @pytest.fixture()

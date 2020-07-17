@@ -863,8 +863,8 @@ class ReferenceFrame(NodeMixin):
         self,
         arr,
         to_frame,
-        moving_frame,
         what="reference_frame",
+        moving_frame=None,
         reference_frame=None,
         axis=-1,
         time_axis=0,
@@ -917,53 +917,69 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
-        to_frame = _resolve_rf(to_frame)
-        moving_frame = _resolve_rf(moving_frame)
-
         if what == "reference_frame":
-            linear, angular, linear_ts = self.lookup_twist(
-                to_frame, to_frame, cutoff=cutoff
+            v_BA = arr
+            ts = timestamps
+            A = self
+            B = _resolve_rf(moving_frame)
+            C = _resolve_rf(to_frame)
+
+            v_AC, w_AC, ts_AC = A.lookup_twist(C, C, cutoff=cutoff)
+            r_BA, _, ts_BA = B.get_transformation(A)
+            r_BA = A.transform_vectors(r_BA, C, timestamps=ts_BA)
+
+            v_AC, v_BA, ts_BA = self._interpolate(v_AC, v_BA, ts_AC, ts)
+            w_AC, _, _ = self._interpolate(w_AC, v_BA, ts_AC, ts)
+            if ts_BA is not None:
+                r_BA, _, _ = self._interpolate(r_BA, v_BA, ts_BA, ts)
+
+            v_BA, ts = A.transform_vectors(
+                v_BA,
+                C,
+                axis=axis,
+                time_axis=time_axis,
+                timestamps=ts,
+                return_timestamps=True,
             )
-            angular_ts = linear_ts
-            translation, _, transform_ts = self.get_transformation(
-                moving_frame
-            )
+
+            correction = np.cross(w_AC, r_BA)
+            arr = v_BA + v_AC + correction
+            pass
+
         elif what == "moving_frame":
-            linear, _, linear_ts = to_frame.lookup_twist(
-                self, to_frame, cutoff=cutoff
+            v_AC = arr
+            ts = timestamps
+            A = self
+            B = _resolve_rf(to_frame)
+            C = _resolve_rf(reference_frame)
+
+            v_BA, _, ts_BA = B.lookup_twist(A, B, cutoff=cutoff)
+            _, w_AC, ts_AC = A.lookup_twist(C, B, cutoff=cutoff)
+            r_BA, _, ts_BA = B.get_transformation(A)
+            r_BA = A.transform_vectors(r_BA, B, timestamps=ts_BA)
+
+            v_AC, ts = A.transform_vectors(
+                v_AC,
+                B,
+                axis=axis,
+                time_axis=time_axis,
+                timestamps=ts,
+                return_timestamps=True,
             )
-            _, angular, angular_ts = self.lookup_twist(
-                reference_frame, to_frame, cutoff=cutoff
-            )
-            translation, _, transform_ts = to_frame.get_transformation(
-                moving_frame
-            )
-            translation = moving_frame.transform_vectors(
-                translation, to_frame, timestamps=transform_ts
-            )
+
+            v_BA, v_AC, ts = self._interpolate(v_BA, v_AC, ts_BA, ts)
+            w_AC, _, _ = self._interpolate(w_AC, v_AC, ts_AC, ts)
+            if ts_BA is not None:
+                r_BA, _, _ = self._interpolate(r_BA, v_AC, ts_BA, ts)
+
+            correction = np.cross(w_AC, r_BA)
+            arr = v_BA + v_AC + correction
+
         else:
             raise ValueError(
                 f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
                 f"got {what}"
             )
-
-        arr, ts = self.transform_vectors(
-            arr,
-            to_frame,
-            axis=axis,
-            time_axis=time_axis,
-            timestamps=timestamps,
-            return_timestamps=True,
-        )
-
-        linear, arr, ts = self._interpolate(linear, arr, linear_ts, ts)
-        angular, _, _ = self._interpolate(angular, arr, angular_ts, ts)
-        if transform_ts is not None:
-            translation, _, _ = self._interpolate(
-                translation, arr, transform_ts, ts
-            )
-
-        arr += linear + np.cross(angular, translation)
 
         if return_timestamps:
             return arr, ts

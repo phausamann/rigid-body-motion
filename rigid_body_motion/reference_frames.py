@@ -826,11 +826,11 @@ class ReferenceFrame(NodeMixin):
         to_frame = _resolve_rf(to_frame)
 
         if what == "reference_frame":
-            _, angular, twist_ts = self.lookup_twist(
+            _, angular, angular_ts = self.lookup_twist(
                 to_frame, to_frame, cutoff=cutoff
             )
         elif what == "moving_frame":
-            _, angular, twist_ts = _resolve_rf(to_frame).lookup_twist(
+            _, angular, angular_ts = _resolve_rf(to_frame).lookup_twist(
                 self, to_frame, cutoff=cutoff
             )
         else:
@@ -849,7 +849,7 @@ class ReferenceFrame(NodeMixin):
         )
 
         angular, arr, timestamps = self._interpolate(
-            angular, arr, twist_ts, ts
+            angular, arr, angular_ts, ts
         )
 
         arr += angular
@@ -870,6 +870,7 @@ class ReferenceFrame(NodeMixin):
         time_axis=0,
         timestamps=None,
         return_timestamps=False,
+        outlier_thresh=None,
         cutoff=None,
     ):
         """ Transform array of linear velocities from this frame to another.
@@ -917,69 +918,53 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
         """
+        to_frame = _resolve_rf(to_frame)
+
         if what == "reference_frame":
-            v_BA = arr
-            ts = timestamps
-            A = self
-            B = _resolve_rf(moving_frame)
-            C = _resolve_rf(to_frame)
-
-            v_AC, w_AC, ts_AC = A.lookup_twist(C, C, cutoff=cutoff)
-            r_BA, _, ts_BA = B.get_transformation(A)
-            r_BA = A.transform_vectors(r_BA, C, timestamps=ts_BA)
-
-            v_AC, v_BA, ts_BA = self._interpolate(v_AC, v_BA, ts_AC, ts)
-            w_AC, _, _ = self._interpolate(w_AC, v_BA, ts_AC, ts)
-            if ts_BA is not None:
-                r_BA, _, _ = self._interpolate(r_BA, v_BA, ts_BA, ts)
-
-            v_BA, ts = A.transform_vectors(
-                v_BA,
-                C,
-                axis=axis,
-                time_axis=time_axis,
-                timestamps=ts,
-                return_timestamps=True,
+            linear, angular, linear_ts = self.lookup_twist(
+                to_frame,
+                to_frame,
+                cutoff=cutoff,
+                outlier_thresh=outlier_thresh,
             )
-
-            correction = np.cross(w_AC, r_BA)
-            arr = v_BA + v_AC + correction
-            pass
-
+            angular_ts = linear_ts
+            translation, _, translation_ts = _resolve_rf(
+                moving_frame
+            ).get_transformation(self)
         elif what == "moving_frame":
-            v_AC = arr
-            ts = timestamps
-            A = self
-            B = _resolve_rf(to_frame)
-            C = _resolve_rf(reference_frame)
-
-            v_BA, _, ts_BA = B.lookup_twist(A, B, cutoff=cutoff)
-            _, w_AC, ts_AC = A.lookup_twist(C, B, cutoff=cutoff)
-            r_BA, _, ts_BA = B.get_transformation(A)
-            r_BA = A.transform_vectors(r_BA, B, timestamps=ts_BA)
-
-            v_AC, ts = A.transform_vectors(
-                v_AC,
-                B,
-                axis=axis,
-                time_axis=time_axis,
-                timestamps=ts,
-                return_timestamps=True,
+            linear, _, linear_ts = to_frame.lookup_twist(
+                self, to_frame, cutoff=cutoff, outlier_thresh=outlier_thresh,
             )
-
-            v_BA, v_AC, ts = self._interpolate(v_BA, v_AC, ts_BA, ts)
-            w_AC, _, _ = self._interpolate(w_AC, v_AC, ts_AC, ts)
-            if ts_BA is not None:
-                r_BA, _, _ = self._interpolate(r_BA, v_AC, ts_BA, ts)
-
-            correction = np.cross(w_AC, r_BA)
-            arr = v_BA + v_AC + correction
-
+            _, angular, angular_ts = self.lookup_twist(
+                reference_frame, to_frame, cutoff=cutoff
+            )
+            translation, _, translation_ts = to_frame.get_transformation(self)
         else:
             raise ValueError(
                 f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
                 f"got {what}"
             )
+
+        arr, ts = self.transform_vectors(
+            arr,
+            to_frame,
+            axis=axis,
+            time_axis=time_axis,
+            timestamps=timestamps,
+            return_timestamps=True,
+        )
+        translation = self.transform_vectors(
+            translation, to_frame, timestamps=translation_ts
+        )
+
+        linear, arr, ts = self._interpolate(linear, arr, linear_ts, ts)
+        angular, _, _ = self._interpolate(angular, arr, angular_ts, ts)
+        if translation_ts is not None:
+            translation, _, _ = self._interpolate(
+                translation, arr, translation_ts, ts
+            )
+
+        arr = arr + linear + np.cross(angular, translation)
 
         if return_timestamps:
             return arr, ts

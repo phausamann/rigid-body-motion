@@ -214,17 +214,17 @@ class TestTopLevel(object):
         gaze_twist = rbm.lookup_twist("eyes", as_dataset=True)
 
         eye_linear_rf = rbm.transform_linear_velocity(
-            gaze_twist.linear_velocity,
+            gaze_twist.linear_velocity[1:-1],
             outof="head",
             into="world",
             moving_frame="eyes",
             timestamps="time",
         )
 
-        assert (eye_linear_rf[1:-1] < 0.06).all()
+        assert (eye_linear_rf < 0.06).all()
 
         eye_linear_mf = rbm.transform_linear_velocity(
-            head_twist.linear_velocity,
+            head_twist.linear_velocity[1:-1],
             outof="head",
             into="eyes",
             what="moving_frame",
@@ -232,7 +232,7 @@ class TestTopLevel(object):
             timestamps="time",
         )
 
-        assert (eye_linear_mf[1:-1] < 0.06).all()
+        assert (eye_linear_mf < 0.06).all()
 
     def test_transform_coordinates(self):
         """"""

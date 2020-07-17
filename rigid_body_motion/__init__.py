@@ -440,6 +440,7 @@ def transform_linear_velocity(
     timestamps=None,
     time_axis=None,
     cutoff=None,
+    outlier_thresh=None,
 ):
     """ Transform an array of linear velocities between reference frames.
 
@@ -508,6 +509,7 @@ def transform_linear_velocity(
         moving_frame=moving_frame,
         reference_frame=reference_frame,
         cutoff=cutoff,
+        outlier_thresh=outlier_thresh,
     )
 
 

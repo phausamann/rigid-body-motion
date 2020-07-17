@@ -3,6 +3,7 @@ __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
 __version__ = "0.1.0"
 
+import warnings
 from pathlib import Path
 
 from pkg_resources import resource_filename
@@ -122,17 +123,23 @@ def _transform(
 
     if outof is None:
         if attrs is not None and what in attrs:
-            # TODO warn if outof(.name) != attrs[what]
-            outof = attrs[what]
+            outof = _resolve_rf(attrs[what])
         else:
             raise ValueError(
                 f"'outof' must be specified unless you provide a DataArray "
                 f"whose ``attrs`` contain a '{what}' entry with "
                 f"the name of a registered frame"
             )
+    else:
+        outof = _resolve_rf(outof)
+        if attrs is not None and what in attrs and attrs[what] != outof.name:
+            warnings.warn(
+                f"You are transforming the '{what}' of the array out of "
+                f"{outof.name}, but the current '{what}' the array is "
+                f"{attrs[what]}"
+            )
 
     into = _resolve_rf(into)
-    outof = _resolve_rf(outof)
 
     if method in ("transform_angular_velocity", "transform_linear_velocity"):
         kwargs["what"] = what

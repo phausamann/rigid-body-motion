@@ -91,7 +91,9 @@ def _transform(
     (
         arr,
         axis,
+        dim,
         time_axis,
+        time_dim,
         ts_in,
         coords,
         dims,
@@ -151,7 +153,7 @@ def _transform(
 
     if coords is not None:
         return _make_dataarray(
-            arr, coords, dims, name, attrs, timestamps, ts_out
+            arr, coords, dims, name, attrs, time_dim, ts_out
         )
     elif ts_out is not None:
         # TODO not so pretty. Maybe also introduce return_timestamps
@@ -545,7 +547,7 @@ def transform_coordinates(
     cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical,
     spherical_to_cartesian
     """
-    arr, axis, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
+    arr, axis, _, _, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
         arr, dim, axis
     )
 

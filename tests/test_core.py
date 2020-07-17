@@ -31,7 +31,9 @@ class TestCore(object):
         (
             arr_out,
             axis,
+            dim,
             time_axis,
+            time_dim,
             timestamps,
             coords,
             dims,
@@ -40,7 +42,9 @@ class TestCore(object):
         ) = _maybe_unpack_dataarray(arr)
         assert arr_out is arr
         assert axis == -1
+        assert dim is None
         assert time_axis == 0
+        assert time_dim is None
         assert timestamps is None
         assert coords is None
         assert dims is None
@@ -62,18 +66,20 @@ class TestCore(object):
         (
             arr_out,
             axis,
+            dim,
             time_axis,
+            time_dim,
             timestamps,
             coords,
             dims,
             name,
             attrs,
-        ) = _maybe_unpack_dataarray(
-            da, dim="cartesian_axis", timestamps="time"
-        )
+        ) = _maybe_unpack_dataarray(da, dim="cartesian_axis")
         npt.assert_equal(arr_out, arr)
         assert axis == 1
+        assert dim == "cartesian_axis"
         assert time_axis == 0
+        assert time_dim == "time"
         npt.assert_equal(timestamps, np.arange(10))
         assert all(c in da.coords for c in coords)
         assert dims is da.dims
@@ -82,19 +88,42 @@ class TestCore(object):
         assert attrs == da.attrs
 
         # static DataArray
-        da = xr.DataArray(arr[0], dims=("cartesian_axis",))
+        da_static = xr.DataArray(arr[0], dims=("cartesian_axis",))
         (
             arr_out,
             axis,
+            dim,
             time_axis,
+            time_dim,
             timestamps,
             coords,
             dims,
-            _,
-            _,
-        ) = _maybe_unpack_dataarray(da, dim="cartesian_axis", timestamps=None)
-        npt.assert_equal(arr_out, arr[0])
+            name,
+            attrs,
+        ) = _maybe_unpack_dataarray(da_static, dim="cartesian_axis")
         assert axis == 0
+        assert dim == "cartesian_axis"
+        assert time_axis is None
+        assert time_dim is None
+        assert timestamps is None
+
+        # multi-dimensional static DataArray
+        (
+            arr_out,
+            axis,
+            dim,
+            time_axis,
+            time_dim,
+            timestamps,
+            coords,
+            dims,
+            name,
+            attrs,
+        ) = _maybe_unpack_dataarray(da, timestamps=False)
+        assert axis == -1
+        assert dim == "cartesian_axis"
+        assert time_axis is None
+        assert time_dim is None
         assert timestamps is None
 
         # dim and axis argument at the same time

@@ -51,6 +51,7 @@ def _maybe_unpack_dataarray(
             raise ValueError("dim argument specified without DataArray input")
         axis = axis or -1
         time_axis = time_axis or 0
+        time_dim = None
         coords = None
         dims = None
         name = None
@@ -64,15 +65,25 @@ def _maybe_unpack_dataarray(
             axis = arr.dims.index(dim)
         else:
             axis = axis or -1
+            dim = str(arr.dims[axis])
         if isinstance(timestamps, str):
             # TODO convert datetimeindex?
             time_axis = arr.dims.index(timestamps)
+            time_dim = timestamps
             timestamps = arr[timestamps].data
         elif timestamps is None:
-            time_axis = 0
+            if arr.ndim > 1:
+                time_axis = time_axis or 0
+                time_dim = arr.dims[time_axis]
+                timestamps = arr.coords[time_dim]
+            else:
+                time_dim = None
+        elif timestamps is False:
+            timestamps = None
+            time_dim = None
         else:
             raise NotImplementedError(
-                "timestamps argument must be dimension name or None"
+                "timestamps argument must be dimension name, None or False"
             )
         coords = dict(arr.coords)
         dims = arr.dims
@@ -80,32 +91,45 @@ def _maybe_unpack_dataarray(
         attrs = arr.attrs.copy()
         arr = arr.data
 
-    return arr, axis, time_axis, timestamps, coords, dims, name, attrs
+    return (
+        arr,
+        axis,
+        dim,
+        time_axis,
+        time_dim,
+        timestamps,
+        coords,
+        dims,
+        name,
+        attrs,
+    )
 
 
-def _make_dataarray(arr, coords, dims, name, attrs, ts_arg, ts_out):
+def _make_dataarray(arr, coords, dims, name, attrs, time_dim, ts_out):
     """ Make DataArray out of transformation results. """
     import xarray as xr
 
-    if ts_arg is None:
+    if time_dim is None:
         # no timestamps specified
         if ts_out is not None:
             coords["time"] = ts_out
             dims = ("time",) + dims
-    elif isinstance(ts_arg, str):
+    elif isinstance(time_dim, str):
         # timestamps specified as coord
         # TODO transpose if time dim is not first?
-        if ts_arg not in coords:
-            raise ValueError(f"{ts_arg} is not a coordinate of this DataArray")
+        if time_dim not in coords:
+            raise ValueError(
+                f"{time_dim} is not a coordinate of this DataArray"
+            )
         assert ts_out is not None
-        if len(coords[ts_arg]) != len(ts_out) or np.any(
-            coords[ts_arg] != ts_out
+        if len(coords[time_dim]) != len(ts_out) or np.any(
+            coords[time_dim] != ts_out
         ):
             # interpolate if timestamps after transform have changed
             for c in coords:
-                if ts_arg in coords[c].dims and c != ts_arg:
-                    coords[c] = coords[c].interp({ts_arg: ts_out})
-            coords[ts_arg] = ts_out
+                if time_dim in coords[c].dims and c != time_dim:
+                    coords[c] = coords[c].interp({time_dim: ts_out})
+            coords[time_dim] = ts_out
     else:
         # timestamps specified as array
         # TODO time_dim argument

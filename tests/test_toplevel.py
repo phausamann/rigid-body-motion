@@ -78,6 +78,7 @@ class TestTopLevel(object):
         assert da_child1.shape == (5, 10, 3)
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
         assert da_child1.attrs["reference_frame"] == "child1"
+        assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
     def test_transform_quaternions(self, rf_tree, mock_quaternion):
@@ -109,6 +110,7 @@ class TestTopLevel(object):
         )
         assert da_child1.shape == (10, 4)
         assert da_child1.attrs["reference_frame"] == "child1"
+        assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors
@@ -157,6 +159,7 @@ class TestTopLevel(object):
         )
         assert da_child1.shape == (10, 3)
         assert da_child1.attrs["reference_frame"] == "child1"
+        assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0], arr_exp)
 
         # multi-dimensional vectors

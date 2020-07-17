@@ -119,26 +119,15 @@ def _transform(
             )
 
     if outof is None:
-        if what == "moving_frame":
-            if attrs is not None and "moving" in attrs:
-                # TODO warn if outof(.name) != attrs["moving_frame"]
-                outof = attrs["moving_frame"]
-            else:
-                raise ValueError(
-                    "'outof' must be specified unless you provide a DataArray "
-                    "whose ``attrs`` contain a 'moving_frame' entry with "
-                    "the name of a registered frame"
-                )
+        if attrs is not None and what in attrs:
+            # TODO warn if outof(.name) != attrs[what]
+            outof = attrs[what]
         else:
-            if attrs is not None and "reference_frame" in attrs:
-                # TODO warn if outof(.name) != attrs["reference_frame"]
-                outof = attrs["reference_frame"]
-            else:
-                raise ValueError(
-                    "'outof' must be specified unless you provide a DataArray "
-                    "whose ``attrs`` contain a 'reference_frame' entry with "
-                    "the name of a registered frame"
-                )
+            raise ValueError(
+                f"'outof' must be specified unless you provide a DataArray "
+                f"whose ``attrs`` contain a '{what}' entry with "
+                f"the name of a registered frame"
+            )
 
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
@@ -147,10 +136,8 @@ def _transform(
         kwargs["what"] = what
 
     if attrs is not None:
-        if what == "moving_frame":
-            attrs["moving_frame"] = into.name
-        else:
-            attrs["reference_frame"] = into.name
+        attrs[what] = into.name
+        attrs["representation_frame"] = into.name
 
     arr, ts_out = getattr(outof, method)(
         arr,

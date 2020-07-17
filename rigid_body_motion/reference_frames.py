@@ -291,6 +291,33 @@ class ReferenceFrame(NodeMixin):
             return arr, rf_t, rf_r, rf_ts
 
     @classmethod
+    def _match_timestamps_multi(cls, arr_list, ts_list):
+        """ Match multiple arrays and timestamps at once. """
+        earliest = np.max([ts[0] for ts in ts_list if ts is not None])
+        latest = np.min([ts[-1] for ts in ts_list if ts is not None])
+
+        return_ts = None
+        for ts in ts_list:
+            if return_ts is None and ts is not None:
+                return_ts = ts[(ts >= earliest) & (ts <= latest)]
+                break
+        else:
+            return arr_list, None
+
+        return_arr_list = []
+        for arr, ts in zip(arr_list, ts_list):
+            if ts is None:
+                return_arr_list.append(cls._broadcast(arr, return_ts))
+            else:
+                return_arr_list.append(
+                    interp1d(ts.astype(float), arr, axis=0)(
+                        return_ts.astype(float)
+                    )
+                )
+
+        return return_arr_list, return_ts
+
+    @classmethod
     def _add_transformation(cls, rf, t, r, ts, inverse=False):
         """ Add transformation of this frame to current transformation. """
         # TODO test
@@ -953,16 +980,23 @@ class ReferenceFrame(NodeMixin):
             timestamps=timestamps,
             return_timestamps=True,
         )
-        translation = self.transform_vectors(
-            translation, to_frame, timestamps=translation_ts
+        translation, translation_ts = self.transform_vectors(
+            translation,
+            to_frame,
+            timestamps=translation_ts,
+            return_timestamps=True,
         )
 
-        linear, arr, ts = self._interpolate(linear, arr, linear_ts, ts)
-        angular, _, _ = self._interpolate(angular, arr, angular_ts, ts)
-        if translation_ts is not None:
-            translation, _, _ = self._interpolate(
-                translation, arr, translation_ts, ts
-            )
+        # linear, arr, ts = self._interpolate(linear, arr, linear_ts, ts)
+        # angular, arr, ts = self._interpolate(angular, arr, angular_ts, ts)
+        # if translation_ts is not None:
+        #     translation, arr, ts = self._interpolate(
+        #         translation, arr, translation_ts, ts
+        #     )
+        (arr, linear, angular, translation), ts = self._match_timestamps_multi(
+            [arr, linear, angular, translation],
+            [ts, linear_ts, angular_ts, translation_ts],
+        )
 
         arr = arr + linear + np.cross(angular, translation)
 

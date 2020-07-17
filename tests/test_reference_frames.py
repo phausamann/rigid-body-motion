@@ -33,6 +33,7 @@ class TestReferenceFrameRegistry(object):
 
     def test_deregister(self):
         """"""
+        rbm.register_frame("world")
         _deregister("world")
         assert "world" not in rbm.registry
 
@@ -46,6 +47,7 @@ class TestReferenceFrameRegistry(object):
 
     def test_deregister_frame(self):
         """"""
+        rbm.register_frame("world")
         rbm.deregister_frame("world")
         assert "world" not in rbm.registry
 

@@ -17,6 +17,13 @@ def load_csv(filepath):
     return list(zip(*contents))
 
 
+@pytest.fixture(autouse=True)
+def clear_registry():
+    """"""
+    rbm.clear_registry()
+    yield
+
+
 @pytest.fixture(params=load_csv(test_data_dir / "rf_test_grid.csv"))
 def rf_grid(request):
     """"""
@@ -99,14 +106,6 @@ def compensated_tree():
     rbm.ReferenceFrame(
         translation=it, rotation=ir, timestamps=ts, parent="head", name="eyes",
     ).register(update=True)
-
-    # rbm.ReferenceFrame(
-    #     translation=(0.0, 0.0, 1.0), parent="eyes", name="gaze_point"
-    # ).register(update=True)
-    #
-    # rbm.ReferenceFrame(
-    #     translation=(1.0, 0.0, 0.0), parent="world", name="world_shifted"
-    # ).register(update=True)
 
 
 @pytest.fixture()

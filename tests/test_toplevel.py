@@ -8,12 +8,6 @@ import rigid_body_motion as rbm
 class TestTopLevel(object):
     """"""
 
-    @pytest.fixture(autouse=True)
-    def clear_registry(self):
-        """"""
-        rbm.clear_registry()
-        yield
-
     @pytest.fixture()
     def rf_tree(self, register_rf_tree, mock_quaternion):
         """"""

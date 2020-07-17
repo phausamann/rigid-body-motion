@@ -11,8 +11,6 @@ from geometry_msgs.msg import (
     TwistStamped,
     Vector3Stamped,
 )
-from quaternion import as_quat_array, as_rotation_vector
-from scipy.signal import butter, filtfilt
 
 try:
     import rospkg
@@ -405,7 +403,8 @@ class ReferenceFrameTransformBroadcaster:
         publish_pose=False,
         publish_twist=False,
         subscribe=False,
-        twist_filter_cutoff=0.1,
+        twist_cutoff=None,
+        twist_outlier_thresh=None,
     ):
         """ Constructor.
 
@@ -461,8 +460,11 @@ class ReferenceFrameTransformBroadcaster:
             self.pose_publisher = None
 
         if publish_twist:
-            self.linear, self.angular = self._estimate_twist(
-                filter_cutoff=twist_filter_cutoff
+            self.linear, self.angular, _ = self.frame.lookup_twist(
+                reference=base,
+                represent_in=self.frame,
+                cutoff=twist_cutoff,
+                outlier_thresh=twist_outlier_thresh,
             )
             self.twist_publisher = rospy.Publisher(
                 f"/{self.frame.name}/twist",
@@ -487,38 +489,6 @@ class ReferenceFrameTransformBroadcaster:
         self.idx = 0
         self.stopped = False
         self._thread = None
-
-    def _estimate_twist(self, filter_cutoff=0.1):
-        """ Estimate twist of frame wrt base, expressed in frame. """
-        if self.timestamps is None:
-            raise ValueError(
-                "Twist cannot be estimated for static transforms."
-            )
-
-        translation = filtfilt(
-            *butter(7, filter_cutoff), self.translation, axis=0
-        )
-        linear = np.gradient(
-            translation, self.timestamps.values.astype(float) / 1e9, axis=0,
-        )
-        linear = self.base.transform_vectors(
-            linear, self.frame, timestamps=self.timestamps
-        )
-
-        rotation = filtfilt(
-            *butter(7, filter_cutoff),
-            as_rotation_vector(as_quat_array(self.rotation)),
-            axis=0
-        )
-        angular = np.gradient(
-            rotation, self.timestamps.values.astype(float) / 1e9, axis=0,
-        )
-
-        angular = self.base.transform_vectors(
-            angular, self.frame, timestamps=self.timestamps
-        )
-
-        return linear, angular
 
     def publish(self, idx=None):
         """ Publish a transform message.

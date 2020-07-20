@@ -95,7 +95,7 @@ class RosbagReader:
             return_vals = {
                 "timestamps": arr[:, 0],
                 "position": arr[:, 1:4],
-                "orientation": arr[:, (7, 4, 5, 6)],
+                "orientation": arr[:, 4:8],
                 "linear_velocity": arr[:, 8:11],
                 "angular_velocity": arr[:, 11:],
             }
@@ -115,7 +115,7 @@ class RosbagReader:
                 return_vals = {
                     "timestamps": arr[:, 0],
                     "position": arr[:, 1:4],
-                    "orientation": arr[:, (7, 4, 5, 6)],
+                    "orientation": arr[:, 4:8],
                 }
 
         else:

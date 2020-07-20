@@ -19,6 +19,13 @@ def ReferenceFrameTransformBroadcaster():
 
 
 @pytest.fixture()
+def RosbagReader():
+    """"""
+    io = pytest.importorskip("rigid_body_motion.ros.io")
+    return io.RosbagReader
+
+
+@pytest.fixture()
 def visualization():
     """"""
     return pytest.importorskip("rigid_body_motion.ros.visualization")
@@ -104,3 +111,77 @@ class TestVisualization:
         marker_msg = visualization.get_marker()
         assert marker_msg.type == 4
         assert marker_msg.header.frame_id == "world"
+
+
+class TestRosbagReader:
+    def test_get_msg_type(self, RosbagReader, rosbag_path):
+        """"""
+        assert (
+            RosbagReader._get_msg_type(rosbag_path, "/camera/odom/sample")
+            == "nav_msgs/Odometry"
+        )
+        assert (
+            RosbagReader._get_msg_type(
+                rosbag_path, "/vicon/t265_tracker/t265_tracker"
+            )
+            == "geometry_msgs/TransformStamped"
+        )
+
+    def test_load_msgs(self, RosbagReader, rosbag_path):
+        """"""
+        # odometry
+        reader = RosbagReader(rosbag_path, "/camera/odom/sample")
+        odometry = reader.load_messages()
+        assert set(odometry.keys()) == {
+            "timestamps",
+            "position",
+            "orientation",
+            "linear_velocity",
+            "angular_velocity",
+        }
+        assert all(v.shape[0] == 228 for v in odometry.values())
+
+        # pose
+        reader = RosbagReader(rosbag_path, "/vicon/t265_tracker/t265_tracker")
+        pose = reader.load_messages()
+        assert set(pose.keys()) == {
+            "timestamps",
+            "position",
+            "orientation",
+        }
+        assert all(v.shape[0] == 57 for v in pose.values())
+
+    def test_load_dataset(self, RosbagReader, rosbag_path):
+        """"""
+        pytest.importorskip("xarray")
+
+        reader = RosbagReader(rosbag_path, "/camera/odom/sample")
+        ds = reader.load_dataset()
+
+        assert set(ds.data_vars) == {
+            "position",
+            "orientation",
+            "linear_velocity",
+            "angular_velocity",
+        }
+
+        assert set(ds.coords) == {
+            "time",
+            "cartesian_axis",
+            "quaternion_axis",
+        }
+
+        assert ds.sizes == {
+            "time": 228,
+            "cartesian_axis": 3,
+            "quaternion_axis": 4,
+        }
+
+    def test_write_netcdf(self, RosbagReader, rosbag_path, export_folder):
+        """"""
+        pytest.importorskip("xarray")
+        pytest.importorskip("netCDF4")
+
+        output_file = export_folder / "test.nc"
+        RosbagReader(rosbag_path, "/camera/odom/sample").export(output_file)
+        assert output_file.exists()

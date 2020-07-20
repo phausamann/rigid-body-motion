@@ -19,3 +19,11 @@ except ImportError:
         raise
     else:
         pass
+
+try:
+    from .io import RosbagReader  # noqa
+except ImportError:
+    if os.environ.get("RBM_ROS_DEBUG"):
+        raise
+    else:
+        pass

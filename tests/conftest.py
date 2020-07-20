@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -115,3 +116,17 @@ def head_dataset():
     pytest.importorskip("netCDF4")
 
     return xr.load_dataset(rbm.example_data["head"])
+
+
+@pytest.fixture()
+def rosbag_path():
+    """"""
+    return test_data_dir / "test.bag"
+
+
+@pytest.fixture()
+def export_folder():
+    """"""
+    export_folder = test_data_dir / "exports"
+    yield export_folder
+    shutil.rmtree(export_folder, ignore_errors=True)

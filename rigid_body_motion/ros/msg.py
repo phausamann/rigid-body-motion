@@ -11,6 +11,9 @@ from geometry_msgs.msg import (
     Vector3Stamped,
 )
 
+# TODO stamped=False/False parameter
+# TODO default values
+
 
 def make_transform_msg(t, r, frame_id, child_frame_id, time=0.0):
     """ Create a TransformStamped message. """
@@ -24,10 +27,14 @@ def make_transform_msg(t, r, frame_id, child_frame_id, time=0.0):
     return msg
 
 
-def unpack_transform_msg(msg):
-    """ Get translation and rotation from a TransformStamped message. """
-    t = msg.transform.translation
-    r = msg.transform.rotation
+def unpack_transform_msg(msg, stamped=False):
+    """ Get translation and rotation from a Transform(Stamped) message. """
+    if stamped:
+        t = msg.transform.translation
+        r = msg.transform.rotation
+    else:
+        t = msg.translation
+        r = msg.rotation
 
     return (t.x, t.y, t.z), (r.w, r.x, r.y, r.z)
 
@@ -43,10 +50,14 @@ def make_pose_msg(p, o, frame_id, time=0.0):
     return msg
 
 
-def unpack_pose_msg(msg):
-    """ Get position and orientation from a PoseStamped message. """
-    p = msg.pose.position
-    o = msg.pose.orientation
+def unpack_pose_msg(msg, stamped=False):
+    """ Get position and orientation from a Pose(Stamped) message. """
+    if stamped:
+        p = msg.pose.position
+        o = msg.pose.orientation
+    else:
+        p = msg.position
+        o = msg.orientation
 
     return (p.x, p.y, p.z), (o.w, o.x, o.y, o.z)
 
@@ -62,10 +73,14 @@ def make_twist_msg(v, w, frame_id, time=0.0):
     return msg
 
 
-def unpack_twist_msg(msg):
-    """ Get linear and angular velocity from a TwistStamped message. """
-    v = msg.twist.linear
-    w = msg.twist.angular
+def unpack_twist_msg(msg, stamped=False):
+    """ Get linear and angular velocity from a Twist(Stamped) message. """
+    if stamped:
+        v = msg.twist.linear
+        w = msg.twist.angular
+    else:
+        v = msg.linear
+        w = msg.angular
 
     return (v.x, v.y, v.z), (w.x, w.y, w.z)
 
@@ -80,9 +95,12 @@ def make_vector_msg(v, frame_id, time=0.0):
     return msg
 
 
-def unpack_vector_msg(msg):
-    """ Get coordinates from a Vector3Stamped message. """
-    v = msg.vector
+def unpack_vector_msg(msg, stamped=False):
+    """ Get coordinates from a Vector3(Stamped) message. """
+    if stamped:
+        v = msg.vector
+    else:
+        v = msg
 
     return v.x, v.y, v.z
 
@@ -97,9 +115,12 @@ def make_point_msg(p, frame_id, time=0.0):
     return msg
 
 
-def unpack_point_msg(msg):
-    """ Get coordinates from a PointStamped message. """
-    p = msg.point
+def unpack_point_msg(msg, stamped=False):
+    """ Get coordinates from a Point(Stamped) message. """
+    if stamped:
+        p = msg.point
+    else:
+        p = msg
 
     return p.x, p.y, p.z
 
@@ -114,9 +135,12 @@ def make_quaternion_msg(q, frame_id, time=0.0):
     return msg
 
 
-def unpack_quaternion_msg(msg):
-    """ Get coordinates from a QuaternionStamped message. """
-    q = msg.quaternion
+def unpack_quaternion_msg(msg, stamped=False):
+    """ Get coordinates from a Quaternion(Stamped) message. """
+    if stamped:
+        q = msg.quaternion
+    else:
+        q = msg
 
     return q.w, q.x, q.y, q.z
 

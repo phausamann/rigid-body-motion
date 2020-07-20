@@ -264,7 +264,7 @@ class Transformer(object):
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
 
-        return unpack_transform_msg(transform)
+        return unpack_transform_msg(transform, stamped=True)
 
     def transform_vector(self, v, target_frame, source_frame, time=0.0):
         """ Transform a vector from the source frame to the target frame.
@@ -294,7 +294,7 @@ class Transformer(object):
         v_msg = make_vector_msg(v, source_frame, time)
         vt_msg = tf2_geometry_msgs.do_transform_vector3(v_msg, transform)
 
-        return unpack_vector_msg(vt_msg)
+        return unpack_vector_msg(vt_msg, stamped=True)
 
     def transform_point(self, p, target_frame, source_frame, time=0.0):
         """ Transform a point from the source frame to the target frame.
@@ -324,7 +324,7 @@ class Transformer(object):
         p_msg = make_point_msg(p, source_frame, time)
         pt_msg = tf2_geometry_msgs.do_transform_point(p_msg, transform)
 
-        return unpack_point_msg(pt_msg)
+        return unpack_point_msg(pt_msg, stamped=True)
 
     def transform_quaternion(self, q, target_frame, source_frame, time=0.0):
         """ Transform a quaternion from the source frame to the target frame.
@@ -354,7 +354,7 @@ class Transformer(object):
         p_msg = make_pose_msg((0.0, 0.0, 0.0), q, source_frame, time)
         pt_msg = tf2_geometry_msgs.do_transform_pose(p_msg, transform)
 
-        return unpack_pose_msg(pt_msg)[1]
+        return unpack_pose_msg(pt_msg, stamped=True)[1]
 
     def transform_pose(self, p, o, target_frame, source_frame, time=0.0):
         """ Transform a pose from the source frame to the target frame.
@@ -390,7 +390,7 @@ class Transformer(object):
         p_msg = make_pose_msg(p, o, source_frame, time)
         pt_msg = tf2_geometry_msgs.do_transform_pose(p_msg, transform)
 
-        return unpack_pose_msg(pt_msg)
+        return unpack_pose_msg(pt_msg, stamped=True)
 
 
 class ReferenceFrameTransformBroadcaster:
@@ -589,7 +589,9 @@ class ReferenceFrameTransformBroadcaster:
         thread: threading.Thread
             If `block=True`, the Thread instance that runs the loop.
         """
-        if block:
+        if self.timestamps is None:
+            self.publish()
+        elif block:
             self._spin_blocking()
         else:
             self._thread = Thread(target=self._spin_blocking)

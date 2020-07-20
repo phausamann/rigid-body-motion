@@ -31,6 +31,7 @@ test:
     - python 3.6
     - pandas
     - xarray
+    - netcdf4
     - numba
     - ros-melodic-rospy # [linux and x86_64]
     - ros-melodic-tf # [linux and x86_64]

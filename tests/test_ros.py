@@ -116,22 +116,26 @@ class TestVisualization:
 class TestRosbagReader:
     def test_get_msg_type(self, RosbagReader, rosbag_path):
         """"""
+        import rosbag
+
+        bag = rosbag.Bag(rosbag_path)
+
         assert (
-            RosbagReader._get_msg_type(rosbag_path, "/camera/odom/sample")
+            RosbagReader._get_msg_type(bag, "/camera/odom/sample")
             == "nav_msgs/Odometry"
         )
         assert (
-            RosbagReader._get_msg_type(
-                rosbag_path, "/vicon/t265_tracker/t265_tracker"
-            )
+            RosbagReader._get_msg_type(bag, "/vicon/t265_tracker/t265_tracker")
             == "geometry_msgs/TransformStamped"
         )
 
     def test_load_msgs(self, RosbagReader, rosbag_path):
         """"""
         # odometry
-        reader = RosbagReader(rosbag_path, "/camera/odom/sample")
-        odometry = reader.load_messages()
+        reader = RosbagReader(rosbag_path)
+        with reader:
+            odometry = reader.load_messages("/camera/odom/sample")
+
         assert set(odometry.keys()) == {
             "timestamps",
             "position",
@@ -142,8 +146,9 @@ class TestRosbagReader:
         assert all(v.shape[0] == 228 for v in odometry.values())
 
         # pose
-        reader = RosbagReader(rosbag_path, "/vicon/t265_tracker/t265_tracker")
-        pose = reader.load_messages()
+        with reader:
+            pose = reader.load_messages("/vicon/t265_tracker/t265_tracker")
+
         assert set(pose.keys()) == {
             "timestamps",
             "position",
@@ -155,8 +160,9 @@ class TestRosbagReader:
         """"""
         pytest.importorskip("xarray")
 
-        reader = RosbagReader(rosbag_path, "/camera/odom/sample")
-        ds = reader.load_dataset()
+        reader = RosbagReader(rosbag_path)
+        with reader:
+            ds = reader.load_dataset("/camera/odom/sample")
 
         assert set(ds.data_vars) == {
             "position",
@@ -183,5 +189,7 @@ class TestRosbagReader:
         pytest.importorskip("netCDF4")
 
         output_file = export_folder / "test.nc"
-        RosbagReader(rosbag_path, "/camera/odom/sample").export(output_file)
+        with RosbagReader(rosbag_path) as reader:
+            reader.export("/camera/odom/sample", output_file)
+
         assert output_file.exists()

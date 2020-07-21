@@ -11,7 +11,7 @@ from geometry_msgs.msg import (
     Vector3Stamped,
 )
 
-# TODO stamped=False/False parameter
+# TODO stamped=True/False parameter
 # TODO default values
 
 

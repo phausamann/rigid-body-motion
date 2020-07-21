@@ -14,31 +14,30 @@ from rigid_body_motion.ros.msg import (
 class RosbagReader:
     """ Reader for motion topics from rosbag files. """
 
-    def __init__(self, bag_file, topic):
+    def __init__(self, bag_file):
         """ Constructor.
 
         Parameters
         ----------
         bag_file: str
             Path to rosbag file.
-
-        topic: str
-            Topic to export.
-
-        output_file: str, optional
-            Path to output file. By default, the path to the bag file, but with
-            a different extension depending on the export format.
         """
         self.bag_file = Path(bag_file)
-        self.topic = topic
 
-        self.msg_type = self._get_msg_type(self.bag_file, self.topic)
+        self._bag = None
+
+    def __enter__(self):
+        self._bag = rosbag.Bag(self.bag_file, "r")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._bag.close()
+        self._bag = None
 
     @staticmethod
-    def _get_msg_type(bag_file, topic):
+    def _get_msg_type(bag, topic):
         """ Get type of message. """
-        with rosbag.Bag(bag_file, "r") as bag:
-            return bag.get_type_and_topic_info(topic).topics[topic].msg_type
+        return bag.get_type_and_topic_info(topic).topics[topic].msg_type
 
     def _get_filename(self, output_file, extension):
         """ Get export filename and create folder. """
@@ -69,29 +68,40 @@ class RosbagReader:
 
         ds.to_netcdf(filename, encoding=encoding)
 
-    def load_messages(self):
+    def load_messages(self, topic):
         """ Load messages from topic as dict.
+
+        Parameters
+        ----------
+        topic: str
+            Name of the topic to load.
 
         Returns
         -------
         messages: dict
-            Dict containing timestamp arrays
-
+            Dict containing arrays of timestamps and other message contents.
         """
-        if self.msg_type == "nav_msgs/Odometry":
-            with rosbag.Bag(self.bag_file, "r") as bag:
-                arr = np.array(
-                    [
-                        (
-                            ts.to_sec(),
-                            *unpack_point_msg(msg.pose.pose.position),
-                            *unpack_quaternion_msg(msg.pose.pose.orientation),
-                            *unpack_vector_msg(msg.twist.twist.linear),
-                            *unpack_vector_msg(msg.twist.twist.angular),
-                        )
-                        for _, msg, ts in bag.read_messages(topics=self.topic)
-                    ]
-                )
+        if self._bag is None:
+            raise RuntimeError(
+                "load_messages must be called from within the RosbagReader "
+                "context manager"
+            )
+
+        msg_type = self._get_msg_type(self._bag, topic)
+
+        if msg_type == "nav_msgs/Odometry":
+            arr = np.array(
+                [
+                    (
+                        ts.to_sec(),
+                        *unpack_point_msg(msg.pose.pose.position),
+                        *unpack_quaternion_msg(msg.pose.pose.orientation),
+                        *unpack_vector_msg(msg.twist.twist.linear),
+                        *unpack_vector_msg(msg.twist.twist.angular),
+                    )
+                    for _, msg, ts in self._bag.read_messages(topics=topic)
+                ]
+            )
             return_vals = {
                 "timestamps": arr[:, 0],
                 "position": arr[:, 1:4],
@@ -100,31 +110,35 @@ class RosbagReader:
                 "angular_velocity": arr[:, 11:],
             }
 
-        elif self.msg_type == "geometry_msgs/TransformStamped":
-            with rosbag.Bag(self.bag_file, "r") as bag:
-                arr = np.array(
-                    [
-                        (
-                            ts.to_sec(),
-                            *unpack_point_msg(msg.transform.translation),
-                            *unpack_quaternion_msg(msg.transform.rotation),
-                        )
-                        for _, msg, ts in bag.read_messages(topics=self.topic)
-                    ]
-                )
-                return_vals = {
-                    "timestamps": arr[:, 0],
-                    "position": arr[:, 1:4],
-                    "orientation": arr[:, 4:8],
-                }
+        elif msg_type == "geometry_msgs/TransformStamped":
+            arr = np.array(
+                [
+                    (
+                        ts.to_sec(),
+                        *unpack_point_msg(msg.transform.translation),
+                        *unpack_quaternion_msg(msg.transform.rotation),
+                    )
+                    for _, msg, ts in self._bag.read_messages(topics=topic)
+                ]
+            )
+            return_vals = {
+                "timestamps": arr[:, 0],
+                "position": arr[:, 1:4],
+                "orientation": arr[:, 4:8],
+            }
 
         else:
-            raise ValueError(f"Unsupported message type {self.msg_type}")
+            raise ValueError(f"Unsupported message type {msg_type}")
 
         return return_vals
 
-    def load_dataset(self):
+    def load_dataset(self, topic):
         """ Load messages from topic as xarray.Dataset.
+
+        Parameters
+        ----------
+        topic: str
+            Name of the topic to load.
 
         Returns
         -------
@@ -134,7 +148,7 @@ class RosbagReader:
         # TODO attrs
         import xarray as xr
 
-        motion = self.load_messages()
+        motion = self.load_messages(topic)
 
         coords = {
             "cartesian_axis": ["x", "y", "z"],
@@ -170,7 +184,17 @@ class RosbagReader:
 
         return ds
 
-    def export(self, output_file=None):
-        """ Export messages from topic as netCDF4 file. """
-        ds = self.load_dataset()
+    def export(self, topic, output_file=None):
+        """ Export messages from topic as netCDF4 file.
+
+        Parameters
+        ----------
+        topic: str
+            Topic to read.
+
+        output_file: str, optional
+            Path to output file. By default, the path to the bag file, but with
+            a different extension depending on the export format.
+        """
+        ds = self.load_dataset(topic)
         self._write_netcdf(ds, self._get_filename(output_file, "nc"))

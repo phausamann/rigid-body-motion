@@ -25,6 +25,7 @@ def qinv(q, qaxis=-1):
     qm: ndarray
         A new array containing the inverse values.
     """
+    # TODO xarray support
     if q.dtype != quaternion:
         q = np.swapaxes(q, qaxis, -1)
         qi = as_float_array(1 / as_quat_array(q))
@@ -58,6 +59,7 @@ def qmean(q, axis=None, qaxis=-1):
     qm: ndarray
         A new array containing the mean values.
     """
+    # TODO xarray support
     if q.dtype != quaternion:
         q = np.swapaxes(q, qaxis, -1)
         was_quaternion = False

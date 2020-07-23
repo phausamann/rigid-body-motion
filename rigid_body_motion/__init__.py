@@ -554,7 +554,7 @@ def lookup_twist(
 
     represent_in: str or ReferenceFrame, optional
         The reference frame in which the twist is represented. Defaults
-        to parent frame of the moving frame.
+        to the reference frame.
 
     outlier_thresh: float, optional
         Some SLAM-based trackers introduce position corrections when a new
@@ -587,7 +587,7 @@ def lookup_twist(
     """
     moving_frame = _resolve_rf(moving_frame)
     reference = _resolve_rf(reference or moving_frame.parent)
-    represent_in = _resolve_rf(represent_in or moving_frame.parent)
+    represent_in = _resolve_rf(represent_in or reference)
 
     linear, angular, timestamps = moving_frame.lookup_twist(
         reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff

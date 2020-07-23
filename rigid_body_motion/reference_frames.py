@@ -221,7 +221,7 @@ class ReferenceFrame(NodeMixin):
         if inverse:
             # TODO utils.qinv
             rotation = as_float_array(1 / as_quat_array(rotation))
-            translation = -rotate_vectors(as_quat_array(rotation), translation)
+            translation = -rotate_vectors(rotation, translation)
 
         return translation, rotation, timestamps
 
@@ -659,7 +659,7 @@ class ReferenceFrame(NodeMixin):
 
         arr, _, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
         r = self._expand_singleton_axes(r, arr.ndim)
-        arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
+        arr = rotate_vectors(r, arr, axis=axis)
 
         # undo time axis swap
         arr = np.swapaxes(arr, 0, time_axis)
@@ -720,7 +720,7 @@ class ReferenceFrame(NodeMixin):
         arr, t, r, ts = self._match_timestamps(arr, arr_ts, t, r, rf_ts)
         t = self._expand_singleton_axes(t, arr.ndim)
         r = self._expand_singleton_axes(r, arr.ndim)
-        arr = rotate_vectors(as_quat_array(r), arr, axis=axis)
+        arr = rotate_vectors(r, arr, axis=axis)
         arr = arr + np.array(t)
 
         # undo time axis swap

@@ -19,17 +19,20 @@ class TestUtils(object):
             )
         )
 
+        # quaternion dtype
         qm = qmean(q)
         npt.assert_allclose(as_float_array(qm), np.array([1.0, 0.0, 0.0, 0.0]))
 
+        # float dtype
+        qm = qmean(as_float_array(q).T, qaxis=0)
+        npt.assert_allclose(qm, np.array([1.0, 0.0, 0.0, 0.0]))
+
+        # not all axes
         qm = qmean(np.tile(q, (10, 1)), axis=1)
         npt.assert_allclose(
             as_float_array(qm),
             np.tile(np.array([1.0, 0.0, 0.0, 0.0]), (10, 1)),
         )
-
-        with pytest.raises(ValueError):
-            qmean(np.array([1.0, 0.0, 0.0, 0.0]))
 
     def test_rotate_vectors(self):
         """"""
@@ -60,6 +63,10 @@ class TestUtils(object):
         # singleton expansion
         vr_act = rotate_vectors(q[:, None], v[None, ...])
         np.testing.assert_allclose(np.tile(vr, (10, 1, 1)), vr_act)
+
+        # float dtype
+        vr_act = rotate_vectors(as_float_array(q[0]), v[0])
+        np.testing.assert_allclose(vr[0], vr_act, rtol=1.0)
 
         with pytest.raises(ValueError):
             rotate_vectors(q, v.T)

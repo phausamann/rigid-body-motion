@@ -6,32 +6,39 @@ from quaternion import rotate_vectors as quat_rv
 from rigid_body_motion.core import _resolve_axis
 
 
-def qmean(q, axis=None):
+def qmean(q, axis=None, qaxis=-1):
     """ Quaternion mean.
 
     Adapted from https://github.com/christophhagen/averaging-quaternions.
 
     Parameters
     ----------
-    q: array_like, quaternion dtype
-        Array containing quaternions whose mean is to be computed.
+    q: array_like
+        Array containing quaternions whose mean is to be computed. Its dtype
+        can be quaternion, otherwise `q_axis` specifies the axis representing
+        the quaternions.
 
     axis: None or int or tuple of ints, optional
         Axis or axes along which the means are computed. The default is to
         compute the mean of the flattened array.
 
+    qaxis: int, default -1
+        If `q` is not quaternion dtype, axis of the quaternion array
+        representing the coordinates of the quaternions.
+
     Returns
     -------
-    qm: ndarray, quaternion dtype
+    qm: ndarray
         A new array containing the mean values.
     """
-    # TODO 4-arrays instead of quaternions
     if q.dtype != quaternion:
-        raise ValueError("Array dtype must be quaternion.")
+        q = np.swapaxes(q, qaxis, -1)
+        was_quaternion = False
+    else:
+        q = as_float_array(q)
+        was_quaternion = True
 
-    axis = _resolve_axis(axis, q.ndim)
-
-    q = as_float_array(q)
+    axis = _resolve_axis(axis, q.ndim - 1)
 
     # compute outer product of quaternion elements
     q = q[..., np.newaxis]
@@ -43,16 +50,22 @@ def qmean(q, axis=None):
     idx = np.unravel_index(l.argsort()[..., ::-1], l.shape) + (0,)
     v = v[idx]
 
-    return as_quat_array(np.real(v))
+    qm = np.real(v)
+
+    if was_quaternion:
+        return as_quat_array(qm)
+    else:
+        return np.swapaxes(qm, -1, qaxis)
 
 
-def rotate_vectors(q, v, axis=-1, one_to_one=True):
+def rotate_vectors(q, v, axis=-1, qaxis=-1, one_to_one=True):
     """ Rotate an array of vectors by an array of quaternions.
 
     Parameters
     ----------
-    q: array_like, quaternion dtype
-        Array of quaternions.
+    q: array_like
+        Array of quaternions. Its dtype can be quaternion, otherwise `q_axis`
+        specifies the axis representing the quaternions.
 
     v: array_like
         The array of vectors to be rotated.
@@ -60,6 +73,10 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
     axis: int, default -1
         The axis of the `v` array representing the coordinates of the
         vectors. Must have length 3.
+
+    qaxis: int, default -1
+        If `q` is not quaternion dtype, axis of the quaternion array
+        representing the coordinates of the quaternions.
 
     one_to_one: bool, default True
         If True, rotate each vector by a single quaternion. In this case,
@@ -73,7 +90,9 @@ def rotate_vectors(q, v, axis=-1, one_to_one=True):
         the shape of all non-singleton dimensions in `q` and `v`.
         Otherwise, this array has shape `q.shape` + `v.shape`.
     """
-    # TODO 4-arrays instead of quaternions
+    if q.dtype != quaternion:
+        q = as_quat_array(np.swapaxes(q, qaxis, -1))
+
     if not one_to_one or q.ndim == 0:
         return quat_rv(q, v, axis=axis)
 

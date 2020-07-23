@@ -6,6 +6,33 @@ from quaternion import rotate_vectors as quat_rv
 from rigid_body_motion.core import _resolve_axis
 
 
+def qinv(q, qaxis=-1):
+    """ Quaternion inverse.
+
+    Parameters
+    ----------
+    q: array_like
+        Array containing quaternions whose inverse is to be computed. Its dtype
+        can be quaternion, otherwise `q_axis` specifies the axis representing
+        the quaternions.
+
+    qaxis: int, default -1
+        If `q` is not quaternion dtype, axis of the quaternion array
+        representing the coordinates of the quaternions.
+
+    Returns
+    -------
+    qm: ndarray
+        A new array containing the inverse values.
+    """
+    if q.dtype != quaternion:
+        q = np.swapaxes(q, qaxis, -1)
+        qi = as_float_array(1 / as_quat_array(q))
+        return np.swapaxes(qi, -1, qaxis)
+    else:
+        return 1 / q
+
+
 def qmean(q, axis=None, qaxis=-1):
     """ Quaternion mean.
 

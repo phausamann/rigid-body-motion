@@ -11,7 +11,7 @@ from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
 
 from rigid_body_motion.core import _resolve_rf
-from rigid_body_motion.utils import rotate_vectors
+from rigid_body_motion.utils import qinv, rotate_vectors
 
 _registry = {}
 
@@ -219,8 +219,7 @@ class ReferenceFrame(NodeMixin):
             rotation[..., 0] = 1.0
 
         if inverse:
-            # TODO utils.qinv
-            rotation = as_float_array(1 / as_quat_array(rotation))
+            rotation = qinv(rotation)
             translation = -rotate_vectors(rotation, translation)
 
         return translation, rotation, timestamps

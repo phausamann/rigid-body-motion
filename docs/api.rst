@@ -65,6 +65,7 @@ Utility functions
     :nosignatures:
     :toctree: _generated
 
+    qinv
     qmean
     rotate_vectors
 

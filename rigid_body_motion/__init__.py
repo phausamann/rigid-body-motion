@@ -26,7 +26,7 @@ from .estimators import shortest_arc_rotation
 from .reference_frames import ReferenceFrame
 from .reference_frames import _registry as registry
 from .reference_frames import clear_registry, deregister_frame, register_frame
-from .utils import qmean, rotate_vectors
+from .utils import qinv, qmean, rotate_vectors
 
 __all__ = [
     "transform_points",
@@ -51,6 +51,7 @@ __all__ = [
     "lookup_twist",
     # utils
     "example_data",
+    "qinv",
     "qmean",
     "rotate_vectors",
 ]

@@ -3,10 +3,20 @@ import pytest
 from numpy import testing as npt
 from quaternion import as_float_array, from_euler_angles, quaternion
 
-from rigid_body_motion.utils import qmean, rotate_vectors
+from rigid_body_motion.utils import qinv, qmean, rotate_vectors
 
 
 class TestUtils(object):
+    def test_qinv(self):
+        """"""
+        q = from_euler_angles(0.0, 0.0, np.pi / 4)
+
+        assert qinv(q) == 1 / q
+        npt.assert_equal(qinv(as_float_array(q)), as_float_array(1 / q))
+
+        q_arr = np.tile(as_float_array(q), (10, 1)).T
+        npt.assert_equal(qinv(q_arr, 0)[:, 0], as_float_array(1 / q))
+
     def test_qmean(self):
         """"""
         q = np.hstack(

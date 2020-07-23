@@ -35,6 +35,8 @@ __all__ = [
     "transform_points",
     "transform_quaternions",
     "transform_vectors",
+    "transform_angular_velocity",
+    "transform_linear_velocity",
     # coordinate system transforms
     "cartesian_to_polar",
     "polar_to_cartesian",
@@ -48,6 +50,7 @@ __all__ = [
     "ReferenceFrame",
     # estimators
     "shortest_arc_rotation",
+    "lookup_transform",
     "lookup_twist",
     # utils
     "example_data",
@@ -590,6 +593,65 @@ def transform_coordinates(
         return arr
 
 
+def _make_transform_or_pose_dataset(
+    translation, rotation, frame, timestamps, pose=False
+):
+    """ Create Dataset with translation and rotation. """
+    import xarray as xr
+
+    if pose:
+        linear_name = "position"
+        angular_name = "orientation"
+    else:
+        linear_name = "translation"
+        angular_name = "rotation"
+
+    if timestamps is not None:
+        ds = xr.Dataset(
+            {
+                linear_name: (["time", "cartesian_axis"], translation),
+                angular_name: (["time", "quaternion_axis"], rotation),
+            },
+            {
+                "time": timestamps,
+                "cartesian_axis": ["x", "y", "z"],
+                "quaternion_axis": ["w", "x", "y", "z"],
+            },
+        )
+    else:
+        ds = xr.Dataset(
+            {
+                linear_name: ("cartesian_axis", translation),
+                angular_name: ("quaternion_axis", rotation),
+            },
+            {
+                "cartesian_axis": ["x", "y", "z"],
+                "quaternion_axis": ["w", "x", "y", "z"],
+            },
+        )
+
+    ds.translation.attrs.update(
+        {
+            "representation_frame": frame.name,
+            "reference_frame": frame.name,
+            "motion_type": linear_name,
+            "long_name": linear_name.capitalize(),
+            "units": "m",
+        }
+    )
+
+    ds.rotation.attrs.update(
+        {
+            "representation_frame": frame.name,
+            "reference_frame": frame.name,
+            "motion_type": angular_name,
+            "long_name": angular_name.capitalize(),
+        }
+    )
+
+    return ds
+
+
 def _make_twist_dataset(
     angular, linear, moving_frame, reference, represent_in, timestamps
 ):
@@ -629,6 +691,42 @@ def _make_twist_dataset(
     return twist
 
 
+def lookup_transform(outof, into, as_dataset=False):
+    """ Look up transformation from one frame to another.
+
+    Parameters
+    ----------
+    outof: str or ReferenceFrame
+        Base frame of the transformation.
+
+    into: str or ReferenceFrame
+        Target frame of the transformation.
+
+    as_dataset: bool, default False
+        If True, return an xarray.Dataset. Otherwise, return a tuple of
+        translation, rotation and timestamps.
+
+    Returns
+    -------
+    translation, rotation, timestamps: each numpy.ndarray
+        Translation, rotation and timestamps of transformation between the
+        frames, if `as_dataset` is False.
+
+    ds: xarray.Dataset
+        The above arrays as an xarray.Dataset, if `as_dataset` is True.
+    """
+    into = _resolve_rf(into)
+    outof = _resolve_rf(outof)
+    translation, rotation, timestamps = into.get_transformation(outof)
+
+    if as_dataset:
+        return _make_transform_or_pose_dataset(
+            translation, rotation, outof, timestamps
+        )
+    else:
+        return translation, rotation, timestamps
+
+
 def lookup_twist(
     moving_frame,
     reference=None,
@@ -637,11 +735,11 @@ def lookup_twist(
     cutoff=None,
     as_dataset=False,
 ):
-    """ Estimate linear and angular velocity of this frame wrt a reference.
+    """ Estimate linear and angular velocity of a frame wrt a reference.
 
     Parameters
     ----------
-    moving_frame: str or ReferenceFrame, optional
+    moving_frame: str or ReferenceFrame
         The reference frame whose twist is estimated.
 
     reference: str or ReferenceFrame, optional

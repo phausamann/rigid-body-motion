@@ -280,6 +280,36 @@ class TestTopLevel(object):
         with pytest.raises(ValueError):
             rbm.transform_coordinates(da, into="spherical")
 
+    def test_lookup_transform_xr(self, rf_tree, head_dataset):
+        """"""
+        xr = pytest.importorskip("xarray")
+
+        # static frame
+        transform = rbm.lookup_transform("world", "child1", as_dataset=True)
+        assert set(transform.dims) == {"cartesian_axis", "quaternion_axis"}
+        np.testing.assert_equal(transform.translation.values, (1.0, 0.0, 0.0))
+        np.testing.assert_equal(
+            transform.rotation.values, (1.0, 0.0, 0.0, 0.0)
+        )
+
+        # moving frame
+        rbm.register_frame("world", update=True)
+        rbm.ReferenceFrame.from_dataset(
+            head_dataset, "position", "orientation", "time", "world", "head",
+        ).register(update=True)
+
+        transform = rbm.lookup_transform("world", "head", as_dataset=True)
+        xr.testing.assert_allclose(
+            transform.translation, head_dataset.position
+        )
+        assert transform.translation.attrs["reference_frame"] == "world"
+        assert transform.translation.attrs["representation_frame"] == "world"
+        xr.testing.assert_allclose(
+            transform.rotation, head_dataset.orientation
+        )
+        assert transform.rotation.attrs["reference_frame"] == "world"
+        assert transform.rotation.attrs["representation_frame"] == "world"
+
     def test_lookup_twist_xr(self, head_dataset):
         """"""
         rbm.register_frame("world")

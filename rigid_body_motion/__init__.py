@@ -2,34 +2,31 @@
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
 __version__ = "0.1.0"
-
-import warnings
 from pathlib import Path
 
 from pkg_resources import resource_filename
 
-from rigid_body_motion import ros as ros  # noqa
-from rigid_body_motion.coordinate_systems import (
+from . import ros  # noqa
+from .coordinate_systems import (
     _replace_dim,
     cartesian_to_polar,
     cartesian_to_spherical,
     polar_to_cartesian,
     spherical_to_cartesian,
 )
-from rigid_body_motion.core import (
+from .core import (
     _make_dataarray,
+    _make_transform_or_pose_dataset,
+    _make_twist_dataset,
     _maybe_unpack_dataarray,
     _resolve_rf,
+    _transform,
 )
-from rigid_body_motion.estimators import shortest_arc_rotation
-from rigid_body_motion.reference_frames import ReferenceFrame
-from rigid_body_motion.reference_frames import _registry as registry
-from rigid_body_motion.reference_frames import (
-    clear_registry,
-    deregister_frame,
-    register_frame,
-)
-from rigid_body_motion.utils import qmean, rotate_vectors
+from .estimators import shortest_arc_rotation
+from .reference_frames import ReferenceFrame
+from .reference_frames import _registry as registry
+from .reference_frames import clear_registry, deregister_frame, register_frame
+from .utils import qmean, rotate_vectors
 
 __all__ = [
     "transform_points",
@@ -77,100 +74,6 @@ example_data = {
         resource_filename("rigid_body_motion", "data/right_eye.nc")
     ),
 }
-
-
-def _transform(
-    method,
-    arr,
-    into,
-    outof,
-    dim,
-    axis,
-    timestamps,
-    time_axis,
-    what="reference_frame",
-    **kwargs,
-):
-    """ Base transform method. """
-    (
-        arr,
-        axis,
-        dim,
-        time_axis,
-        time_dim,
-        ts_in,
-        coords,
-        dims,
-        name,
-        attrs,
-    ) = _maybe_unpack_dataarray(
-        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
-    )
-
-    if method is None:
-        method_lookup = {
-            "position": "transform_points",
-            "translation": "transform_points",
-            "orientation": "transform_quaternions",
-            "rotation": "transform_quaternions",
-        }
-        try:
-            # TODO warn if method doesn't match attrs["motion_type"]
-            method = method_lookup[attrs["motion_type"]]
-        except (KeyError, TypeError):
-            raise ValueError(
-                f"'method' must be specified unless you provide a DataArray "
-                f"whose ``attrs`` contain a 'motion_type' entry "
-                f"containing any of {method_lookup.keys()}"
-            )
-
-    if outof is None:
-        if attrs is not None and what in attrs:
-            outof = _resolve_rf(attrs[what])
-        else:
-            raise ValueError(
-                f"'outof' must be specified unless you provide a DataArray "
-                f"whose ``attrs`` contain a '{what}' entry with "
-                f"the name of a registered frame"
-            )
-    else:
-        outof = _resolve_rf(outof)
-        if attrs is not None and what in attrs and attrs[what] != outof.name:
-            warnings.warn(
-                f"You are transforming the '{what}' of the array out of "
-                f"{outof.name}, but the current '{what}' the array is "
-                f"{attrs[what]}"
-            )
-
-    into = _resolve_rf(into)
-
-    if method in ("transform_angular_velocity", "transform_linear_velocity"):
-        kwargs["what"] = what
-
-    if attrs is not None:
-        attrs[what] = into.name
-        attrs["representation_frame"] = into.name
-
-    arr, ts_out = getattr(outof, method)(
-        arr,
-        into,
-        axis=axis,
-        timestamps=ts_in,
-        time_axis=time_axis,
-        return_timestamps=True,
-        **kwargs
-    )
-
-    if coords is not None:
-        return _make_dataarray(
-            arr, coords, dims, name, attrs, time_dim, ts_out
-        )
-    elif ts_out is not None:
-        # TODO not so pretty. Maybe also introduce return_timestamps
-        #  parameter and do this when return_timestamps=None
-        return arr, ts_out
-    else:
-        return arr
 
 
 def transform_vectors(
@@ -591,104 +494,6 @@ def transform_coordinates(
         return _make_dataarray(arr, coords, dims, name, attrs, None, None)
     else:
         return arr
-
-
-def _make_transform_or_pose_dataset(
-    translation, rotation, frame, timestamps, pose=False
-):
-    """ Create Dataset with translation and rotation. """
-    import xarray as xr
-
-    if pose:
-        linear_name = "position"
-        angular_name = "orientation"
-    else:
-        linear_name = "translation"
-        angular_name = "rotation"
-
-    if timestamps is not None:
-        ds = xr.Dataset(
-            {
-                linear_name: (["time", "cartesian_axis"], translation),
-                angular_name: (["time", "quaternion_axis"], rotation),
-            },
-            {
-                "time": timestamps,
-                "cartesian_axis": ["x", "y", "z"],
-                "quaternion_axis": ["w", "x", "y", "z"],
-            },
-        )
-    else:
-        ds = xr.Dataset(
-            {
-                linear_name: ("cartesian_axis", translation),
-                angular_name: ("quaternion_axis", rotation),
-            },
-            {
-                "cartesian_axis": ["x", "y", "z"],
-                "quaternion_axis": ["w", "x", "y", "z"],
-            },
-        )
-
-    ds.translation.attrs.update(
-        {
-            "representation_frame": frame.name,
-            "reference_frame": frame.name,
-            "motion_type": linear_name,
-            "long_name": linear_name.capitalize(),
-            "units": "m",
-        }
-    )
-
-    ds.rotation.attrs.update(
-        {
-            "representation_frame": frame.name,
-            "reference_frame": frame.name,
-            "motion_type": angular_name,
-            "long_name": angular_name.capitalize(),
-        }
-    )
-
-    return ds
-
-
-def _make_twist_dataset(
-    angular, linear, moving_frame, reference, represent_in, timestamps
-):
-    """ Create Dataset with linear and angular velocity. """
-    import xarray as xr
-
-    twist = xr.Dataset(
-        {
-            "angular_velocity": (["time", "cartesian_axis"], angular),
-            "linear_velocity": (["time", "cartesian_axis"], linear),
-        },
-        {"time": timestamps, "cartesian_axis": ["x", "y", "z"]},
-    )
-
-    twist.angular_velocity.attrs.update(
-        {
-            "representation_frame": represent_in.name,
-            "reference_frame": reference.name,
-            "moving_frame": moving_frame.name,
-            "motion_type": "angular_velocity",
-            "long_name": "Angular velocity",
-            "units": "rad/s",
-        }
-    )
-
-    twist.linear_velocity.attrs.update(
-        {
-            "representation_frame": represent_in.name,
-            "reference_frame": reference.name,
-            "moving_frame": moving_frame.name,
-            "motion_type": "linear_velocity",
-            "long_name": "Linear velocity",
-            "units": "m/s",
-        }
-    )
-
-    return twist
 
 
 def lookup_transform(outof, into, as_dataset=False):

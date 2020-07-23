@@ -1032,6 +1032,7 @@ class ReferenceFrame(NodeMixin):
                 timestamps[dt <= outlier_thresh],
                 linear[dt <= outlier_thresh],
                 axis=0,
+                bounds_error=False,
             )(timestamps)
 
         if cutoff is not None:

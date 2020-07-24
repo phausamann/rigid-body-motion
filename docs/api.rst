@@ -55,8 +55,9 @@ Estimators
 
     lookup_transform
     lookup_twist
-    best_fit_transform
     shortest_arc_rotation
+    best_fit_transform
+    iterative_closest_point
 
 
 Utility functions

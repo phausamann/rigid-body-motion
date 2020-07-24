@@ -22,7 +22,11 @@ from .core import (
     _resolve_rf,
     _transform,
 )
-from .estimators import best_fit_transform, shortest_arc_rotation
+from .estimators import (
+    best_fit_transform,
+    iterative_closest_point,
+    shortest_arc_rotation,
+)
 from .reference_frames import ReferenceFrame
 from .reference_frames import _registry as registry
 from .reference_frames import clear_registry, deregister_frame, register_frame
@@ -46,8 +50,9 @@ __all__ = [
     "clear_registry",
     "ReferenceFrame",
     # estimators
-    "best_fit_transform",
     "shortest_arc_rotation",
+    "best_fit_transform",
+    "iterative_closest_point",
     "lookup_transform",
     "lookup_twist",
     # utils

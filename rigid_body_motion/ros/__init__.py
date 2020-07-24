@@ -27,3 +27,11 @@ except ImportError:
         raise
     else:
         pass
+
+try:
+    from .utils import play_publisher  # noqa
+except ImportError:
+    if os.environ.get("RBM_ROS_DEBUG"):
+        raise
+    else:
+        pass

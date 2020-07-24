@@ -193,3 +193,27 @@ class TestRosbagReader:
             reader.export("/camera/odom/sample", output_file)
 
         assert output_file.exists()
+
+
+class MockPublisher:
+    def __init__(self, n_msgs):
+        """"""
+        self.timestamps = np.arange(n_msgs).astype(np.datetime64)
+        self.pub_count = 0
+
+    def publish(self, idx=None):
+        """"""
+        self.pub_count += 1
+
+
+@pytest.fixture()
+def mock_publisher():
+    """"""
+    return MockPublisher(100)
+
+
+class TestUtils:
+    def test_play_publisher(self, mock_publisher):
+        """"""
+        utils = pytest.importorskip("rigid_body_motion.ros.utils")
+        utils.play_publisher(mock_publisher)

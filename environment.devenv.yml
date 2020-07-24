@@ -2,7 +2,6 @@ name: rbm
 channels:
   - conda-forge
   - robostack
-  - phausamann
 dependencies:
   - python=3.6
   - pip=19.1
@@ -19,6 +18,8 @@ dependencies:
   - sphinx_rtd_theme=0.4.3
   - numpydoc=0.9.1
   - coverage=4.5.3
+  - pip:
+      - --editable "{{ root }}"
   # additional dev tools
   {% if "RBM_DEV_TOOLS" in os.environ %}
   - tox=3.5.2

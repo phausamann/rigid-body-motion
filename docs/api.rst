@@ -55,6 +55,7 @@ Estimators
 
     lookup_transform
     lookup_twist
+    best_fit_transform
     shortest_arc_rotation
 
 

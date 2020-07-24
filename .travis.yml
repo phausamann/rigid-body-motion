@@ -17,7 +17,7 @@ jobs:
       env: TOXENV=docs
     - python: 3.6
       env: TOXENV=lint
-    - env: CONDA_BLD_PATH=~/conda-bld
+    - env: CONDA_BLD_PATH=~/conda-bld RBM_ROS_DEBUG=true
       install:
         - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
         - bash miniconda.sh -b -p $HOME/miniconda
@@ -28,7 +28,7 @@ jobs:
         - conda install conda-build anaconda-client
         - conda config --set anaconda_upload no
       script:
-        - conda build -c conda-forge -c RoboStack -c phausamann ci/conda_recipe
+        - conda build -c conda-forge -c robostack ci/conda_recipe
       after_success:
         - chmod +x ci/conda_recipe/conda_upload.sh
 

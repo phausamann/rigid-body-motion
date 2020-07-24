@@ -2,18 +2,13 @@ from threading import Thread
 
 import numpy as np
 import pandas as pd
-import PyKDL
 import rospy
 from anytree import PreOrderIter
-from geometry_msgs.msg import (
-    PointStamped,
-    PoseStamped,
-    TwistStamped,
-    Vector3Stamped,
-)
+from geometry_msgs.msg import PoseStamped, TwistStamped
 
 try:
     import rospkg
+    import tf2_geometry_msgs
     import tf2_ros
     from tf.msg import tfMessage
 except rospkg.ResourceNotFound:
@@ -37,81 +32,6 @@ from .msg import (
     unpack_transform_msg,
     unpack_vector_msg,
 )
-
-
-class tf2_geometry_msgs:
-    """ Copied routines from tf2_geometry_msgs. """
-
-    @classmethod
-    def transform_to_kdl(cls, t):
-        return PyKDL.Frame(
-            PyKDL.Rotation.Quaternion(
-                t.transform.rotation.x,
-                t.transform.rotation.y,
-                t.transform.rotation.z,
-                t.transform.rotation.w,
-            ),
-            PyKDL.Vector(
-                t.transform.translation.x,
-                t.transform.translation.y,
-                t.transform.translation.z,
-            ),
-        )
-
-    @classmethod
-    def do_transform_point(cls, point, transform):
-        p = cls.transform_to_kdl(transform) * PyKDL.Vector(
-            point.point.x, point.point.y, point.point.z
-        )
-        res = PointStamped()
-        res.point.x = p[0]
-        res.point.y = p[1]
-        res.point.z = p[2]
-        res.header = transform.header
-        return res
-
-    @classmethod
-    def do_transform_vector3(cls, vector3, transform):
-        transform.transform.translation.x = 0
-        transform.transform.translation.y = 0
-        transform.transform.translation.z = 0
-        p = cls.transform_to_kdl(transform) * PyKDL.Vector(
-            vector3.vector.x, vector3.vector.y, vector3.vector.z
-        )
-        res = Vector3Stamped()
-        res.vector.x = p[0]
-        res.vector.y = p[1]
-        res.vector.z = p[2]
-        res.header = transform.header
-        return res
-
-    @classmethod
-    def do_transform_pose(cls, pose, transform):
-        f = cls.transform_to_kdl(transform) * PyKDL.Frame(
-            PyKDL.Rotation.Quaternion(
-                pose.pose.orientation.x,
-                pose.pose.orientation.y,
-                pose.pose.orientation.z,
-                pose.pose.orientation.w,
-            ),
-            PyKDL.Vector(
-                pose.pose.position.x,
-                pose.pose.position.y,
-                pose.pose.position.z,
-            ),
-        )
-        res = PoseStamped()
-        res.pose.position.x = f.p[0]
-        res.pose.position.y = f.p[1]
-        res.pose.position.z = f.p[2]
-        (
-            res.pose.orientation.x,
-            res.pose.orientation.y,
-            res.pose.orientation.z,
-            res.pose.orientation.w,
-        ) = f.M.GetQuaternion()
-        res.header = transform.header
-        return res
 
 
 class Transformer(object):

@@ -4,31 +4,48 @@ import pytest
 import rigid_body_motion as rbm
 
 
+class RospyPublisher:
+    def __init__(
+        self,
+        name,
+        data_class,
+        subscriber_listener=None,
+        tcp_nodelay=False,
+        latch=False,
+        headers=None,
+        queue_size=None,
+    ):
+        """ Monkey patch drop in for rospy.Publisher. """
+        self.name = name
+        self.data_class = data_class
+        self.subscriber_listener = subscriber_listener
+        self.tcp_nodelay = tcp_nodelay
+        self.latch = latch
+        self.headers = headers
+        self.queue_size = queue_size
+
+        self._last_msg = None
+        self._pub_count = 0
+
+    def publish(self, msg):
+        """"""
+        self._last_msg = msg
+        self._pub_count += 1
+
+
+@pytest.fixture(autouse=True)
+def patch_rospy_publisher(monkeypatch):
+    """"""
+    rospy = pytest.importorskip("rospy")
+    monkeypatch.setattr(rospy, "Publisher", RospyPublisher)
+
+
+# -- transformer module -- #
 @pytest.fixture()
 def Transformer():
     """"""
     tf = pytest.importorskip("rigid_body_motion.ros.transformer")
     return tf.Transformer
-
-
-@pytest.fixture()
-def ReferenceFrameTransformBroadcaster():
-    """"""
-    tf = pytest.importorskip("rigid_body_motion.ros.transformer")
-    return tf.ReferenceFrameTransformBroadcaster
-
-
-@pytest.fixture()
-def RosbagReader():
-    """"""
-    io = pytest.importorskip("rigid_body_motion.ros.io")
-    return io.RosbagReader
-
-
-@pytest.fixture()
-def visualization():
-    """"""
-    return pytest.importorskip("rigid_body_motion.ros.visualization")
 
 
 class TestTransformer(object):
@@ -97,6 +114,57 @@ class TestTransformer(object):
         np.testing.assert_allclose(ot_act, ot, rtol=1.0)
 
 
+@pytest.fixture()
+def ReferenceFrameTransformBroadcaster():
+    """"""
+    tf = pytest.importorskip("rigid_body_motion.ros.transformer")
+    return tf.ReferenceFrameTransformBroadcaster
+
+
+class TestReferenceFrameTransformBroadcaster:
+    def test_constructor(
+        self,
+        ReferenceFrameTransformBroadcaster,
+        register_rf_tree,
+        head_rf_tree,
+    ):
+        """"""
+        # moving frame
+        broadcaster = ReferenceFrameTransformBroadcaster(
+            "head", publish_pose=True, publish_twist=True
+        )
+        assert broadcaster.frame.name == "head"
+        assert broadcaster.base.name == "world"
+        assert broadcaster.pose_publisher is not None
+        assert broadcaster.twist_publisher is not None
+
+        # static frame
+        rbm.clear_registry()
+        register_rf_tree()
+        broadcaster = ReferenceFrameTransformBroadcaster("child1")
+        assert broadcaster.frame.name == "child1"
+        assert broadcaster.base.name == "world"
+
+    def test_publish(
+        self, ReferenceFrameTransformBroadcaster, head_rf_tree,
+    ):
+        """"""
+        broadcaster = ReferenceFrameTransformBroadcaster(
+            "head", publish_pose=True, publish_twist=True
+        )
+        broadcaster.publish()
+        assert broadcaster.broadcaster.pub_tf._pub_count == 1
+        assert broadcaster.pose_publisher._pub_count == 1
+        assert broadcaster.twist_publisher._pub_count == 1
+
+
+# -- visualization module -- #
+@pytest.fixture()
+def visualization():
+    """"""
+    return pytest.importorskip("rigid_body_motion.ros.visualization")
+
+
 class TestVisualization:
     def test_hex_to_rgba(self, visualization):
         """"""
@@ -111,6 +179,27 @@ class TestVisualization:
         marker_msg = visualization.get_marker()
         assert marker_msg.type == 4
         assert marker_msg.header.frame_id == "world"
+
+
+class TestReferenceFrameMarkerPublisher:
+    def test_constructor(self, visualization, head_rf_tree):
+        """"""
+        publisher = visualization.ReferenceFrameMarkerPublisher("head")
+        assert publisher.topic == "/head/path"
+
+    def test_publish(self, visualization, head_rf_tree):
+        """"""
+        publisher = visualization.ReferenceFrameMarkerPublisher("head")
+        publisher.publish()
+        assert publisher.publisher._pub_count == 1
+
+
+# -- io module -- #
+@pytest.fixture()
+def RosbagReader():
+    """"""
+    io = pytest.importorskip("rigid_body_motion.ros.io")
+    return io.RosbagReader
 
 
 class TestRosbagReader:
@@ -195,6 +284,7 @@ class TestRosbagReader:
         assert output_file.exists()
 
 
+# -- utils module -- #
 class MockPublisher:
     def __init__(self, n_msgs):
         """"""

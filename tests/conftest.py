@@ -119,6 +119,15 @@ def head_dataset():
 
 
 @pytest.fixture()
+def head_rf_tree(head_dataset):
+    """"""
+    rbm.register_frame("world")
+    rbm.ReferenceFrame.from_dataset(
+        head_dataset, "position", "orientation", "time", "world", "head",
+    ).register()
+
+
+@pytest.fixture()
 def rosbag_path():
     """"""
     return test_data_dir / "test.bag"

@@ -95,18 +95,17 @@ class TestEstimators(object):
         assert t.dims == ("cartesian_axis",)
         assert r.dims == ("quaternion_axis",)
 
-    def test_iterative_closest_point(self, get_rf_tree, mock_quaternion):
+    def test_iterative_closest_point(self, icp_test_data):
         """"""
-        rf_world, rf_child1, _ = get_rf_tree(
-            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
-        )
-        v1 = np.random.randn(10, 3)
-        v2 = rf_world.transform_points(v1, rf_child1)
+        v1 = icp_test_data["t265"]
+        v2 = icp_test_data["vicon"]
 
         t, r = iterative_closest_point(v1, v2)
-        t_exp, r_exp, _ = rf_world.get_transformation(rf_child1)
-        npt.assert_allclose(t, t_exp, rtol=1.0, atol=1e-10)
-        npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
+        npt.assert_allclose(t, [-1.89872037, 0.61755277, 0.95930489])
+        npt.assert_allclose(
+            r,
+            [-6.87968663e-01, 4.73801246e-04, 9.12595868e-03, 7.25682859e-01],
+        )
 
     def test_iterative_closest_point_xr(self, get_rf_tree, mock_quaternion):
         """"""

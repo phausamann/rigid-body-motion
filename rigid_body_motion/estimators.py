@@ -243,7 +243,7 @@ def iterative_closest_point(
         prev_error = mean_error
 
     # calculate final transformation
-    translation, rotation = best_fit_transform(v1_new, v2)
+    translation, rotation = best_fit_transform(v1, v1_new)
 
     if was_dataarray:
         translation, rotation = _make_transform_dataarrays(

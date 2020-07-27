@@ -1,6 +1,7 @@
 import shutil
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 from quaternion import as_float_array, from_euler_angles
@@ -107,6 +108,12 @@ def compensated_tree():
     rbm.ReferenceFrame(
         translation=it, rotation=ir, timestamps=ts, parent="head", name="eyes",
     ).register(update=True)
+
+
+@pytest.fixture()
+def icp_test_data():
+    """"""
+    return np.load(test_data_dir / "icp_test_data.npz")
 
 
 @pytest.fixture()

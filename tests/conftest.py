@@ -137,7 +137,8 @@ def head_rf_tree(head_dataset):
 @pytest.fixture()
 def rosbag_path():
     """"""
-    return test_data_dir / "test.bag"
+    yield test_data_dir / "test.bag"
+    shutil.rmtree(test_data_dir / "cache", ignore_errors=True)
 
 
 @pytest.fixture()

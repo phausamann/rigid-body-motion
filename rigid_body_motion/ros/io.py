@@ -132,13 +132,17 @@ class RosbagReader:
 
         return return_vals
 
-    def load_dataset(self, topic):
+    def load_dataset(self, topic, cache=False):
         """ Load messages from topic as xarray.Dataset.
 
         Parameters
         ----------
         topic: str
             Name of the topic to load.
+
+        cache: bool, default False
+            If True, cache the dataset in ``cache/<topic>.nc`` in the same
+            folder as the rosbag.
 
         Returns
         -------
@@ -147,6 +151,16 @@ class RosbagReader:
         """
         # TODO attrs
         import xarray as xr
+
+        if cache:
+            filepath = (
+                self.bag_file.parent
+                / "cache"
+                / f"{topic.replace('/', '_')}.nc"
+            )
+            if not filepath.exists():
+                self.export(topic, filepath)
+            return xr.open_dataset(filepath)
 
         motion = self.load_messages(topic)
 
@@ -196,5 +210,5 @@ class RosbagReader:
             Path to output file. By default, the path to the bag file, but with
             a different extension depending on the export format.
         """
-        ds = self.load_dataset(topic)
+        ds = self.load_dataset(topic, cache=False)
         self._write_netcdf(ds, self._get_filename(output_file, "nc"))

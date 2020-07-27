@@ -251,7 +251,11 @@ class TestRosbagReader:
 
         reader = RosbagReader(rosbag_path)
         with reader:
-            ds = reader.load_dataset("/camera/odom/sample")
+            ds = reader.load_dataset("/camera/odom/sample", cache=True)
+
+        assert (
+            rosbag_path.parent / "cache" / "_camera_odom_sample.nc"
+        ).exists()
 
         assert set(ds.data_vars) == {
             "position",

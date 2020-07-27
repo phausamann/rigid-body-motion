@@ -124,6 +124,23 @@ class TestTopLevel(object):
         assert da_child1.dims == ("extra_dim", "time", "quaternion_axis")
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
+    def test_scalar_dataarray(self, head_rf_tree):
+        """"""
+        xr = pytest.importorskip("xarray")
+        g_world = xr.DataArray(
+            [0.0, 1.0, 0.0],
+            {"cartesian_axis": ["x", "y", "z"]},
+            "cartesian_axis",
+        )
+        q_world = xr.DataArray(
+            [1.0, 0.0, 0.0, 0.0],
+            {"quaternion_axis": ["w", "x", "y", "z"]},
+            "quaternion_axis",
+        )
+        rbm.transform_vectors(g_world, outof="world", into="head")
+        rbm.transform_points(g_world, outof="world", into="head")
+        rbm.transform_quaternions(q_world, outof="world", into="head")
+
     def test_transform_vectors(self, rf_tree):
         """"""
         arr_child2 = (1.0, 1.0, 1.0)

@@ -661,7 +661,8 @@ class ReferenceFrame(NodeMixin):
         arr = rotate_vectors(r, arr, axis=axis)
 
         # undo time axis swap
-        arr = np.swapaxes(arr, 0, time_axis)
+        if time_axis is not None:
+            arr = np.swapaxes(arr, 0, time_axis)
 
         if not return_timestamps:
             return arr
@@ -723,7 +724,8 @@ class ReferenceFrame(NodeMixin):
         arr = arr + np.array(t)
 
         # undo time axis swap
-        arr = np.swapaxes(arr, 0, time_axis)
+        if time_axis is not None:
+            arr = np.swapaxes(arr, 0, time_axis)
 
         if not return_timestamps:
             return arr
@@ -786,7 +788,8 @@ class ReferenceFrame(NodeMixin):
         arr = np.swapaxes(as_float_array(arr), -1, axis)
 
         # undo time axis swap
-        arr = np.swapaxes(arr, 0, time_axis)
+        if time_axis is not None:
+            arr = np.swapaxes(arr, 0, time_axis)
 
         if not return_timestamps:
             return arr

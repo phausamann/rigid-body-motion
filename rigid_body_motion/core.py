@@ -221,7 +221,7 @@ def _transform(
         timestamps=ts_in,
         time_axis=time_axis,
         return_timestamps=True,
-        **kwargs
+        **kwargs,
     )
 
     if coords is not None:

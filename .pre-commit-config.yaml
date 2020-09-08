@@ -13,5 +13,5 @@ repos:
     rev: 3.7.9
     hooks:
     -   id: flake8
-        exclude: pupil_recording_interface/externals
         args: ['--ignore=E203,W503,W504']
+        exclude: docs/conf.py

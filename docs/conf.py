@@ -58,9 +58,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"rigid-body-motion"
-copyright = u"2020, Peter Hausamann"
-author = u"Peter Hausamann"
+project = "rigid-body-motion"
+copyright = "2020, Peter Hausamann"
+author = "Peter Hausamann"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -142,8 +142,8 @@ latex_documents = [
     (
         master_doc,
         "rigid_body_motion.tex",
-        u"rigid-body-motion Documentation",
-        u"Peter Hausamann",
+        "rigid-body-motion Documentation",
+        "Peter Hausamann",
         "manual",
     ),
 ]
@@ -157,7 +157,7 @@ man_pages = [
     (
         master_doc,
         "rigid_body_motion",
-        u"rigid-body-motion Documentation",
+        "rigid-body-motion Documentation",
         [author],
         1,
     )
@@ -173,7 +173,7 @@ texinfo_documents = [
     (
         master_doc,
         "rigid_body_motion",
-        u"rigid-body-motion Documentation",
+        "rigid-body-motion Documentation",
         author,
         "rigid_body_motion",
         "One line description of project.",

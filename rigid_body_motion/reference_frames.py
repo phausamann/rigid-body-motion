@@ -1117,7 +1117,7 @@ class ReferenceFrame(NodeMixin):
             raise ValueError("Twist cannot be estimated for static transforms")
 
         linear = self._estimate_linear_velocity(
-            translation, timestamps, outlier_thresh
+            translation, timestamps, outlier_thresh, cutoff
         )
         angular = self._estimate_angular_velocity(rotation, timestamps, cutoff)
 

@@ -45,7 +45,7 @@ deploy:
   # $ travis encrypt --com deploy.password
   # Paste the hashed password in the `secure` field
   - provider: pypi
-    distributions: sdist bdist_wheel
+    distributions: sdist
     username: phausamann
     password:
       secure: "tSq7XQWOlDhRpOnHnZ8QWJSew0VUT68i8YEqFcyghFGSgrzJhGkOLl2Fx11f0wXGY2BWom4Dpj82LJI5vJt8YyhDtrkbQnVw8z9uS1eWPmW4WOAuY6kQQogt84EU7F0rJSmQWTHc5GQYNfkqyYLxoJXhvq6Y9KvZ8fZyKwrsUJwpz9aBzu59JYu6YnvSE1/GRf2TVOCcYSaCJisNoZUdalQFUB+QBtVMOuMugp5zPCucfsovEFni94i9PW0OOMF6ZUMiwbsUGHAeFSSETGWB16FWjh8HlXq5eZk4NXi0GCwineI8/4DLvP7Qtipw68AeMi2IUPuUV81GOVzMkaccivXdLfxq58bzB0XKHWZ+OYUhK1C5gG3gfzUAyxFaP2Mr+SWWnboB6tNnHZXevhzyd3g+MbJVE7Oz0aIDaPJuwtDlkqPAQK2UtnQi1xxHpvyZmLYJalayPsOrsaWQ40XpRGARmCICeToHDwmoSRlqlrw7kVrJYS250ei170oSgQFiMWTE+/RguusCvm7pj4clAoLlqgz6WxftXNUwpPfPOmn9A9fxFWHAHe/T74HDpbL97p2Uu7C7jjz7mjoGHizninUVLiYAFKu6eLy9IBqesI1hCx9IBg3ySSRDz+UfADL8iL2qUR/e3NhzAoJIZ1qHURYHltY9sY+KXDcf9PbnWc0="

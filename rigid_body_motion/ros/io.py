@@ -93,7 +93,7 @@ class RosbagReader:
             arr = np.array(
                 [
                     (
-                        ts.to_sec(),
+                        (msg.header.stamp if msg._has_header else ts).to_sec(),
                         *unpack_point_msg(msg.pose.pose.position),
                         *unpack_quaternion_msg(msg.pose.pose.orientation),
                         *unpack_vector_msg(msg.twist.twist.linear),
@@ -114,7 +114,7 @@ class RosbagReader:
             arr = np.array(
                 [
                     (
-                        ts.to_sec(),
+                        (msg.header.stamp if msg._has_header else ts).to_sec(),
                         *unpack_point_msg(msg.transform.translation),
                         *unpack_quaternion_msg(msg.transform.rotation),
                     )

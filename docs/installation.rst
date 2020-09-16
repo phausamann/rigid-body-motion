@@ -14,13 +14,11 @@ rigid-body-motion can be installed via ``pip``:
 
     $ pip install rigid-body-motion
 
-If using the ``conda`` package manager, install these dependencies first:
+or via ``conda``:
 
 .. code-block:: console
 
     $ conda install -c phausamann -c conda-forge rigid-body-motion
-
-Afterwards, install the package via ``pip`` as detailed above.
 
 
 Optional dependencies

@@ -269,7 +269,16 @@ def transform_angular_velocity(
     time_axis=None,
     cutoff=None,
 ):
-    """ Transform an array of angular velocities between reference frames.
+    """ Transform an array of angular velocities between frames.
+
+    The array represents the velocity of a moving body or frame wrt a
+    reference frame, expressed in a representation frame.
+
+    The transformation changes either the reference frame, the moving
+    frame or the representation frame of the velocity from this frame to
+    another. In either case, it is assumed that the array is represented in
+    the frame that is being changed and will be represented in the new
+    frame after the transformation.
 
     Parameters
     ----------
@@ -277,14 +286,17 @@ def transform_angular_velocity(
         The array to transform.
 
     into: str or ReferenceFrame
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array will be represented after the transformation.
+        The target reference frame.
 
     outof: str or ReferenceFrame, optional
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "representation_frame" entry
-        with the name of a registered frame.
+        The source reference frame. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "representation_frame",
+        "reference_frame" or "moving_frame" entry with the name of a
+        registered frame (depending on what you want to transform, see `what`).
+
+    what: str
+        What frame of the velocity to transform. Can be "reference_frame",
+        "moving_frame" or "representation_frame".
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -351,7 +363,16 @@ def transform_linear_velocity(
     cutoff=None,
     outlier_thresh=None,
 ):
-    """ Transform an array of linear velocities between reference frames.
+    """ Transform an array of linear velocities between frames.
+
+    The array represents the velocity of a moving body or frame wrt a
+    reference frame, expressed in a representation frame.
+
+    The transformation changes either the reference frame, the moving
+    frame or the representation frame of the velocity from this frame to
+    another. In either case, it is assumed that the array is represented in
+    the frame that is being changed and will be represented in the new
+    frame after the transformation.
 
     Parameters
     ----------
@@ -359,14 +380,25 @@ def transform_linear_velocity(
         The array to transform.
 
     into: str or ReferenceFrame
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array will be represented after the transformation.
+        The target reference frame.
 
     outof: str or ReferenceFrame, optional
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "representation_frame" entry
-        with the name of a registered frame.
+        The source reference frame. Can be omitted if the array
+        is a DataArray whose ``attrs`` contain a "representation_frame",
+        "reference_frame" or "moving_frame" entry with the name of a
+        registered frame (depending on what you want to transform, see `what`).
+
+    what: str
+        What frame of the velocity to transform. Can be "reference_frame",
+        "moving_frame" or "representation_frame".
+
+    moving_frame: str or ReferenceFrame, optional
+        The moving frame when transforming the reference frame of the
+        velocity.
+
+    reference_frame: str or ReferenceFrame, optional
+        The reference frame when transforming the moving frame of the
+        velocity.
 
     dim: str, optional
         If the array is a DataArray, the name of the dimension
@@ -391,6 +423,16 @@ def transform_linear_velocity(
         Frequency of a low-pass filter applied to linear and angular
         velocity after the twist estimation as a fraction of the Nyquist
         frequency.
+
+    outlier_thresh: float, optional
+        Some SLAM-based trackers introduce position corrections when a new
+        camera frame becomes available. This introduces outliers in the
+        linear velocity estimate. The estimation algorithm used here
+        can suppress these outliers by throwing out samples where the
+        norm of the second-order differences of the position is above
+        `outlier_thresh` and interpolating the missing values. For
+        measurements from the Intel RealSense T265 tracker, set this value
+        to 1e-3.
 
     Returns
     -------

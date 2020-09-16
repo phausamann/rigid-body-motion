@@ -827,6 +827,10 @@ class ReferenceFrame(NodeMixin):
             The target reference frame. If str, the frame will be looked up
             in the registry under that name.
 
+        what: str, default "reference_frame"
+            What frame of the velocity to transform. Can be "reference_frame",
+            "moving_frame" or "representation_frame".
+
         axis: int, default -1
             The axis of the array representing the spatial coordinates of the
             velocities.
@@ -843,6 +847,11 @@ class ReferenceFrame(NodeMixin):
 
         return_timestamps: bool, default False
             If True, also return the timestamps after the transformation.
+
+        cutoff: float, optional
+            Frequency of a low-pass filter applied to linear and angular
+            velocity after the twist estimation as a fraction of the Nyquist
+            frequency.
 
         Returns
         -------
@@ -929,6 +938,18 @@ class ReferenceFrame(NodeMixin):
             The target reference frame. If str, the frame will be looked up
             in the registry under that name.
 
+        what: str, default "reference_frame"
+            What frame of the velocity to transform. Can be "reference_frame",
+            "moving_frame" or "representation_frame".
+
+        moving_frame: str or ReferenceFrame, optional
+            The moving frame when transforming the reference frame of the
+            velocity.
+
+        reference_frame: str or ReferenceFrame, optional
+            The reference frame when transforming the moving frame of the
+            velocity.
+
         axis: int, default -1
             The axis of the array representing the spatial coordinates of the
             velocities.
@@ -945,6 +966,21 @@ class ReferenceFrame(NodeMixin):
 
         return_timestamps: bool, default False
             If True, also return the timestamps after the transformation.
+
+        cutoff: float, optional
+            Frequency of a low-pass filter applied to linear and angular
+            velocity after the twist estimation as a fraction of the Nyquist
+            frequency.
+
+        outlier_thresh: float, optional
+            Some SLAM-based trackers introduce position corrections when a new
+            camera frame becomes available. This introduces outliers in the
+            linear velocity estimate. The estimation algorithm used here
+            can suppress these outliers by throwing out samples where the
+            norm of the second-order differences of the position is above
+            `outlier_thresh` and interpolating the missing values. For
+            measurements from the Intel RealSense T265 tracker, set this value
+            to 1e-3.
 
         Returns
         -------

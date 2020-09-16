@@ -61,8 +61,7 @@ Transform numpy arrays between coordinate systems:
     import rigid_body_motion as rbm
 
     arr_cart = np.ones((10, 2))
-    arr_polar = rbm.transform_coordinates(
-        arr_cart, outof='cartesian', into='polar')
+    arr_polar = rbm.transform_coordinates(arr_cart, outof="cartesian", into="polar")
 
 
 Transform numpy arrays across a tree of reference frames:
@@ -72,13 +71,12 @@ Transform numpy arrays across a tree of reference frames:
     import numpy as np
     import rigid_body_motion as rbm
 
-    rbm.register_frame('world')
-    rbm.register_frame('child', parent='world', translation=(1., 0., 0.))
-    rbm.register_frame('child2', parent='world', translation=(-1., 0., 0.))
+    rbm.register_frame("world")
+    rbm.register_frame("child", parent="world", translation=(1., 0., 0.))
+    rbm.register_frame("child2", parent="world", translation=(-1., 0., 0.))
 
     arr_child = np.ones((10, 3))
-    arr_child2 = rbm.transform_points(
-        arr_child, outof='child', into='child2')
+    arr_child2 = rbm.transform_points(arr_child, outof="child", into="child2")
 
 
 Credits

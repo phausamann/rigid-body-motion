@@ -9,7 +9,7 @@ source:
 
 build:
   noarch: python
-  number: 6
+  number: 0
   ignore_run_exports:
     - python_abi
 

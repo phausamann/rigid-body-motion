@@ -185,3 +185,28 @@ class TestCore(object):
                 "not_a_coord",
                 None,
             )
+
+        # non-numeric coord
+        da_in = xr.DataArray(
+            arr,
+            dims=("time", "cartesian_axis"),
+            coords={
+                "time": np.arange(10),
+                "test_coord": ("time", ["A"] * 5 + ["B"] * 5),
+            },
+        )
+        da_out = _make_dataarray(
+            arr[:5],
+            dict(da_in.coords),
+            da_in.dims,
+            None,
+            None,
+            "time",
+            np.arange(5) + 2.5,
+        )
+        npt.assert_allclose(da_out, arr[:5])
+        assert da_out.dims == ("time", "cartesian_axis")
+        npt.assert_equal(da_out.coords["time"], np.arange(5) + 2.5)
+        npt.assert_equal(
+            da_out.coords["test_coord"], np.array(["A", "A", "B", "B", "B"])
+        )

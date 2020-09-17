@@ -1,0 +1,47 @@
+name: rbm
+channels:
+  - conda-forge
+  - robostack
+dependencies:
+  - python=3.6
+  - pip=19.1
+  - numpy=1.18
+  - scipy=1.4
+  - pandas=1.0
+  - xarray=0.15
+  - netcdf4=1.5
+  - quaternion=2020.4.24.9.29.7
+  - numba=0.48
+  - anytree=2.8
+  - pytest=5.4.3
+  - pytest-cov=2.7.1
+  - sphinx=2.4.4
+  - sphinx_rtd_theme=0.4.3
+  - numpydoc=0.9.1
+  - coverage=4.5.3
+  - pip:
+      - --editable "{{ root }}"
+  # additional dev tools
+  {% if "RBM_DEV_TOOLS" in os.environ %}
+  - tox=3.5.2
+  - bump2version=1.0.0
+  - flake8=3.7.9
+  - pre-commit=2.5.1
+  - black=19.10b0
+  - isort=5.0.4
+  {% endif %}
+  # ROS dependencies
+  {% if "RBM_ROS" in os.environ %}
+  - ros-melodic-rospy=1.14.5
+  - ros-melodic-tf=1.12.1
+  - ros-melodic-tf2-ros=0.6.5
+  - ros-melodic-geometry-msgs=1.12.7
+  - ros-melodic-tf2-geometry-msgs=0.6.5
+  - ros-melodic-visualization-msgs=1.12.7
+  - ros-melodic-python-orocos-kdl=1.4.0
+  - bqplot=0.12.13
+  - ipywidgets=7.5.1
+  - pyyaml=5.3.1
+  - pip:
+      - jupyros==0.3.0
+  {% endif %}

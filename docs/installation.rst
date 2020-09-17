@@ -14,13 +14,11 @@ rigid-body-motion can be installed via ``pip``:
 
     $ pip install rigid-body-motion
 
-If using the ``conda`` package manager, install these dependencies first:
+or via ``conda``:
 
 .. code-block:: console
 
-    $ conda install numpy quaternion scipy
-
-Afterwards, install the package via ``pip`` as detailed above.
+    $ conda install -c phausamann -c conda-forge rigid-body-motion
 
 
 Optional dependencies
@@ -32,11 +30,24 @@ Transformations can be sped up significantly by installing the numba library:
 
     $ pip install numba
 
+or
+
+.. code-block:: console
+
+    $ conda install numba
+
+
 rigid-body-motion supports xarray data types:
 
 .. code-block:: console
 
     $ pip install xarray
+
+or
+
+.. code-block:: console
+
+    $ conda install xarray
 
 
 Pre-release version

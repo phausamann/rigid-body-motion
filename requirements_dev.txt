@@ -1,15 +1,9 @@
 pip==18.1
-bumpversion==0.5.3
 wheel==0.32.1
-flake8==3.5.0
-tox==3.5.2
 coverage==4.5.1
-Sphinx==1.8.5
+Sphinx==2.4.4
 sphinx_rtd_theme==0.4
 numpydoc==0.9.1
-twine==1.12.1
-pygments==2.3.1
 
-pytest==4.5.0
-pytest-runner==4.2
+pytest==5.4.3
 pytest-cov==2.7.1

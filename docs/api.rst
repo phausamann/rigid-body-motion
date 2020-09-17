@@ -1,3 +1,5 @@
+.. _api_reference:
+
 API Reference
 =============
 
@@ -19,6 +21,8 @@ Transformations
     transform_points
     transform_quaternions
     transform_coordinates
+    transform_angular_velocity
+    transform_linear_velocity
 
 Reference Frames
 ~~~~~~~~~~~~~~~~
@@ -51,7 +55,11 @@ Estimators
     :nosignatures:
     :toctree: _generated
 
+    lookup_transform
+    lookup_twist
     shortest_arc_rotation
+    best_fit_transform
+    iterative_closest_point
 
 
 Utility functions
@@ -61,6 +69,7 @@ Utility functions
     :nosignatures:
     :toctree: _generated
 
+    qinv
     qmean
     rotate_vectors
 

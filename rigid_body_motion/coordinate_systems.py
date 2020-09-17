@@ -4,25 +4,26 @@ import numpy as np
 
 def _replace_dim(coords, dims, axis, into, dimensionality):
     """ Replace the dimension after coordinate transformation """
+    # TODO can we improve this with assign_coords / swap_dims?
     old_dim = dims[axis]
 
     if dimensionality == 2:
-        if into == 'cartesian':
-            new_dim = 'cartesian_axis'
-            new_coord = ['x', 'y']
-        elif into == 'polar':
-            new_dim = 'polar_axis'
-            new_coord = ['r', 'phi']
+        if into == "cartesian":
+            new_dim = "cartesian_axis"
+            new_coord = ["x", "y"]
+        elif into == "polar":
+            new_dim = "polar_axis"
+            new_coord = ["r", "phi"]
     elif dimensionality == 3:
-        if into == 'cartesian':
-            new_dim = 'cartesian_axis'
-            new_coord = ['x', 'y', 'z']
-        elif into == 'spherical':
-            new_dim = 'spherical_axis'
-            new_coord = ['r', 'theta', 'phi']
-        elif into == 'quaternion':
-            new_dim = 'quaternion_axis'
-            new_coord = ['w', 'x', 'y', 'z']
+        if into == "cartesian":
+            new_dim = "cartesian_axis"
+            new_coord = ["x", "y", "z"]
+        elif into == "spherical":
+            new_dim = "spherical_axis"
+            new_coord = ["r", "theta", "phi"]
+        elif into == "quaternion":
+            new_dim = "quaternion_axis"
+            new_coord = ["w", "x", "y", "z"]
 
     dims = tuple((d if d != old_dim else new_dim) for d in dims)
 
@@ -50,8 +51,9 @@ def cartesian_to_polar(arr, axis=-1):
     """
     if arr.shape[axis] != 2:
         raise ValueError(
-            'Expected length of axis {} to be 2, got {} instead.'.format(
-                axis, arr.shape[axis]))
+            f"Expected length of axis {axis} to be 2, got {arr.shape[axis]} "
+            f"instead."
+        )
 
     r = np.linalg.norm(arr, axis=axis)
     phi = np.arctan2(np.take(arr, 1, axis=axis), np.take(arr, 0, axis=axis))
@@ -76,8 +78,9 @@ def polar_to_cartesian(arr, axis=-1):
     """
     if arr.shape[axis] != 2:
         raise ValueError(
-            'Expected length of axis {} to be 2, got {} instead.'.format(
-                axis, arr.shape[axis]))
+            f"Expected length of axis {axis} to be 2, got {arr.shape[axis]} "
+            f"instead."
+        )
 
     x = np.take(arr, 0, axis=axis) * np.cos(np.take(arr, 1, axis=axis))
     y = np.take(arr, 0, axis=axis) * np.sin(np.take(arr, 1, axis=axis))
@@ -104,8 +107,9 @@ def cartesian_to_spherical(arr, axis=-1):
     """
     if arr.shape[axis] != 3:
         raise ValueError(
-            'Expected length of axis {} to be 3, got {} instead.'.format(
-                axis, arr.shape[axis]))
+            f"Expected length of axis {axis} to be 3, got {arr.shape[axis]} "
+            f"instead."
+        )
 
     r = np.linalg.norm(arr, axis=axis)
     theta = np.arccos(np.take(arr, 2, axis=axis) / r)
@@ -133,14 +137,19 @@ def spherical_to_cartesian(arr, axis=-1):
     """
     if arr.shape[axis] != 3:
         raise ValueError(
-            'Expected length of axis {} to be 3, got {} instead.'.format(
-                axis, arr.shape[axis]))
+            f"Expected length of axis {axis} to be 3, got {arr.shape[axis]} "
+            f"instead."
+        )
 
-    x = np.take(arr, 0, axis=axis) \
-        * np.sin(np.take(arr, 1, axis=axis)) \
+    x = (
+        np.take(arr, 0, axis=axis)
+        * np.sin(np.take(arr, 1, axis=axis))
         * np.cos(np.take(arr, 2, axis=axis))
-    y = np.take(arr, 0, axis=axis) \
-        * np.sin(np.take(arr, 1, axis=axis)) \
+    )
+    y = (
+        np.take(arr, 0, axis=axis)
+        * np.sin(np.take(arr, 1, axis=axis))
         * np.sin(np.take(arr, 2, axis=axis))
+    )
     z = np.take(arr, 0, axis=axis) * np.cos(np.take(arr, 1, axis=axis))
     return np.stack((x, y, z), axis=axis)

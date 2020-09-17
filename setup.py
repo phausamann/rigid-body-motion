@@ -2,46 +2,38 @@
 # -*- coding: utf-8 -*-
 
 """The setup script."""
+from setuptools import find_packages, setup
 
-from setuptools import setup, find_packages
-
-with open('README.rst') as readme_file:
+with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
+with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = ['numpy', 'numpy-quaternion', 'scipy', 'anytree']
-
-setup_requirements = ['pytest-runner', ]
-
-test_requirements = ['pytest', ]
+requirements = ["numpy", "numpy-quaternion", "scipy", "anytree"]
 
 setup(
     author="Peter Hausamann",
-    author_email='peter.hausamann@tum.de',
+    author_email="peter.hausamann@tum.de",
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
-    description="Python utilities for estimating and transforming rigid body motion.",
+    description="Python utilities for estimating and transforming "
+    "rigid body motion.",
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + '\n\n' + history,
+    long_description=readme + "\n\n" + history,
     include_package_data=True,
-    keywords='rigid_body_motion',
-    name='rigid-body-motion',
-    packages=find_packages(exclude=['tests']),
-    setup_requires=setup_requirements,
-    test_suite='tests',
-    tests_require=test_requirements,
-    url='https://github.com/phausamann/rigid-body-motion',
-    version='0.1.0',
+    keywords="rigid_body_motion",
+    name="rigid-body-motion",
+    packages=find_packages(exclude=["tests"]),
+    url="https://github.com/phausamann/rigid-body-motion",
+    version="0.1.0",
     zip_safe=False,
 )

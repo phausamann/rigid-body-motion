@@ -130,7 +130,12 @@ def _make_dataarray(arr, coords, dims, name, attrs, time_dim, ts_out):
             # interpolate if timestamps after transform have changed
             for c in coords:
                 if time_dim in coords[c].dims and c != time_dim:
-                    coords[c] = coords[c].interp({time_dim: ts_out})
+                    if np.issubdtype(coords[c].dtype, np.number):
+                        coords[c] = coords[c].interp({time_dim: ts_out})
+                    else:
+                        coords[c] = coords[c].sel(
+                            {time_dim: ts_out}, method="nearest"
+                        )
             coords[time_dim] = ts_out
     else:
         # timestamps specified as array

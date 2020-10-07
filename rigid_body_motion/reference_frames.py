@@ -6,6 +6,7 @@ from quaternion import (
     as_quat_array,
     derivative,
     from_rotation_matrix,
+    squad,
 )
 from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
@@ -244,7 +245,6 @@ class ReferenceFrame(NodeMixin):
     @classmethod
     def _interpolate(cls, source_arr, target_arr, source_ts, target_ts):
         """ Interpolate source array at target array timestamps. """
-        # TODO SLERP for quaternions
         # TODO specify time_axis as parameter
         # TODO priority=None/<rf_name>
         # TODO method + optional scipy dependency?
@@ -267,7 +267,28 @@ class ReferenceFrame(NodeMixin):
             target_arr = target_arr[target_ts <= source_ts[-1]]
             target_ts = target_ts[target_ts <= source_ts[-1]]
 
-        source_arr_interp = interp1d(source_ts, source_arr, axis=0)(target_ts)
+        if source_arr.shape[1] == 7:
+            # ugly edge case of t and r stacked
+            source_arr_interp = np.hstack(
+                (
+                    interp1d(source_ts, source_arr[:, :3], axis=0)(target_ts),
+                    as_float_array(
+                        squad(
+                            as_quat_array(source_arr[:, 3:]),
+                            source_ts,
+                            target_ts,
+                        )
+                    ),
+                )
+            )
+        elif source_arr.shape[1] == 4:
+            source_arr_interp = as_float_array(
+                squad(as_quat_array(source_arr), source_ts, target_ts)
+            )
+        else:
+            source_arr_interp = interp1d(source_ts, source_arr, axis=0)(
+                target_ts
+            )
 
         return source_arr_interp, target_arr, target_ts.astype(ts_dtype)
 
@@ -308,11 +329,15 @@ class ReferenceFrame(NodeMixin):
             if ts is None:
                 return_arr_list.append(cls._broadcast(arr, return_ts))
             else:
-                return_arr_list.append(
-                    interp1d(ts.astype(float), arr, axis=0)(
+                if arr.shape[1] == 4:
+                    arr_t = as_float_array(
+                        squad(arr, ts.astype(float), return_ts.astype(float))
+                    )
+                else:
+                    arr_t = interp1d(ts.astype(float), arr, axis=0)(
                         return_ts.astype(float)
                     )
-                )
+                return_arr_list.append(arr_t)
 
         return return_arr_list, return_ts
 

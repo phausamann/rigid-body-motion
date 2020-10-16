@@ -34,6 +34,6 @@ setup(
     name="rigid-body-motion",
     packages=find_packages(exclude=["tests"]),
     url="https://github.com/phausamann/rigid-body-motion",
-    version="0.1.1",
+    version="0.1.2",
     zip_safe=False,
 )

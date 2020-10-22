@@ -2,8 +2,13 @@
 import numpy as np
 from quaternion import as_float_array, from_rotation_matrix
 
-from rigid_body_motion.coordinate_systems import _replace_dim
-from rigid_body_motion.core import _make_dataarray, _maybe_unpack_dataarray
+from rigid_body_motion.core import (
+    _estimate_angular_velocity,
+    _estimate_linear_velocity,
+    _make_dataarray,
+    _maybe_unpack_dataarray,
+    _replace_dim,
+)
 from rigid_body_motion.utils import rotate_vectors
 
 
@@ -11,7 +16,7 @@ def _reshape_vectors(v1, v2, axis, dim):
     """ Reshape input vectors to two dimensions. """
     # TODO v2 as DataArray with possibly different dimension order
     v1, axis, _, _, _, _, coords, *_ = _maybe_unpack_dataarray(
-        v1, dim, axis, None
+        v1, dim, axis, None, False
     )
     v2, *_ = _maybe_unpack_dataarray(v2, None, axis, None)
 
@@ -49,6 +54,157 @@ def _make_transform_dataarrays(translation, rotation):
     )
 
     return translation, rotation
+
+
+def estimate_linear_velocity(
+    arr,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    outlier_thresh=None,
+    cutoff=None,
+):
+    """ Estimate linear velocity from a time series of translation.
+
+    Parameters
+    ----------
+    arr: array_like
+        Array of translations.
+
+    dim: str, optional
+        If the array is a DataArray, the name of the dimension
+        representing the spatial coordinates of the points.
+
+    axis: int, optional
+        The axis of the array representing the spatial coordinates of the
+        points. Defaults to the last axis of the array.
+
+    timestamps: array_like or str, optional
+        The timestamps of the points, corresponding to the `time_axis`
+        of the array. If str and the array is a DataArray, the name of the
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the points.
+        Defaults to the first axis of the array.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to the linear velocity after
+        the estimation as a fraction of the Nyquist frequency.
+
+    outlier_thresh: float, optional
+        Some SLAM-based trackers introduce position corrections when a new
+        camera frame becomes available. This introduces outliers in the
+        linear velocity estimate. The estimation algorithm used here
+        can suppress these outliers by throwing out samples where the
+        norm of the second-order differences of the position is above
+        `outlier_thresh` and interpolating the missing values. For
+        measurements from the Intel RealSense T265 tracker, set this value
+        to 1e-3.
+
+    Returns
+    -------
+    linear: array_like
+        Array of linear velocities.
+    """
+    (
+        arr,
+        axis,
+        dim,
+        time_axis,
+        time_dim,
+        timestamps,
+        coords,
+        dims,
+        name,
+        attrs,
+    ) = _maybe_unpack_dataarray(
+        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
+    )
+
+    linear = _estimate_linear_velocity(
+        arr,
+        timestamps,
+        time_axis=time_axis,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
+    )
+
+    if coords is not None:
+        return _make_dataarray(
+            linear, coords, dims, name, attrs, time_dim, timestamps
+        )
+    else:
+        return linear
+
+
+def estimate_angular_velocity(
+    arr, dim=None, axis=None, timestamps=None, time_axis=None, cutoff=None,
+):
+    """ Estimate angular velocity from a time series of rotations.
+
+    Parameters
+    ----------
+    arr: array_like
+        Array of rotations, expressed in quaternions.
+
+    dim: str, optional
+        If the array is a DataArray, the name of the dimension
+        representing the spatial coordinates of the quaternions.
+
+    axis: int, optional
+        The axis of the array representing the spatial coordinates of the
+        quaternions. Defaults to the last axis of the array.
+
+    timestamps: array_like or str, optional
+        The timestamps of the quaternions, corresponding to the `time_axis`
+        of the array. If str and the array is a DataArray, the name of the
+        coordinate with the timestamps. The axis defined by `time_axis` will
+        be re-sampled to the timestamps for which the transformation is
+        defined.
+
+    time_axis: int, optional
+        The axis of the array representing the timestamps of the quaternions.
+        Defaults to the first axis of the array.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to the angular velocity after
+        the estimation as a fraction of the Nyquist frequency.
+
+    Returns
+    -------
+    angular: array_like
+        Array of angular velocities.
+    """
+    (
+        arr,
+        axis,
+        dim,
+        time_axis,
+        time_dim,
+        timestamps,
+        coords,
+        dims,
+        name,
+        attrs,
+    ) = _maybe_unpack_dataarray(
+        arr, dim=dim, axis=axis, time_axis=time_axis, timestamps=timestamps
+    )
+
+    angular = _estimate_angular_velocity(
+        arr, timestamps, axis=axis, time_axis=time_axis, cutoff=cutoff
+    )
+
+    if coords is not None:
+        coords, dims = _replace_dim(coords, dims, axis, "cartesian", 3)
+        return _make_dataarray(
+            angular, coords, dims, name, attrs, time_dim, timestamps
+        )
+    else:
+        return angular
 
 
 def shortest_arc_rotation(v1, v2, dim=None, axis=None):

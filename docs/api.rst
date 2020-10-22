@@ -72,6 +72,7 @@ Utility functions
     :toctree: _generated
 
     qinv
+    qmul
     qmean
     rotate_vectors
 

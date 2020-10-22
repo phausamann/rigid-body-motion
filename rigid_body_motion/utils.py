@@ -1,4 +1,7 @@
 """"""
+import operator
+from functools import reduce
+
 import numpy as np
 from quaternion import as_float_array, as_quat_array, quaternion
 from quaternion import rotate_vectors as quat_rv
@@ -22,7 +25,7 @@ def qinv(q, qaxis=-1):
 
     Returns
     -------
-    qm: ndarray
+    qi: ndarray
         A new array containing the inverse values.
     """
     # TODO xarray support
@@ -32,6 +35,42 @@ def qinv(q, qaxis=-1):
         return np.swapaxes(qi, -1, qaxis)
     else:
         return 1 / q
+
+
+def qmul(*q, qaxis=-1):
+    """ Quaternion multiplication.
+
+    Parameters
+    ----------
+    q: iterable of array_like
+        Arrays containing quaternions to multiply. Their dtype can be
+        quaternion, otherwise `q_axis` specifies the axis representing
+        the quaternions.
+
+    qaxis: int, default -1
+        If `q` are not quaternion dtype, axis of the quaternion arrays
+        representing the coordinates of the quaternions.
+
+    Returns
+    -------
+    qm: ndarray
+        A new array containing the multiplied quaternions.
+    """
+    # TODO xarray support
+    if len(q) < 2:
+        raise ValueError("Please provide at least 2 quaternions to multiply")
+
+    if all(qq.dtype != quaternion for qq in q):
+        q = (as_quat_array(np.swapaxes(qq, qaxis, -1)) for qq in q)
+        qm = reduce(operator.mul, q, 1)
+        return np.swapaxes(as_float_array(qm), -1, qaxis)
+    elif all(qq.dtype == quaternion for qq in q):
+        return reduce(operator.mul, q, 1)
+    else:
+        raise ValueError(
+            "Either all or none of the provided quaternions must be "
+            "quaternion dtype"
+        )
 
 
 def qmean(q, axis=None, qaxis=-1):

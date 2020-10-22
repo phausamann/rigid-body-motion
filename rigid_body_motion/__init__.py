@@ -32,7 +32,7 @@ from .estimators import (
 from .reference_frames import ReferenceFrame
 from .reference_frames import _registry as registry
 from .reference_frames import clear_registry, deregister_frame, register_frame
-from .utils import qinv, qmean, rotate_vectors
+from .utils import qinv, qmean, qmul, rotate_vectors
 
 __all__ = [
     "transform_points",
@@ -63,6 +63,7 @@ __all__ = [
     "example_data",
     "qinv",
     "qmean",
+    "qmul",
     "rotate_vectors",
 ]
 

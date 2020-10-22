@@ -5,11 +5,12 @@ from numpy import testing as npt
 from rigid_body_motion.core import (
     _make_dataarray,
     _maybe_unpack_dataarray,
+    _replace_dim,
     _resolve_axis,
 )
 
 
-class TestCore(object):
+class TestCore:
     def test_resolve_axis(self):
         """"""
         assert _resolve_axis(0, 1) == 0
@@ -21,6 +22,47 @@ class TestCore(object):
             _resolve_axis(2, 1)
         with pytest.raises(IndexError):
             _resolve_axis((-2, 0), 1)
+
+    def test_replace_dim(self):
+        """"""
+        xr = pytest.importorskip("xarray")
+
+        da = xr.DataArray(
+            np.ones((10, 3)),
+            {
+                "time": np.arange(10),
+                "old_dim": ["a", "b", "c"],
+                "old_dim_coord": ("old_dim", np.arange(3)),
+            },
+            ("time", "old_dim"),
+        )
+        dims = da.dims
+        coords = dict(da.coords)
+
+        new_coords, new_dims = _replace_dim(coords, dims, -1, "cartesian", 2)
+        assert set(new_coords.keys()) == set(new_dims)
+        assert new_coords["cartesian_axis"] == ["x", "y"]
+        assert new_dims == ("time", "cartesian_axis")
+
+        new_coords, new_dims = _replace_dim(coords, dims, -1, "polar", 2)
+        assert set(new_coords.keys()) == set(new_dims)
+        assert new_coords["polar_axis"] == ["r", "phi"]
+        assert new_dims == ("time", "polar_axis")
+
+        new_coords, new_dims = _replace_dim(coords, dims, -1, "cartesian", 3)
+        assert set(new_coords.keys()) == set(new_dims)
+        assert new_coords["cartesian_axis"] == ["x", "y", "z"]
+        assert new_dims == ("time", "cartesian_axis")
+
+        new_coords, new_dims = _replace_dim(coords, dims, -1, "spherical", 3)
+        assert set(new_coords.keys()) == set(new_dims)
+        assert new_coords["spherical_axis"] == ["r", "theta", "phi"]
+        assert new_dims == ("time", "spherical_axis")
+
+        new_coords, new_dims = _replace_dim(coords, dims, -1, "quaternion", 3)
+        assert set(new_coords.keys()) == set(new_dims)
+        assert new_coords["quaternion_axis"] == ["w", "x", "y", "z"]
+        assert new_dims == ("time", "quaternion_axis")
 
     def test_maybe_unpack_dataarray(self):
         """"""

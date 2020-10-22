@@ -4,14 +4,16 @@ from anytree import NodeMixin, Walker
 from quaternion import (
     as_float_array,
     as_quat_array,
-    derivative,
     from_rotation_matrix,
     squad,
 )
 from scipy.interpolate import interp1d
-from scipy.signal import butter, filtfilt
 
-from rigid_body_motion.core import _resolve_rf
+from rigid_body_motion.core import (
+    _estimate_angular_velocity,
+    _estimate_linear_velocity,
+    _resolve_rf,
+)
 from rigid_body_motion.utils import qinv, rotate_vectors
 
 _registry = {}
@@ -1080,45 +1082,6 @@ class ReferenceFrame(NodeMixin):
         else:
             return arr
 
-    @classmethod
-    def _estimate_linear_velocity(
-        cls, translation, timestamps, outlier_thresh=None, cutoff=None
-    ):
-        """ Estimate linear velocity of transform. """
-        timestamps = timestamps.astype(float) / 1e9
-
-        linear = np.gradient(translation, timestamps, axis=0)
-
-        if outlier_thresh is not None:
-            dt = np.linalg.norm(np.diff(translation, n=2, axis=0), axis=1)
-            dt = np.hstack((dt, 0.0, 0.0)) + np.hstack((0.0, dt, 0.0))
-            linear = interp1d(
-                timestamps[dt <= outlier_thresh],
-                linear[dt <= outlier_thresh],
-                axis=0,
-                bounds_error=False,
-            )(timestamps)
-
-        if cutoff is not None:
-            linear = filtfilt(*butter(7, cutoff), linear, axis=0)
-
-        return linear
-
-    @classmethod
-    def _estimate_angular_velocity(cls, rotation, timestamps, cutoff=None):
-        """ Estimate angular velocity of transform. """
-        timestamps = timestamps.astype(float) / 1e9
-
-        dq = derivative(rotation, timestamps)
-        angular = as_float_array(
-            2 * as_quat_array(rotation).conjugate() * as_quat_array(dq)
-        )[:, 1:]
-
-        if cutoff is not None:
-            angular = filtfilt(*butter(7, cutoff), angular, axis=0)
-
-        return angular
-
     def lookup_twist(
         self,
         reference=None,
@@ -1177,10 +1140,15 @@ class ReferenceFrame(NodeMixin):
         if timestamps is None:
             raise ValueError("Twist cannot be estimated for static transforms")
 
-        linear = self._estimate_linear_velocity(
-            translation, timestamps, outlier_thresh, cutoff
+        linear = _estimate_linear_velocity(
+            translation,
+            timestamps,
+            outlier_thresh=outlier_thresh,
+            cutoff=cutoff,
         )
-        angular = self._estimate_angular_velocity(rotation, timestamps, cutoff)
+        angular = _estimate_angular_velocity(
+            rotation, timestamps, cutoff=cutoff
+        )
 
         linear, linear_ts = reference.transform_vectors(
             linear, represent_in, timestamps=timestamps, return_timestamps=True

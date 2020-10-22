@@ -2,6 +2,16 @@
 History
 =======
 
+0.2.0 (October 22nd, 2020)
+-------------------------
+
+New features
+~~~~~~~~~~~~
+
+* New ``estimate_linear_velocity`` and ``estimate_angular_velocity`` top-level
+  methods.
+
+
 0.1.2 (October 7th, 2020)
 -------------------------
 

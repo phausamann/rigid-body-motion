@@ -2,15 +2,18 @@ import numpy as np
 import pytest
 from numpy import testing as npt
 
+from rigid_body_motion import lookup_transform
 from rigid_body_motion.estimators import (
     _reshape_vectors,
     best_fit_transform,
+    estimate_angular_velocity,
+    estimate_linear_velocity,
     iterative_closest_point,
     shortest_arc_rotation,
 )
 
 
-class TestEstimators(object):
+class TestEstimators:
     def test_reshape_vectors(self):
         """"""
         v = np.random.randn(10, 3, 10)
@@ -30,6 +33,38 @@ class TestEstimators(object):
         # different shapes
         with pytest.raises(ValueError):
             _reshape_vectors(v, v[1:], 1, None)
+
+    def test_estimate_angular_velocity_xr(self, compensated_tree):
+        """"""
+        pytest.importorskip("xarray")
+
+        gaze = lookup_transform("eyes", "world", as_dataset=True)
+
+        angular = estimate_angular_velocity(gaze.rotation)
+        assert angular.dims == ("time", "cartesian_axis")
+        assert (angular < 1e-10).all()
+
+        angular = estimate_angular_velocity(
+            gaze.rotation.T, dim="quaternion_axis", timestamps="time",
+        )
+        assert angular.dims == ("cartesian_axis", "time")
+        assert (angular < 1e-10).all()
+
+    def test_estimate_linear_velocity_xr(self, compensated_tree):
+        """"""
+        pytest.importorskip("xarray")
+
+        gaze = lookup_transform("eyes", "world", as_dataset=True)
+
+        linear = estimate_linear_velocity(gaze.translation)
+        assert linear.dims == ("time", "cartesian_axis")
+        assert (linear < 0.06).all()
+
+        linear = estimate_linear_velocity(
+            gaze.translation.T, dim="cartesian_axis", timestamps="time",
+        )
+        assert linear.dims == ("cartesian_axis", "time")
+        assert (linear < 1e-10).all()
 
     def test_shortest_arc_rotation(self):
         """"""

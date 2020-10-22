@@ -8,7 +8,6 @@ from pkg_resources import resource_filename
 
 from . import ros  # noqa
 from .coordinate_systems import (
-    _replace_dim,
     cartesian_to_polar,
     cartesian_to_spherical,
     polar_to_cartesian,
@@ -19,11 +18,14 @@ from .core import (
     _make_transform_or_pose_dataset,
     _make_twist_dataset,
     _maybe_unpack_dataarray,
+    _replace_dim,
     _resolve_rf,
     _transform,
 )
 from .estimators import (
     best_fit_transform,
+    estimate_angular_velocity,
+    estimate_linear_velocity,
     iterative_closest_point,
     shortest_arc_rotation,
 )
@@ -50,6 +52,8 @@ __all__ = [
     "clear_registry",
     "ReferenceFrame",
     # estimators
+    "estimate_linear_velocity",
+    "estimate_angular_velocity",
     "shortest_arc_rotation",
     "best_fit_transform",
     "iterative_closest_point",

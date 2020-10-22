@@ -2,6 +2,9 @@
 import warnings
 
 import numpy as np
+from quaternion import as_float_array, as_quat_array, derivative
+from scipy.interpolate import interp1d
+from scipy.signal import butter, filtfilt
 
 
 def _resolve_axis(axis, ndim):
@@ -42,11 +45,44 @@ def _resolve_rf(rf):
         )
 
 
+def _replace_dim(coords, dims, axis, into, dimensionality):
+    """ Replace the spatial dimension. """
+    # TODO can we improve this with assign_coords / swap_dims?
+    old_dim = dims[axis]
+
+    if dimensionality == 2:
+        if into == "cartesian":
+            new_dim = "cartesian_axis"
+            new_coord = ["x", "y"]
+        elif into == "polar":
+            new_dim = "polar_axis"
+            new_coord = ["r", "phi"]
+    elif dimensionality == 3:
+        if into == "cartesian":
+            new_dim = "cartesian_axis"
+            new_coord = ["x", "y", "z"]
+        elif into == "spherical":
+            new_dim = "spherical_axis"
+            new_coord = ["r", "theta", "phi"]
+        elif into == "quaternion":
+            new_dim = "quaternion_axis"
+            new_coord = ["w", "x", "y", "z"]
+
+    dims = tuple((d if d != old_dim else new_dim) for d in dims)
+
+    coords = {c: coords[c] for c in coords if old_dim not in coords[c].dims}
+    coords[new_dim] = new_coord
+
+    return coords, dims
+
+
 def _maybe_unpack_dataarray(
     arr, dim=None, axis=None, time_axis=None, timestamps=None
 ):
     """ If input is DataArray, unpack into data, coords and dims. """
     from rigid_body_motion.utils import is_dataarray
+
+    ndim = np.asanyarray(arr).ndim
 
     if not is_dataarray(arr):
         if dim is not None:
@@ -92,6 +128,11 @@ def _maybe_unpack_dataarray(
         name = arr.name
         attrs = arr.attrs.copy()
         arr = arr.data
+
+    if timestamps is not None and axis % ndim == time_axis % ndim:
+        raise ValueError(
+            "Spatial and time dimension refer to the same array axis"
+        )
 
     return (
         arr,
@@ -337,3 +378,45 @@ def _make_twist_dataset(
     )
 
     return twist
+
+
+def _estimate_angular_velocity(
+    rotation, timestamps, axis=-1, time_axis=0, cutoff=None
+):
+    """ Estimate angular velocity of transform. """
+    timestamps = timestamps.astype(float) / 1e9
+
+    dq = derivative(rotation, timestamps, axis=time_axis)
+    rotation = as_quat_array(np.swapaxes(rotation, axis, -1))
+    dq = as_quat_array(np.swapaxes(dq, axis, -1))
+    angular = as_float_array(2 * rotation.conjugate() * dq)[..., 1:]
+    angular = np.swapaxes(angular, axis, -1)
+
+    if cutoff is not None:
+        angular = filtfilt(*butter(7, cutoff), angular, axis=time_axis)
+
+    return angular
+
+
+def _estimate_linear_velocity(
+    translation, timestamps, time_axis=0, outlier_thresh=None, cutoff=None
+):
+    """ Estimate linear velocity of transform. """
+    timestamps = timestamps.astype(float) / 1e9
+
+    linear = np.gradient(translation, timestamps, axis=time_axis)
+
+    if outlier_thresh is not None:
+        dt = np.linalg.norm(np.diff(translation, n=2, axis=time_axis), axis=1)
+        dt = np.hstack((dt, 0.0, 0.0)) + np.hstack((0.0, dt, 0.0))
+        linear = interp1d(
+            timestamps[dt <= outlier_thresh],
+            linear[dt <= outlier_thresh],
+            axis=time_axis,
+            bounds_error=False,
+        )(timestamps)
+
+    if cutoff is not None:
+        linear = filtfilt(*butter(7, cutoff), linear, axis=time_axis)
+
+    return linear

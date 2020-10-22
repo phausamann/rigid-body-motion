@@ -5,7 +5,7 @@ from numpy import testing as npt
 import rigid_body_motion as rbm
 
 
-class TestTopLevel(object):
+class TestTopLevel:
     """"""
 
     @pytest.fixture()

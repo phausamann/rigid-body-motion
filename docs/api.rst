@@ -55,6 +55,8 @@ Estimators
     :nosignatures:
     :toctree: _generated
 
+    estimate_linear_velocity
+    estimate_angular_velocity
     lookup_transform
     lookup_twist
     shortest_arc_rotation

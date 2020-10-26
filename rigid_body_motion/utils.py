@@ -16,7 +16,7 @@ def qinv(q, qaxis=-1):
     ----------
     q: array_like
         Array containing quaternions whose inverse is to be computed. Its dtype
-        can be quaternion, otherwise `q_axis` specifies the axis representing
+        can be quaternion, otherwise `qaxis` specifies the axis representing
         the quaternions.
 
     qaxis: int, default -1
@@ -44,7 +44,7 @@ def qmul(*q, qaxis=-1):
     ----------
     q: iterable of array_like
         Arrays containing quaternions to multiply. Their dtype can be
-        quaternion, otherwise `q_axis` specifies the axis representing
+        quaternion, otherwise `qaxis` specifies the axis representing
         the quaternions.
 
     qaxis: int, default -1
@@ -82,7 +82,7 @@ def qmean(q, axis=None, qaxis=-1):
     ----------
     q: array_like
         Array containing quaternions whose mean is to be computed. Its dtype
-        can be quaternion, otherwise `q_axis` specifies the axis representing
+        can be quaternion, otherwise `qaxis` specifies the axis representing
         the quaternions.
 
     axis: None or int or tuple of ints, optional
@@ -158,6 +158,7 @@ def rotate_vectors(q, v, axis=-1, qaxis=-1, one_to_one=True):
         the shape of all non-singleton dimensions in `q` and `v`.
         Otherwise, this array has shape `q.shape` + `v.shape`.
     """
+    # TODO proper broadcasting if v is DataArray
     if q.dtype != quaternion:
         q = as_quat_array(np.swapaxes(q, qaxis, -1))
 

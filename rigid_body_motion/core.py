@@ -2,7 +2,12 @@
 import warnings
 
 import numpy as np
-from quaternion import as_float_array, as_quat_array, derivative
+from quaternion import (
+    as_float_array,
+    as_quat_array,
+    as_rotation_vector,
+    derivative,
+)
 from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
 
@@ -381,19 +386,55 @@ def _make_twist_dataset(
 
 
 def _estimate_angular_velocity(
-    rotation, timestamps, axis=-1, time_axis=0, cutoff=None
+    rotation,
+    timestamps,
+    axis=-1,
+    time_axis=0,
+    mode="quaternion",
+    outlier_thresh=None,
+    cutoff=None,
 ):
     """ Estimate angular velocity of transform. """
     timestamps = timestamps.astype(float) / 1e9
 
-    dq = derivative(rotation, timestamps, axis=time_axis)
-    rotation = as_quat_array(np.swapaxes(rotation, axis, -1))
-    dq = as_quat_array(np.swapaxes(dq, axis, -1))
-    angular = as_float_array(2 * rotation.conjugate() * dq)[..., 1:]
-    angular = np.swapaxes(angular, axis, -1)
+    axis = axis % rotation.ndim
+    time_axis = time_axis % rotation.ndim
+
+    # fix time axis if it's the last axis of the array and will be swapped with
+    # axis when converting to quaternion dtype
+    if time_axis == rotation.ndim - 1:
+        time_axis = axis
+
+    r = np.swapaxes(rotation, axis, -1)
+    q = as_quat_array(r)
+
+    if mode == "quaternion":
+        dq = as_quat_array(derivative(r, timestamps, axis=time_axis))
+        angular = as_float_array(2 * q.conjugate() * dq)[..., 1:]
+    elif mode == "rotation_vector":
+        rv = as_rotation_vector(q)
+        angular = np.gradient(rv, timestamps, axis=time_axis)
+    else:
+        raise ValueError(
+            f"'mode' can be 'quaternion' or 'rotation_vector', got {mode}"
+        )
+
+    if outlier_thresh is not None:
+        dr = np.linalg.norm(
+            np.diff(as_rotation_vector(q), n=2, axis=time_axis), axis=-1
+        )
+        dr = np.hstack((dr, 0.0, 0.0)) + np.hstack((0.0, dr, 0.0))
+        angular = interp1d(
+            timestamps[dr <= outlier_thresh],
+            angular[dr <= outlier_thresh],
+            axis=time_axis,
+            bounds_error=False,
+        )(timestamps)
 
     if cutoff is not None:
         angular = filtfilt(*butter(7, cutoff), angular, axis=time_axis)
+
+    angular = np.swapaxes(angular, axis, -1)
 
     return angular
 

@@ -2,6 +2,16 @@
 History
 =======
 
+0.2.1 (Unreleased)
+------------------
+
+Improvements
+~~~~~~~~~~~~
+
+* Added ``mode`` and ``outlier_thresh`` arguments to
+  ``estimate_angular_velocity``.
+
+
 0.2.0 (October 22nd, 2020)
 --------------------------
 

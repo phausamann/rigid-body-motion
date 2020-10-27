@@ -142,7 +142,14 @@ def estimate_linear_velocity(
 
 
 def estimate_angular_velocity(
-    arr, dim=None, axis=None, timestamps=None, time_axis=None, cutoff=None,
+    arr,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    mode="quaternion",
+    outlier_thresh=None,
+    cutoff=None,
 ):
     """ Estimate angular velocity from a time series of rotations.
 
@@ -170,6 +177,15 @@ def estimate_angular_velocity(
         The axis of the array representing the timestamps of the quaternions.
         Defaults to the first axis of the array.
 
+    mode: str, default "quaternion"
+        If "quaternion", compute the angular velocity from the quaternion
+        derivative. If "rotation_vector", compute the angular velocity from
+        the gradient of the axis-angle representation of the rotations.
+
+    outlier_thresh: float, optional
+        Suppress samples where the norm of the second-order differences of the
+        rotation is above `outlier_thresh` and interpolate the missing values.
+
     cutoff: float, optional
         Frequency of a low-pass filter applied to the angular velocity after
         the estimation as a fraction of the Nyquist frequency.
@@ -195,7 +211,13 @@ def estimate_angular_velocity(
     )
 
     angular = _estimate_angular_velocity(
-        arr, timestamps, axis=axis, time_axis=time_axis, cutoff=cutoff
+        arr,
+        timestamps,
+        axis=axis,
+        time_axis=time_axis,
+        mode=mode,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
     )
 
     if coords is not None:

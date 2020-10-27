@@ -36,7 +36,7 @@ class TestEstimators:
 
     def test_estimate_angular_velocity_xr(self, compensated_tree):
         """"""
-        pytest.importorskip("xarray")
+        xr = pytest.importorskip("xarray")
 
         gaze = lookup_transform("eyes", "world", as_dataset=True)
 
@@ -49,6 +49,15 @@ class TestEstimators:
         )
         assert angular.dims == ("cartesian_axis", "time")
         assert (angular < 1e-10).all()
+
+        angular_rv = estimate_angular_velocity(
+            gaze.rotation.T,
+            dim="quaternion_axis",
+            timestamps="time",
+            mode="rotation_vector",
+            outlier_thresh=1,
+        )
+        xr.testing.assert_allclose(angular, angular_rv)
 
     def test_estimate_linear_velocity_xr(self, compensated_tree):
         """"""

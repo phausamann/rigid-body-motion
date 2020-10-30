@@ -5,6 +5,7 @@ from functools import reduce
 import numpy as np
 from quaternion import as_float_array, as_quat_array, quaternion
 from quaternion import rotate_vectors as quat_rv
+from quaternion import squad
 
 from rigid_body_motion.core import _resolve_axis
 
@@ -124,6 +125,60 @@ def qmean(q, axis=None, qaxis=-1):
         return as_quat_array(qm)
     else:
         return np.swapaxes(qm, -1, qaxis)
+
+
+def qinterp(q, t_in, t_out, axis=0, qaxis=-1):
+    """ Quaternion interpolation.
+
+    Parameters
+    ----------
+    q: array_like
+        Array containing quaternions to interpolate. Its dtype
+        can be quaternion, otherwise `qaxis` specifies the axis representing
+        the quaternions.
+
+    t_in: array_like
+        Array of current sampling points of `q`.
+
+    t_out: array_like
+        Array of desired sampling points of `q`.
+
+    axis: int, default 0
+        Axis along which the quaternions are interpolated.
+
+    qaxis: int, default -1
+        If `q` is not quaternion dtype, axis of the quaternion array
+        representing the coordinates of the quaternions.
+
+    Returns
+    -------
+    qi: ndarray
+        A new array containing the interpolated values.
+    """
+    # TODO xarray support
+    axis = axis % q.ndim
+    t_in = np.array(t_in).astype(float)
+    t_out = np.array(t_out).astype(float)
+
+    if q.dtype != quaternion:
+        qaxis = qaxis % q.ndim
+        # fix axis if it's the last axis of the array and will be swapped with
+        # axis when converting to quaternion dtype
+        if axis == q.ndim - 1:
+            axis = qaxis
+        q = as_quat_array(np.swapaxes(q, qaxis, -1))
+        was_quaternion = False
+    else:
+        was_quaternion = True
+
+    q = np.swapaxes(q, axis, 0)
+
+    qi = squad(q, t_in, t_out)
+
+    if was_quaternion:
+        return qi
+    else:
+        return np.swapaxes(as_float_array(qi), -1, qaxis)
 
 
 def rotate_vectors(q, v, axis=-1, qaxis=-1, one_to_one=True):

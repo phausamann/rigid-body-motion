@@ -8,7 +8,8 @@ from quaternion import (
     quaternion,
 )
 
-from rigid_body_motion.utils import qinv, qmean, qmul, rotate_vectors
+from rigid_body_motion.testing import make_test_motion
+from rigid_body_motion.utils import qinterp, qinv, qmean, qmul, rotate_vectors
 
 
 class TestUtils(object):
@@ -73,6 +74,27 @@ class TestUtils(object):
             as_float_array(qm),
             np.tile(np.array([1.0, 0.0, 0.0, 0.0]), (10, 1)),
         )
+
+    def test_qinterp(self):
+        """"""
+        _, r_100, ts_100 = make_test_motion(100, fs=100, stack=True)
+        _, r_200, ts_200 = make_test_motion(200, fs=200, stack=True)
+
+        # standard case
+        r_act = qinterp(r_200, ts_200, ts_100)
+        np.testing.assert_allclose(r_act, r_100)
+
+        # quaternion dtype
+        r_act = qinterp(as_quat_array(r_200), ts_200, ts_100)
+        np.testing.assert_allclose(as_float_array(r_act), r_100)
+
+        # different axis
+        r_act = qinterp(r_200.T, ts_200, ts_100, qaxis=0)
+        np.testing.assert_allclose(r_act, r_100.T)
+
+        # TODO support for higher dimensions
+        # r_act = qinterp(np.tile(r_200, (5, 1, 1)), ts_200, ts_100, axis=1)
+        # np.testing.assert_allclose(r_act, np.tile(r_100, (5, 1, 1)))
 
     def test_rotate_vectors(self):
         """"""

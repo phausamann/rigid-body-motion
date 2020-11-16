@@ -2,8 +2,13 @@
 History
 =======
 
-0.2.1 (Unreleased)
+0.3.0 (Unreleased)
 ------------------
+
+New features
+~~~~~~~~~~~~
+
+* New ``best_fit_rotation`` and ``qinterp`` top-level methods.
 
 Improvements
 ~~~~~~~~~~~~

@@ -272,6 +272,66 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
         return rotation
 
 
+def best_fit_rotation(v1, v2, dim=None, axis=None):
+    """ Least-squares best-fit rotation between two arrays of vectors.
+
+    Finds the rotation `r` that minimizes:
+
+    .. math:: || v_2 - rot(r, v_1) ||
+
+    Parameters
+    ----------
+    v1: array_like, shape (..., 3, ...)
+        The first array of vectors.
+
+    v2: array_like, shape (..., 3, ...)
+        The second array of vectors.
+
+    dim: str, optional
+        If the first array is a DataArray, the name of the dimension
+        representing the spatial coordinates of the vectors.
+
+    axis: int, optional
+        The axis of the arrays representing the spatial coordinates of the
+        vectors. Defaults to the last axis of the arrays.
+
+    Returns
+    -------
+    rotation: array_like, shape (4,)
+        Rotation of transform.
+
+    References
+    ----------
+    Adapted from https://github.com/ClayFlannigan/icp
+    """
+    v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
+
+    # rotation matrix
+    H = np.dot(v1.T, v2)
+    U, S, Vt = np.linalg.svd(H)
+    R = np.dot(Vt.T, U.T)
+
+    # special reflection case
+    if np.linalg.det(R) < 0:
+        Vt[2, :] *= -1
+        R = np.dot(Vt.T, U.T)
+
+    # rotation as quaternion
+    rotation = as_float_array(from_rotation_matrix(R))
+
+    if was_dataarray:
+        import xarray as xr
+
+        rotation = xr.DataArray(
+            rotation,
+            {"quaternion_axis": ["w", "x", "y", "z"]},
+            "quaternion_axis",
+            name="rotation",
+        )
+
+    return rotation
+
+
 def best_fit_transform(v1, v2, dim=None, axis=None):
     """ Least-squares best-fit transform between two arrays of vectors.
 
@@ -321,9 +381,8 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
     R = np.dot(Vt.T, U.T)
 
     # special reflection case
-    m = 3
     if np.linalg.det(R) < 0:
-        Vt[m - 1, :] *= -1
+        Vt[2, :] *= -1
         R = np.dot(Vt.T, U.T)
 
     # rotation as quaternion

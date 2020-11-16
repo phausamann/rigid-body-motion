@@ -23,6 +23,7 @@ from .core import (
     _transform,
 )
 from .estimators import (
+    best_fit_rotation,
     best_fit_transform,
     estimate_angular_velocity,
     estimate_linear_velocity,
@@ -55,6 +56,7 @@ __all__ = [
     "estimate_linear_velocity",
     "estimate_angular_velocity",
     "shortest_arc_rotation",
+    "best_fit_rotation",
     "best_fit_transform",
     "iterative_closest_point",
     "lookup_transform",

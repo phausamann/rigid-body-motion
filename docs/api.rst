@@ -60,6 +60,7 @@ Estimators
     lookup_transform
     lookup_twist
     shortest_arc_rotation
+    best_fit_rotation
     best_fit_transform
     iterative_closest_point
 

@@ -108,6 +108,19 @@ class TestEstimators:
 
         xr.testing.assert_allclose(actual, expected)
 
+    def test_best_fit_rotation(self, get_rf_tree, mock_quaternion):
+        """"""
+        rf_world, rf_child1, _ = get_rf_tree(
+            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
+        )
+        v1 = np.random.randn(10, 3)
+        v2 = rf_world.transform_points(v1, rf_child1)
+
+        t, r = best_fit_transform(v1, v2)
+        t_exp, r_exp, _ = rf_world.get_transformation(rf_child1)
+        npt.assert_allclose(t, t_exp, rtol=1.0, atol=1e-10)
+        npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
+
     def test_best_fit_transform(self, get_rf_tree, mock_quaternion):
         """"""
         rf_world, rf_child1, _ = get_rf_tree(

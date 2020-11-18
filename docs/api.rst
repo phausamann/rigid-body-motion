@@ -75,6 +75,7 @@ Utility functions
     qinv
     qmul
     qmean
+    qinterp
     rotate_vectors
 
 Class member details

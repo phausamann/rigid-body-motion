@@ -172,8 +172,14 @@ def qinterp(q, t_in, t_out, axis=0, qaxis=-1):
         was_quaternion = True
 
     q = np.swapaxes(q, axis, 0)
-
-    qi = squad(q, t_in, t_out)
+    try:
+        qi = squad(q, t_in, t_out)
+    except ValueError:
+        raise RuntimeError(
+            "Error using SQUAD with multi-dimensional array, please upgrade "
+            "the quaternion package to the latest version"
+        )
+    qi = np.swapaxes(qi, 0, axis)
 
     if was_quaternion:
         return qi

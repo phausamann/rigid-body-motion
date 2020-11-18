@@ -10,7 +10,7 @@ dependencies:
   - pandas=1.0
   - xarray=0.15
   - netcdf4=1.5
-  - quaternion=2020.4.24.9.29.7
+  - quaternion=2020.9.5.14.42.2
   - numba=0.48
   - anytree=2.8
   - pytest=5.4.3

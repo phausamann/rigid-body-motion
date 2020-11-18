@@ -92,9 +92,9 @@ class TestUtils(object):
         r_act = qinterp(r_200.T, ts_200, ts_100, qaxis=0)
         np.testing.assert_allclose(r_act, r_100.T)
 
-        # TODO support for higher dimensions
-        # r_act = qinterp(np.tile(r_200, (5, 1, 1)), ts_200, ts_100, axis=1)
-        # np.testing.assert_allclose(r_act, np.tile(r_100, (5, 1, 1)))
+        # higher dimensions
+        r_act = qinterp(np.tile(r_200, (5, 1, 1)), ts_200, ts_100, axis=1)
+        np.testing.assert_allclose(r_act, np.tile(r_100, (5, 1, 1)))
 
     def test_rotate_vectors(self):
         """"""

@@ -1,3 +1,4 @@
+import numpy as np
 import xarray as xr
 from xarray.core.utils import either_dict_or_kwargs
 
@@ -12,7 +13,7 @@ class DataArrayAccessor:
         """ Constructor. """
         self._obj = obj
 
-    def qinterp(self, coords=None, dim="quaternion_axis", **coords_kwargs):
+    def qinterp(self, coords=None, qdim="quaternion_axis", **coords_kwargs):
         """ Quaternion interpolation.
 
         Parameters
@@ -21,7 +22,7 @@ class DataArrayAccessor:
             Mapping from dimension names to the new coordinates.
             New coordinate can be a scalar, array-like or DataArray.
 
-        dim: str, default "quaternion_axis"
+        qdim: str, default "quaternion_axis"
             Name of the dimension representing the quaternions.
 
         **coords_kwargs : {dim: coordinate, ...}, optional
@@ -43,8 +44,8 @@ class DataArrayAccessor:
         <xarray.DataArray 'orientation' (time: 113373, quaternion_axis: 4)>
         array(...)
         Coordinates:
-          * quaternion_axis  (quaternion_axis) object 'w' 'x' 'y' 'z'
           * time             (time) datetime64[ns] ...
+          * quaternion_axis  (quaternion_axis) object 'w' 'x' 'y' 'z'
         Attributes:
             long_name:  Orientation
         """  # noqa
@@ -61,18 +62,35 @@ class DataArrayAccessor:
                 f"{interp_dim} is not a dimension of this DataArray"
             )
 
-        if dim not in self._obj.dims:
-            raise ValueError(f"{dim} is not a dimension of this DataArray")
+        if qdim not in self._obj.dims:
+            raise ValueError(f"{qdim} is not a dimension of this DataArray")
 
+        # interpolate
         arr = self._obj.values
         t_in = self._obj.coords[interp_dim]
         t_out = coords[interp_dim]
         axis = self._obj.dims.index(interp_dim)
-        qaxis = self._obj.dims.index(dim)
-
+        qaxis = self._obj.dims.index(qdim)
         arr_out = qinterp(arr, t_in, t_out, axis, qaxis)
 
-        interpolated = self._obj.interp(coords)
-        interpolated.values = arr_out
+        # update coords either by interpolating or selecting nearest for
+        # non-numerical coords
+        coords_out = dict(self._obj.coords)
+        for c in coords_out:
+            if c == interp_dim:
+                coords_out[c] = t_out
+            elif interp_dim in coords_out[c].dims:
+                if np.issubdtype(coords_out[c].dtype, np.number):
+                    coords_out[c] = coords_out[c].interp(coords)
+                else:
+                    coords_out[c] = coords_out[c].sel(coords, method="nearest")
+
+        interpolated = xr.DataArray(
+            arr_out,
+            coords_out,
+            self._obj.dims,
+            self._obj.name,
+            self._obj.attrs,
+        )
 
         return interpolated

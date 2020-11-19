@@ -35,6 +35,11 @@ from .reference_frames import _registry as registry
 from .reference_frames import clear_registry, deregister_frame, register_frame
 from .utils import qinterp, qinv, qmean, qmul, rotate_vectors
 
+try:
+    import rigid_body_motion.accessors  # noqa
+except ImportError:
+    pass
+
 __all__ = [
     "transform_points",
     "transform_quaternions",

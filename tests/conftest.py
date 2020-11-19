@@ -126,6 +126,15 @@ def head_dataset():
 
 
 @pytest.fixture()
+def left_eye_dataset():
+    """"""
+    xr = pytest.importorskip("xarray")
+    pytest.importorskip("netCDF4")
+
+    return xr.load_dataset(rbm.example_data["left_eye"])
+
+
+@pytest.fixture()
 def head_rf_tree(head_dataset):
     """"""
     rbm.register_frame("world")

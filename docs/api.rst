@@ -78,6 +78,21 @@ Utility functions
     qinterp
     rotate_vectors
 
+
+xarray Accessors
+----------------
+
+.. currentmodule:: xarray
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+    :template: autosummary/accessor_method.rst
+
+    DataArray.rbm.qinterp
+
+
+
 Class member details
 --------------------
 

@@ -8,6 +8,7 @@ History
 New features
 ~~~~~~~~~~~~
 
+* ``rbm`` accessor for DataArrays.
 * New ``best_fit_rotation`` and ``qinterp`` top-level methods.
 
 Improvements

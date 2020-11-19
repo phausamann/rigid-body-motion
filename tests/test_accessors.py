@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 import rigid_body_motion  # noqa
@@ -25,3 +26,17 @@ class TestDataArrayAccessor:
             head_dataset.orientation.rbm.qinterp(
                 time=left_eye_dataset.time, other_dim=range(10)
             )
+
+        with pytest.raises(NotImplementedError):
+            head_dataset.orientation.rbm.qinterp(time=np.eye(3))
+
+    def test_qinv(self, head_dataset):
+        """"""
+        expected = head_dataset.orientation.copy()
+        expected.values = rigid_body_motion.qinv(expected.values)
+        actual = head_dataset.orientation.rbm.qinv()
+
+        xr.testing.assert_equal(actual, expected)
+
+        with pytest.raises(ValueError):
+            head_dataset.position.rbm.qinv()

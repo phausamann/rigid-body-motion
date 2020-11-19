@@ -90,6 +90,7 @@ xarray Accessors
     :template: autosummary/accessor_method.rst
 
     DataArray.rbm.qinterp
+    DataArray.rbm.qinv
 
 
 

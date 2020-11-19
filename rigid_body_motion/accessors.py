@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 from xarray.core.utils import either_dict_or_kwargs
 
-from .utils import qinterp
+from .utils import qinterp, qinv
 
 
 @xr.register_dataarray_accessor("rbm")
@@ -62,6 +62,11 @@ class DataArrayAccessor:
                 f"{interp_dim} is not a dimension of this DataArray"
             )
 
+        if np.asanyarray(coords[interp_dim]).ndim != 1:
+            raise NotImplementedError(
+                "qinterp only supports one-dimensional coords so far"
+            )
+
         if qdim not in self._obj.dims:
             raise ValueError(f"{qdim} is not a dimension of this DataArray")
 
@@ -94,3 +99,39 @@ class DataArrayAccessor:
         )
 
         return interpolated
+
+    def qinv(self, qdim="quaternion_axis"):
+        """ Quaternion inverse.
+
+        Parameters
+        ----------
+        qdim: str, default "quaternion_axis"
+            Name of the dimension representing the quaternions.
+
+        Returns
+        -------
+        inverse: xr.DataArray
+            New array with inverted quaternions.
+
+        Examples
+        --------
+        >>> import xarray as xr
+        >>> import rigid_body_motion as rbm
+        >>> ds_head = xr.load_dataset(rbm.example_data["head"])
+        >>> ds_head.orientation.rbm.qinv() # doctest:+ELLIPSIS
+        <xarray.DataArray 'orientation' (time: 66629, quaternion_axis: 4)>
+        array(...)
+        Coordinates:
+          * time             (time) datetime64[ns] ...
+          * quaternion_axis  (quaternion_axis) object 'w' 'x' 'y' 'z'
+        Attributes:
+            long_name:  Orientation
+        """
+        if qdim not in self._obj.dims:
+            raise ValueError(f"{qdim} is not a dimension of this DataArray")
+
+        qaxis = self._obj.dims.index(qdim)
+        inverse = self._obj.copy()
+        inverse.values = qinv(self._obj.values, qaxis)
+
+        return inverse

@@ -53,6 +53,7 @@ def register_frame(
     rotation=None,
     timestamps=None,
     inverse=False,
+    event_based=False,
     update=False,
 ):
     """ Register a new reference frame in the registry.
@@ -84,6 +85,11 @@ def register_frame(
         translation and rotation are specified for the parent frame wrt this
         frame.
 
+    event_based: bool, default False
+        If True, transformations with timestamps are assumed to be events.
+        Instead of interpolating between timestamps, transformations are
+        fixed between their timestamp and the next one.
+
     update: bool, default False
         If True, overwrite if there is a frame with the same name in the
         registry.
@@ -96,6 +102,7 @@ def register_frame(
         rotation=rotation,
         timestamps=timestamps,
         inverse=inverse,
+        event_based=event_based,
     )
     _register(rf, update=update)
 
@@ -127,6 +134,7 @@ class ReferenceFrame(NodeMixin):
         rotation=None,
         timestamps=None,
         inverse=False,
+        event_based=False,
     ):
         """ Constructor.
 
@@ -148,7 +156,7 @@ class ReferenceFrame(NodeMixin):
             The rotation of this frame wrt the parent frame. Not
             applicable if there is no parent frame.
 
-        timestamps : array_like, optional
+        timestamps: array_like, optional
             The timestamps for translation and rotation of this frame. Not
             applicable if this is a static reference frame.
 
@@ -156,6 +164,11 @@ class ReferenceFrame(NodeMixin):
             If True, invert the transform wrt the parent frame, i.e. the
             translation and rotation are specified for the parent frame wrt
             this frame.
+
+        event_based: bool, default False
+            If True, transformations with timestamps are assumed to be events.
+            Instead of interpolating between timestamps, transformations are
+            fixed between their timestamp and the next one.
         """
         super(ReferenceFrame, self).__init__()
 
@@ -173,6 +186,13 @@ class ReferenceFrame(NodeMixin):
             self.parent = None
             self._verify_root(translation, rotation, timestamps)
             self.translation, self.rotation, self.timestamps = None, None, None
+
+        if event_based and self.timestamps is None:
+            raise ValueError(
+                "timestamps must be provided when event_based=True"
+            )
+        else:
+            self.event_based = event_based
 
     def __del__(self):
         """ Destructor. """
@@ -250,10 +270,12 @@ class ReferenceFrame(NodeMixin):
         # TODO specify time_axis as parameter
         # TODO priority=None/<rf_name>
         # TODO method + optional scipy dependency?
-        ts_dtype = target_ts.dtype
+        source_ts_dtype = source_ts.dtype
         source_ts = source_ts.astype(float)
+        target_ts_dtype = target_ts.dtype
         target_ts = target_ts.astype(float)
 
+        # make sure timestamps are sorted
         # TODO sort somewhere and turn these into assertions or use min/max
         #  with boolean indexing
         if np.any(np.diff(source_ts) < 0):
@@ -261,6 +283,7 @@ class ReferenceFrame(NodeMixin):
         if np.any(np.diff(target_ts) < 0):
             raise ValueError("target_ts is not sorted.")
 
+        # get overlapping range of source_ts and target_ts
         # TODO raise error when intersection is empty
         if target_ts[0] < source_ts[0]:
             target_arr = target_arr[target_ts >= source_ts[0]]
@@ -269,6 +292,7 @@ class ReferenceFrame(NodeMixin):
             target_arr = target_arr[target_ts <= source_ts[-1]]
             target_ts = target_ts[target_ts <= source_ts[-1]]
 
+        # do interpolation
         if source_arr.shape[1] == 7:
             # ugly edge case of t and r stacked
             source_arr_interp = np.hstack(
@@ -292,10 +316,54 @@ class ReferenceFrame(NodeMixin):
                 target_ts
             )
 
-        return source_arr_interp, target_arr, target_ts.astype(ts_dtype)
+        return (
+            source_arr_interp,
+            target_arr,
+            source_ts.astype(source_ts_dtype),
+            target_ts.astype(target_ts_dtype),
+        )
 
     @classmethod
-    def _match_timestamps(cls, arr, arr_ts, rf_t, rf_r, rf_ts):
+    def _match_events(cls, source_arr, target_arr, source_ts, target_ts):
+        """ Match event-based transforms with array. """
+        # TODO specify time_axis as parameter
+        # TODO priority=None/<rf_name>
+        # TODO method + optional scipy dependency?
+        source_ts_dtype = source_ts.dtype
+        source_ts = source_ts.astype(float)
+        target_ts_dtype = target_ts.dtype
+        target_ts = target_ts.astype(float)
+
+        # make sure timestamps are sorted
+        # TODO sort somewhere and turn these into assertions or use min/max
+        #  with boolean indexing
+        if np.any(np.diff(source_ts) < 0):
+            raise ValueError("source_ts is not sorted.")
+        if np.any(np.diff(target_ts) < 0):
+            raise ValueError("target_ts is not sorted.")
+
+        # get arr_ts that are greater than first transform_ts
+        # TODO raise error when intersection is empty
+        if target_ts[0] > source_ts[0]:
+            source_arr = source_arr[source_ts >= target_ts[0]]
+            source_ts = source_ts[source_ts >= target_ts[0]]
+
+        # TODO check performance
+        target_arr_out = np.zeros((len(source_ts), target_arr.shape[1]))
+        for ts, tr in zip(target_ts, target_arr):
+            target_arr_out[source_ts >= ts, :] = tr
+
+        return (
+            source_arr,
+            target_arr_out,
+            source_ts.astype(source_ts_dtype),
+            target_ts.astype(target_ts_dtype),
+        )
+
+    @classmethod
+    def _match_timestamps(
+        cls, arr, arr_ts, rf_t, rf_r, rf_ts, event_based=False
+    ):
         """ Match timestamps of array and reference frame. """
         # TODO test
         # TODO policy='from_arr'/'from_rf'
@@ -306,7 +374,14 @@ class ReferenceFrame(NodeMixin):
         elif len(arr_ts) != len(rf_ts) or np.any(arr_ts != rf_ts):
             # abuse interpolate by stacking t and r and splitting afterwards
             rf_tr = np.hstack((rf_t, rf_r))
-            arr, rf_tr, rf_ts = cls._interpolate(arr, rf_tr, arr_ts, rf_ts)
+            if event_based:
+                arr, rf_tr, arr_ts, rf_ts = cls._match_events(
+                    arr, rf_tr, arr_ts, rf_ts
+                )
+            else:
+                arr, rf_tr, arr_ts, rf_ts = cls._interpolate(
+                    arr, rf_tr, arr_ts, rf_ts
+                )
             rf_t, rf_r = np.hsplit(rf_tr, [3])
             return arr, rf_t, rf_r, rf_ts
         else:
@@ -315,22 +390,28 @@ class ReferenceFrame(NodeMixin):
     @classmethod
     def _match_timestamps_multi(cls, arr_list, ts_list):
         """ Match multiple arrays and timestamps at once. """
+        # get earliest and latest timestamp
         earliest = np.max([ts[0] for ts in ts_list if ts is not None])
         latest = np.min([ts[-1] for ts in ts_list if ts is not None])
 
         return_ts = None
         for ts in ts_list:
+            # get output timestamps from the first timestamp array in the list,
+            # limited to the (earliest, latest) interval
             if return_ts is None and ts is not None:
                 return_ts = ts[(ts >= earliest) & (ts <= latest)]
                 break
         else:
+            # or return the arrays as they were if none of them had timestamps
             return arr_list, None
 
         return_arr_list = []
         for arr, ts in zip(arr_list, ts_list):
             if ts is None:
+                # add array as-is if it doesn't have timestamps
                 return_arr_list.append(cls._broadcast(arr, return_ts))
             else:
+                # or interpolate to return_ts
                 if arr.shape[1] == 4:
                     arr_t = as_float_array(
                         squad(arr, ts.astype(float), return_ts.astype(float))
@@ -344,7 +425,7 @@ class ReferenceFrame(NodeMixin):
         return return_arr_list, return_ts
 
     @classmethod
-    def _add_transformation(cls, rf, t, r, ts, inverse=False):
+    def _add_transformation(cls, rf, t, r, ts, event_based, inverse=False):
         """ Add transformation of this frame to current transformation. """
         # TODO test
         if rf.timestamps is not None:
@@ -354,11 +435,32 @@ class ReferenceFrame(NodeMixin):
                 t = cls._broadcast(t, rf.timestamps)
                 r = cls._broadcast(r, rf.timestamps)
                 ts_new = rf.timestamps
-            else:
-                translation, t, ts_new = cls._interpolate(
+            elif event_based:
+                # if the first timestamped transformation is event-based it
+                # shouldn't determine the timestamps of subsequent
+                # transformations, therefore we flip the order here
+                # TODO implement proper handling of target timestamps of the
+                #  transformation
+                translation, t, ts_new, _ = cls._match_events(
                     rf.translation, t, rf.timestamps, ts
                 )
-                rotation, r, ts_new = cls._interpolate(
+                rotation, r, ts_new, _ = cls._match_events(
+                    rf.rotation, r, rf.timestamps, ts
+                )
+                event_based = False
+            elif rf.event_based:
+                t, translation, ts_new, _ = cls._match_events(
+                    t, rf.translation, ts, rf.timestamps
+                )
+                r, rotation, ts_new, _ = cls._match_events(
+                    r, rf.rotation, ts, rf.timestamps
+                )
+                event_based = True
+            else:
+                translation, t, _, ts_new = cls._interpolate(
+                    rf.translation, t, rf.timestamps, ts
+                )
+                rotation, r, _, ts_new = cls._interpolate(
                     rf.rotation, r, rf.timestamps, ts
                 )
         else:
@@ -375,7 +477,7 @@ class ReferenceFrame(NodeMixin):
             dt = np.array(translation)
             t = rotate_vectors(q, t) + dt
 
-        return t, as_float_array(q * as_quat_array(r)), ts_new
+        return t, as_float_array(q * as_quat_array(r)), ts_new, event_based
 
     @classmethod
     def _validate_input(cls, arr, axis, n_axis, timestamps, time_axis):
@@ -428,6 +530,7 @@ class ReferenceFrame(NodeMixin):
         parent,
         name=None,
         inverse=False,
+        event_based=False,
     ):
         """ Construct a reference frame from a Dataset.
 
@@ -460,6 +563,11 @@ class ReferenceFrame(NodeMixin):
             translation and rotation are specified for the parent frame wrt
             this frame.
 
+        event_based: bool, default False
+            If True, transformations with timestamps are assumed to be events.
+            Instead of interpolating between timestamps, transformations are
+            fixed between their timestamp and the next one.
+
         Returns
         -------
         rf: ReferenceFrame
@@ -473,11 +581,18 @@ class ReferenceFrame(NodeMixin):
             ds[rotation].data,
             ds[timestamps].data,
             inverse=inverse,
+            event_based=event_based,
         )
 
     @classmethod
     def from_translation_dataarray(
-        cls, da, timestamps, parent, name=None, inverse=False
+        cls,
+        da,
+        timestamps,
+        parent,
+        name=None,
+        inverse=False,
+        event_based=False,
     ):
         """ Construct a reference frame from a translation DataArray.
 
@@ -502,6 +617,11 @@ class ReferenceFrame(NodeMixin):
             If True, invert the transform wrt the parent frame, i.e. the
             translation is specified for the parent frame wrt this frame.
 
+        event_based: bool, default False
+            If True, transformations with timestamps are assumed to be events.
+            Instead of interpolating between timestamps, transformations are
+            fixed between their timestamp and the next one.
+
         Returns
         -------
         rf: ReferenceFrame
@@ -514,11 +634,18 @@ class ReferenceFrame(NodeMixin):
             translation=da.data,
             timestamps=da[timestamps].data,
             inverse=inverse,
+            event_based=event_based,
         )
 
     @classmethod
     def from_rotation_dataarray(
-        cls, da, timestamps, parent, name=None, inverse=False
+        cls,
+        da,
+        timestamps,
+        parent,
+        name=None,
+        inverse=False,
+        event_based=False,
     ):
         """ Construct a reference frame from a rotation DataArray.
 
@@ -543,6 +670,11 @@ class ReferenceFrame(NodeMixin):
             If True, invert the transform wrt the parent frame, i.e. the
             rotation is specified for the parent frame wrt this frame.
 
+        event_based: bool, default False
+            If True, transformations with timestamps are assumed to be events.
+            Instead of interpolating between timestamps, transformations are
+            fixed between their timestamp and the next one.
+
         Returns
         -------
         rf: ReferenceFrame
@@ -555,6 +687,7 @@ class ReferenceFrame(NodeMixin):
             rotation=da.data,
             timestamps=da[timestamps].data,
             inverse=inverse,
+            event_based=event_based,
         )
 
     @classmethod
@@ -626,12 +759,17 @@ class ReferenceFrame(NodeMixin):
         t = np.zeros(3)
         r = np.array((1.0, 0.0, 0.0, 0.0))
         ts = None
+        event_based = self.event_based
 
         for rf in up:
-            t, r, ts = self._add_transformation(rf, t, r, ts)
+            t, r, ts, event_based = self._add_transformation(
+                rf, t, r, ts, event_based
+            )
 
         for rf in down:
-            t, r, ts = self._add_transformation(rf, t, r, ts, inverse=True)
+            t, r, ts, event_based = self._add_transformation(
+                rf, t, r, ts, event_based, inverse=True
+            )
 
         return t, r, ts
 
@@ -920,7 +1058,7 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        angular, arr, timestamps = self._interpolate(
+        angular, arr, _, timestamps = self._interpolate(
             angular, arr, angular_ts, ts
         )
 
@@ -1159,7 +1297,7 @@ class ReferenceFrame(NodeMixin):
             timestamps=timestamps,
             return_timestamps=True,
         )
-        angular, linear, timestamps = self._interpolate(
+        angular, linear, _, timestamps = self._interpolate(
             angular, linear, angular_ts, linear_ts
         )
 

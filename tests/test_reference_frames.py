@@ -291,31 +291,56 @@ class TestReferenceFrame(object):
         ts2 = np.arange(5) + 2.5
 
         # float timestamps
-        arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
+        arr1_out, arr2_out, _, ts_out = rbm.ReferenceFrame._interpolate(
             arr1, arr2, ts1, ts2
         )
-        npt.assert_allclose(arr1_int, arr1[:5])
-        npt.assert_allclose(arr2_int, arr2)
+        npt.assert_allclose(arr1_out, arr1[:5])
+        npt.assert_allclose(arr2_out, arr2)
         npt.assert_allclose(ts_out, ts2)
 
         # target range greater than source range
-        arr2_int, arr1_int, ts_out = rbm.ReferenceFrame._interpolate(
+        arr2_out, arr1_out, _, ts_out = rbm.ReferenceFrame._interpolate(
             arr2, arr1, ts2, ts1
         )
-        npt.assert_allclose(arr2_int, arr2[:-1])
-        npt.assert_allclose(arr1_int, arr1[:4])
+        npt.assert_allclose(arr2_out, arr2[:-1])
+        npt.assert_allclose(arr1_out, arr1[:4])
         npt.assert_allclose(ts_out, ts1[3:7])
 
         # datetime timestamps
         ts1 = pd.date_range(start=0, freq="1s", periods=10).values
         ts2 = pd.date_range(start=0, freq="1s", periods=5).values
-        arr1_int, arr2_int, ts_out = rbm.ReferenceFrame._interpolate(
+        arr1_out, arr2_out, _, ts_out = rbm.ReferenceFrame._interpolate(
             arr1, arr2, ts1, ts2
         )
-        npt.assert_allclose(arr1_int, arr1[:5])
-        npt.assert_allclose(arr2_int, arr2)
+        npt.assert_allclose(arr1_out, arr1[:5])
+        npt.assert_allclose(arr2_out, arr2)
         npt.assert_allclose(ts_out.astype(float), ts1[:5].astype(float))
         assert ts_out.dtype == ts1.dtype
+
+        # not sorted
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1[::-1], ts2)
+        with pytest.raises(ValueError):
+            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
+
+    def test_match_events(self):
+        """"""
+        arr1 = np.random.randn(10, 3)
+        ts1 = np.arange(10)
+        arr2 = np.random.randn(5, 3)
+        ts2 = np.array([1.0, 2.0, 3.0, 5.0, 12.0])
+
+        # float timestamps
+        (
+            arr1_out,
+            arr2_out,
+            ts1_out,
+            ts2_out,
+        ) = rbm.ReferenceFrame._match_events(arr1, arr2, ts1, ts2)
+        npt.assert_equal(arr1_out, arr1[1:])
+        npt.assert_equal(arr2_out, arr2[[0, 1, 2, 2, 3, 3, 3, 3, 3]])
+        npt.assert_equal(ts1_out, ts1[1:])
+        npt.assert_equal(ts2_out, ts2)
 
         # not sorted
         with pytest.raises(ValueError):
@@ -361,6 +386,37 @@ class TestReferenceFrame(object):
         npt.assert_almost_equal(t_act, np.tile(t, (5, 1)))
         npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
         npt.assert_equal(ts, np.arange(5) + 2.5)
+
+    def test_get_transformation_event_based(self):
+        """"""
+        t1 = np.ones((10, 3))
+        t2 = np.array([[1.0, 0.0, 0.0], [2.0, 0.0, 0.0]])
+
+        rf_world = rbm.ReferenceFrame("world")
+        rf_child1 = rbm.ReferenceFrame(
+            "child1", rf_world, translation=t1, timestamps=np.arange(10),
+        )
+        rf_child2 = rbm.ReferenceFrame(
+            "child2",
+            rf_world,
+            translation=t2,
+            timestamps=[2, 5],
+            event_based=True,
+        )
+
+        # interpolated first
+        t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
+        npt.assert_equal(t_act, [[0.0, 1.0, 1.0]] * 3 + [[-1.0, 1.0, 1.0]] * 5)
+        npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (8, 1)))
+        npt.assert_allclose(ts, np.arange(2, 10))
+
+        # event-based first
+        t_act, r_act, ts = rf_child2.get_transformation(rf_child1)
+        npt.assert_equal(
+            t_act, [[0.0, -1.0, -1.0]] * 3 + [[1.0, -1.0, -1.0]] * 5
+        )
+        npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (8, 1)))
+        npt.assert_allclose(ts, np.arange(2, 10))
 
     def test_transform_vectors(self, transform_grid, get_rf_tree):
         """"""

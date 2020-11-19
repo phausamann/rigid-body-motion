@@ -8,7 +8,11 @@ History
 New features
 ~~~~~~~~~~~~
 
-* ``rbm`` accessor for DataArrays.
+* Reference frames with timestamps now accept the ``event_based`` parameter,
+  allowing for transformations to be fixed from their timestamp into the
+  future.
+* ``rbm`` accessor for DataArrays implementing ``qinterp`` and ``qinv``
+  methods.
 * New ``best_fit_rotation`` and ``qinterp`` top-level methods.
 
 Improvements

@@ -292,9 +292,9 @@ class TestTransformMatcher:
         matcher.add_reference_frame(mock_frame())
         assert matcher.get_range() == (0, 8)
 
-        # event based frames should not change the range
+        # discrete frames should not change the range
         matcher.add_reference_frame(
-            mock_frame(t=np.zeros((2, 3)), ts=[2, 6], event_based=True)
+            mock_frame(t=np.zeros((2, 3)), ts=[2, 6], discrete=True)
         )
         assert matcher.get_range() == (0, 8)
 
@@ -321,9 +321,9 @@ class TestTransformMatcher:
         matcher.add_reference_frame(mock_frame())
         np.testing.assert_equal(matcher.get_timestamps(), np.arange(9))
 
-        # event based frames should not change the range
+        # discrete frames should not change the range
         matcher.add_reference_frame(
-            mock_frame(t=np.zeros((2, 3)), ts=[2, 6], event_based=True)
+            mock_frame(t=np.zeros((2, 3)), ts=[2, 6], discrete=True)
         )
         np.testing.assert_equal(matcher.get_timestamps(), np.arange(9))
 
@@ -335,12 +335,12 @@ class TestTransformMatcher:
     def test_get_timestamps_discrete_only(self, matcher, mock_frame):
         """"""
         matcher.add_reference_frame(
-            mock_frame(t=np.zeros((2, 3)), ts=[2, 6], event_based=True)
+            mock_frame(t=np.zeros((2, 3)), ts=[2, 6], discrete=True)
         )
         npt.assert_equal(matcher.get_timestamps(), [2, 6])
 
         matcher.add_reference_frame(
-            mock_frame(t=np.zeros((3, 3)), ts=[1, 5, 7], event_based=True)
+            mock_frame(t=np.zeros((3, 3)), ts=[1, 5, 7], discrete=True)
         )
         npt.assert_equal(matcher.get_timestamps(), [1, 2, 5, 6, 7])
 
@@ -349,7 +349,7 @@ class TestTransformMatcher:
         t = np.random.rand(10, 3)
         rf_1 = mock_frame(t=t, ts=np.arange(10))
         rf_2 = mock_frame(t=t, ts=np.arange(-1, 9))
-        rf_3 = mock_frame(t=t[:3], ts=[1, 5, 7], event_based=True)
+        rf_3 = mock_frame(t=t[:3], ts=[1, 5, 7], discrete=True)
 
         matcher.add_reference_frame(rf_1)
         matcher.add_reference_frame(rf_2)
@@ -375,7 +375,7 @@ class TestTransformMatcher:
         idx3 = idx1[[0, 5, 7]]
         rf_1 = mock_frame(t=t, ts=idx1)
         rf_2 = mock_frame(t=t, ts=idx2)
-        rf_3 = mock_frame(t=t[:3], ts=idx3, event_based=True)
+        rf_3 = mock_frame(t=t[:3], ts=idx3, discrete=True)
 
         matcher.add_reference_frame(rf_1)
         matcher.add_reference_frame(rf_2)

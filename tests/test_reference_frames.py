@@ -387,7 +387,7 @@ class TestReferenceFrame(object):
         npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
         npt.assert_equal(ts, np.arange(5) + 2.5)
 
-    def test_get_transformation_event_based(self):
+    def test_get_transformation_discrete(self):
         """"""
         t1 = np.ones((10, 3))
         t2 = np.array([[1.0, 0.0, 0.0], [2.0, 0.0, 0.0]])
@@ -401,7 +401,7 @@ class TestReferenceFrame(object):
             rf_world,
             translation=t2,
             timestamps=[2, 5],
-            event_based=True,
+            discrete=True,
         )
 
         # interpolated first

@@ -8,7 +8,7 @@ History
 New features
 ~~~~~~~~~~~~
 
-* Reference frames with timestamps now accept the ``event_based`` parameter,
+* Reference frames with timestamps now accept the ``discrete`` parameter,
   allowing for transformations to be fixed from their timestamp into the
   future.
 * ``rbm`` accessor for DataArrays implementing ``qinterp`` and ``qinv``

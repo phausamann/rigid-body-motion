@@ -15,8 +15,7 @@ from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
 
 Frame = namedtuple(
-    "Frame",
-    ("translation", "rotation", "timestamps", "event_based", "inverse"),
+    "Frame", ("translation", "rotation", "timestamps", "discrete", "inverse"),
 )
 Array = namedtuple("Array", ("data", "timestamps"))
 
@@ -50,7 +49,7 @@ class TransformMatcher:
             else:
                 translation = np.tile(frame.translation, (len(timestamps), 1))
                 rotation = np.tile(frame.rotation, (len(timestamps), 1))
-        elif frame.event_based:
+        elif frame.discrete:
             translation = np.tile(frame.translation[0], (len(timestamps), 1))
             for t, ts in zip(frame.translation, frame.timestamps):
                 translation[timestamps >= ts, :] = t
@@ -88,7 +87,7 @@ class TransformMatcher:
                 frame.translation,
                 frame.rotation,
                 frame.timestamps,
-                frame.event_based,
+                frame.discrete,
                 inverse,
             )
         )
@@ -120,7 +119,7 @@ class TransformMatcher:
         """
         first_stamps = []
         for frame in self.frames:
-            if frame.timestamps is not None and not frame.event_based:
+            if frame.timestamps is not None and not frame.discrete:
                 first_stamps.append(frame.timestamps[0])
         for array in self.arrays:
             if array.timestamps is not None:
@@ -128,7 +127,7 @@ class TransformMatcher:
 
         last_stamps = []
         for frame in self.frames:
-            if frame.timestamps is not None and not frame.event_based:
+            if frame.timestamps is not None and not frame.discrete:
                 last_stamps.append(frame.timestamps[-1])
         for array in self.arrays:
             if array.timestamps is not None:
@@ -170,12 +169,12 @@ class TransformMatcher:
         discrete_frames = [
             frame
             for frame in self.frames
-            if frame.event_based and frame.timestamps is not None
+            if frame.discrete and frame.timestamps is not None
         ]
         continuous_frames = [
             frame
             for frame in self.frames
-            if not frame.event_based and frame.timestamps is not None
+            if not frame.discrete and frame.timestamps is not None
         ]
 
         if arrays_first:

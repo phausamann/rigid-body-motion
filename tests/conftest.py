@@ -58,14 +58,14 @@ def mock_frame():
         name="mock",
         parent="world",
         inverse=False,
-        event_based=False,
+        discrete=False,
     ):
         """"""
         if t is None and r is None:
             t = (0.0, 0.0, 0.0)
             r = (1.0, 0.0, 0.0, 0.0)
 
-        return rbm.ReferenceFrame(name, parent, t, r, ts, inverse, event_based)
+        return rbm.ReferenceFrame(name, parent, t, r, ts, inverse, discrete)
 
     yield _mock_frame
 

@@ -54,7 +54,7 @@ def register_frame(
     rotation=None,
     timestamps=None,
     inverse=False,
-    event_based=False,
+    discrete=False,
     update=False,
 ):
     """ Register a new reference frame in the registry.
@@ -86,7 +86,7 @@ def register_frame(
         translation and rotation are specified for the parent frame wrt this
         frame.
 
-    event_based: bool, default False
+    discrete: bool, default False
         If True, transformations with timestamps are assumed to be events.
         Instead of interpolating between timestamps, transformations are
         fixed between their timestamp and the next one.
@@ -103,7 +103,7 @@ def register_frame(
         rotation=rotation,
         timestamps=timestamps,
         inverse=inverse,
-        event_based=event_based,
+        discrete=discrete,
     )
     _register(rf, update=update)
 
@@ -135,7 +135,7 @@ class ReferenceFrame(NodeMixin):
         rotation=None,
         timestamps=None,
         inverse=False,
-        event_based=False,
+        discrete=False,
     ):
         """ Constructor.
 
@@ -166,7 +166,7 @@ class ReferenceFrame(NodeMixin):
             translation and rotation are specified for the parent frame wrt
             this frame.
 
-        event_based: bool, default False
+        discrete: bool, default False
             If True, transformations with timestamps are assumed to be events.
             Instead of interpolating between timestamps, transformations are
             fixed between their timestamp and the next one.
@@ -188,12 +188,10 @@ class ReferenceFrame(NodeMixin):
             self._verify_root(translation, rotation, timestamps)
             self.translation, self.rotation, self.timestamps = None, None, None
 
-        if event_based and self.timestamps is None:
-            raise ValueError(
-                "timestamps must be provided when event_based=True"
-            )
+        if discrete and self.timestamps is None:
+            raise ValueError("timestamps must be provided when discrete=True")
         else:
-            self.event_based = event_based
+            self.discrete = discrete
 
     def __del__(self):
         """ Destructor. """
@@ -362,9 +360,7 @@ class ReferenceFrame(NodeMixin):
         )
 
     @classmethod
-    def _match_timestamps(
-        cls, arr, arr_ts, rf_t, rf_r, rf_ts, event_based=False
-    ):
+    def _match_timestamps(cls, arr, arr_ts, rf_t, rf_r, rf_ts, discrete=False):
         """ Match timestamps of array and reference frame. """
         # TODO test
         # TODO policy='from_arr'/'from_rf'
@@ -375,7 +371,7 @@ class ReferenceFrame(NodeMixin):
         elif len(arr_ts) != len(rf_ts) or np.any(arr_ts != rf_ts):
             # abuse interpolate by stacking t and r and splitting afterwards
             rf_tr = np.hstack((rf_t, rf_r))
-            if event_based:
+            if discrete:
                 arr, rf_tr, arr_ts, rf_ts = cls._match_events(
                     arr, rf_tr, arr_ts, rf_ts
                 )
@@ -426,7 +422,7 @@ class ReferenceFrame(NodeMixin):
         return return_arr_list, return_ts
 
     @classmethod
-    def _add_transformation(cls, rf, t, r, ts, event_based, inverse=False):
+    def _add_transformation(cls, rf, t, r, ts, discrete, inverse=False):
         """ Add transformation of this frame to current transformation. """
         # TODO test
         if rf.timestamps is not None:
@@ -436,7 +432,7 @@ class ReferenceFrame(NodeMixin):
                 t = cls._broadcast(t, rf.timestamps)
                 r = cls._broadcast(r, rf.timestamps)
                 ts_new = rf.timestamps
-            elif event_based:
+            elif discrete:
                 # if the first timestamped transformation is event-based it
                 # shouldn't determine the timestamps of subsequent
                 # transformations, therefore we flip the order here
@@ -448,15 +444,15 @@ class ReferenceFrame(NodeMixin):
                 rotation, r, ts_new, _ = cls._match_events(
                     rf.rotation, r, rf.timestamps, ts
                 )
-                event_based = False
-            elif rf.event_based:
+                discrete = False
+            elif rf.discrete:
                 t, translation, ts_new, _ = cls._match_events(
                     t, rf.translation, ts, rf.timestamps
                 )
                 r, rotation, ts_new, _ = cls._match_events(
                     r, rf.rotation, ts, rf.timestamps
                 )
-                event_based = True
+                discrete = True
             else:
                 translation, t, _, ts_new = cls._interpolate(
                     rf.translation, t, rf.timestamps, ts
@@ -478,7 +474,7 @@ class ReferenceFrame(NodeMixin):
             dt = np.array(translation)
             t = rotate_vectors(q, t) + dt
 
-        return t, as_float_array(q * as_quat_array(r)), ts_new, event_based
+        return t, as_float_array(q * as_quat_array(r)), ts_new, discrete
 
     @classmethod
     def _validate_input(cls, arr, axis, n_axis, timestamps, time_axis):
@@ -531,7 +527,7 @@ class ReferenceFrame(NodeMixin):
         parent,
         name=None,
         inverse=False,
-        event_based=False,
+        discrete=False,
     ):
         """ Construct a reference frame from a Dataset.
 
@@ -564,7 +560,7 @@ class ReferenceFrame(NodeMixin):
             translation and rotation are specified for the parent frame wrt
             this frame.
 
-        event_based: bool, default False
+        discrete: bool, default False
             If True, transformations with timestamps are assumed to be events.
             Instead of interpolating between timestamps, transformations are
             fixed between their timestamp and the next one.
@@ -582,18 +578,12 @@ class ReferenceFrame(NodeMixin):
             ds[rotation].data,
             ds[timestamps].data,
             inverse=inverse,
-            event_based=event_based,
+            discrete=discrete,
         )
 
     @classmethod
     def from_translation_dataarray(
-        cls,
-        da,
-        timestamps,
-        parent,
-        name=None,
-        inverse=False,
-        event_based=False,
+        cls, da, timestamps, parent, name=None, inverse=False, discrete=False,
     ):
         """ Construct a reference frame from a translation DataArray.
 
@@ -618,7 +608,7 @@ class ReferenceFrame(NodeMixin):
             If True, invert the transform wrt the parent frame, i.e. the
             translation is specified for the parent frame wrt this frame.
 
-        event_based: bool, default False
+        discrete: bool, default False
             If True, transformations with timestamps are assumed to be events.
             Instead of interpolating between timestamps, transformations are
             fixed between their timestamp and the next one.
@@ -635,18 +625,12 @@ class ReferenceFrame(NodeMixin):
             translation=da.data,
             timestamps=da[timestamps].data,
             inverse=inverse,
-            event_based=event_based,
+            discrete=discrete,
         )
 
     @classmethod
     def from_rotation_dataarray(
-        cls,
-        da,
-        timestamps,
-        parent,
-        name=None,
-        inverse=False,
-        event_based=False,
+        cls, da, timestamps, parent, name=None, inverse=False, discrete=False,
     ):
         """ Construct a reference frame from a rotation DataArray.
 
@@ -671,7 +655,7 @@ class ReferenceFrame(NodeMixin):
             If True, invert the transform wrt the parent frame, i.e. the
             rotation is specified for the parent frame wrt this frame.
 
-        event_based: bool, default False
+        discrete: bool, default False
             If True, transformations with timestamps are assumed to be events.
             Instead of interpolating between timestamps, transformations are
             fixed between their timestamp and the next one.
@@ -688,7 +672,7 @@ class ReferenceFrame(NodeMixin):
             rotation=da.data,
             timestamps=da[timestamps].data,
             inverse=inverse,
-            event_based=event_based,
+            discrete=discrete,
         )
 
     @classmethod

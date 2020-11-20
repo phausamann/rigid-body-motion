@@ -14,7 +14,6 @@ from quaternion import (
 from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
 
-from rigid_body_motion.utils import rotate_vectors
 
 Frame = namedtuple(
     "Frame",
@@ -163,6 +162,8 @@ class TransformMatcher:
 
     def get_transformation(self, array_first=True):
         """"""
+        from rigid_body_motion.utils import rotate_vectors
+
         timestamps = self.get_timestamps(array_first)
         translation = np.zeros(3) if timestamps is None else np.zeros((1, 3))
         rotation = quaternion(1.0, 0.0, 0.0, 0.0)

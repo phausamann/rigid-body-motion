@@ -730,7 +730,7 @@ class ReferenceFrame(NodeMixin):
             inverse=inverse,
         )
 
-    def get_transformation(self, to_frame):
+    def get_transformation(self, to_frame, arrays=None):
         """ Calculate the transformation from this frame to another.
 
         The transformation is a rotation followed by a translation which,
@@ -762,6 +762,10 @@ class ReferenceFrame(NodeMixin):
             matcher.add_reference_frame(rf)
         for rf in down:
             matcher.add_reference_frame(rf, inverse=True)
+
+        if arrays is not None:
+            for array in arrays:
+                matcher.add_array(*array)
 
         return matcher.get_transformation()
 

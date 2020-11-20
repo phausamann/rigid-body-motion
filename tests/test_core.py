@@ -292,15 +292,15 @@ class TestTransformMatcher:
         matcher.add_reference_frame(mock_frame())
         assert matcher.get_range() == (0, 8)
 
-        # event based frames should only change the start of the range
+        # event based frames should not change the range
         matcher.add_reference_frame(
             mock_frame(t=np.zeros((2, 3)), ts=[2, 6], event_based=True)
         )
-        assert matcher.get_range() == (2, 8)
+        assert matcher.get_range() == (0, 8)
 
         # array
         matcher.add_array(np.zeros((5, 3)), np.arange(5))
-        assert matcher.get_range() == (2, 4)
+        assert matcher.get_range() == (0, 4)
 
     def test_get_timestamps(self, matcher, mock_frame):
         """"""
@@ -321,18 +321,16 @@ class TestTransformMatcher:
         matcher.add_reference_frame(mock_frame())
         np.testing.assert_equal(matcher.get_timestamps(), np.arange(9))
 
-        # event based frames should only change the start of the range
+        # event based frames should not change the range
         matcher.add_reference_frame(
             mock_frame(t=np.zeros((2, 3)), ts=[2, 6], event_based=True)
         )
-        np.testing.assert_equal(matcher.get_timestamps(), np.arange(2, 9))
+        np.testing.assert_equal(matcher.get_timestamps(), np.arange(9))
 
         # array with offset timestamps
         matcher.add_array(np.zeros((5, 3)), np.arange(5) + 0.5)
-        np.testing.assert_equal(
-            matcher.get_timestamps(), np.arange(2, 5) + 0.5
-        )
-        np.testing.assert_equal(matcher.get_timestamps(False), np.arange(2, 5))
+        np.testing.assert_equal(matcher.get_timestamps(), np.arange(5) + 0.5)
+        np.testing.assert_equal(matcher.get_timestamps(False), np.arange(1, 5))
 
     def test_get_timestamps_discrete_only(self, matcher, mock_frame):
         """"""
@@ -344,14 +342,14 @@ class TestTransformMatcher:
         matcher.add_reference_frame(
             mock_frame(t=np.zeros((3, 3)), ts=[1, 5, 7], event_based=True)
         )
-        npt.assert_equal(matcher.get_timestamps(), [2, 5, 6, 7])
+        npt.assert_equal(matcher.get_timestamps(), [1, 2, 5, 6, 7])
 
     def test_transform_from_frame(self, matcher, mock_frame):
         """"""
         t = np.random.rand(10, 3)
         rf_1 = mock_frame(t=t, ts=np.arange(10))
         rf_2 = mock_frame(t=t, ts=np.arange(-1, 9))
-        rf_3 = mock_frame(t=t[:3], ts=[0, 5, 7], event_based=True)
+        rf_3 = mock_frame(t=t[:3], ts=[1, 5, 7], event_based=True)
 
         matcher.add_reference_frame(rf_1)
         matcher.add_reference_frame(rf_2)
@@ -385,12 +383,12 @@ class TestTransformMatcher:
         ts = matcher.get_timestamps()
 
         t_act, r_act = matcher._transform_from_frame(rf_1, ts)
-        npt.assert_equal(t_act, t[:-1])
+        npt.assert_allclose(t_act, t[:-1])
         npt.assert_equal(r_act, rf_1.rotation[:-1])
 
         t_act, r_act = matcher._transform_from_frame(rf_2, ts)
-        npt.assert_equal(t_act, t[1:])
+        npt.assert_allclose(t_act, t[1:])
         npt.assert_equal(r_act, rf_2.rotation[1:])
 
         t_act, r_act = matcher._transform_from_frame(rf_3, ts)
-        npt.assert_equal(t_act, t[[0, 0, 0, 0, 0, 1, 1, 2, 2]])
+        npt.assert_allclose(t_act, t[[0, 0, 0, 0, 0, 1, 1, 2, 2]])

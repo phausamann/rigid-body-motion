@@ -51,10 +51,10 @@ class TransformMatcher:
                 translation = np.tile(frame.translation, (len(timestamps), 1))
                 rotation = np.tile(frame.rotation, (len(timestamps), 1))
         elif frame.event_based:
-            translation = np.zeros((len(timestamps), 3))
+            translation = np.tile(frame.translation[0], (len(timestamps), 1))
             for t, ts in zip(frame.translation, frame.timestamps):
                 translation[timestamps >= ts, :] = t
-            rotation = np.zeros((len(timestamps), 4))
+            rotation = np.tile(frame.rotation[0], (len(timestamps), 1))
             for r, ts in zip(frame.rotation, frame.timestamps):
                 rotation[timestamps >= ts, :] = r
         else:
@@ -120,7 +120,7 @@ class TransformMatcher:
         """
         first_stamps = []
         for frame in self.frames:
-            if frame.timestamps is not None:
+            if frame.timestamps is not None and not frame.event_based:
                 first_stamps.append(frame.timestamps[0])
         for array in self.arrays:
             if array.timestamps is not None:
@@ -157,6 +157,9 @@ class TransformMatcher:
         ts_range = self.get_range()
         if ts_range is (None, None):
             return None
+        elif ts_range[0] is None:
+            # first timestamp can be None for only discrete transforms
+            ts_range = (-np.inf, ts_range[1])
         elif ts_range[1] is None:
             # last timestamp can be None for only discrete transforms
             ts_range = (ts_range[0], np.inf)
@@ -182,6 +185,7 @@ class TransformMatcher:
 
         if len(elements):
             # The first element with timestamps determines the timestamps
+            # TODO check if this fails for datetime timestamps
             timestamps = elements[0].timestamps
             timestamps = timestamps[
                 (timestamps >= ts_range[0]) & (timestamps <= ts_range[-1])
@@ -193,7 +197,7 @@ class TransformMatcher:
             timestamps = np.concatenate(
                 [d.timestamps for d in discrete_frames]
             )
-            timestamps = np.unique(timestamps[timestamps >= ts_range[0]])
+            timestamps = np.unique(timestamps)
         else:
             timestamps = None
 

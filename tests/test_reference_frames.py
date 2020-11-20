@@ -406,17 +406,17 @@ class TestReferenceFrame(object):
 
         # interpolated first
         t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
-        npt.assert_equal(t_act, [[0.0, 1.0, 1.0]] * 3 + [[-1.0, 1.0, 1.0]] * 5)
-        npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (8, 1)))
-        npt.assert_allclose(ts, np.arange(2, 10))
+        npt.assert_equal(t_act, [[0.0, 1.0, 1.0]] * 5 + [[-1.0, 1.0, 1.0]] * 5)
+        npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (10, 1)))
+        npt.assert_allclose(ts, np.arange(10))
 
         # event-based first
         t_act, r_act, ts = rf_child2.get_transformation(rf_child1)
         npt.assert_equal(
-            t_act, [[0.0, -1.0, -1.0]] * 3 + [[1.0, -1.0, -1.0]] * 5
+            t_act, [[0.0, -1.0, -1.0]] * 5 + [[1.0, -1.0, -1.0]] * 5
         )
-        npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (8, 1)))
-        npt.assert_allclose(ts, np.arange(2, 10))
+        npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (10, 1)))
+        npt.assert_allclose(ts, np.arange(10))
 
     def test_transform_vectors(self, transform_grid, get_rf_tree):
         """"""

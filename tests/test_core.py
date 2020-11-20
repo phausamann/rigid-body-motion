@@ -358,15 +358,15 @@ class TestTransformMatcher:
         matcher.add_reference_frame(rf_3)
         ts = matcher.get_timestamps()
 
-        t_act, r_act = matcher.transform_from_frame(rf_1, ts)
+        t_act, r_act = matcher._transform_from_frame(rf_1, ts)
         npt.assert_equal(t_act, t[:-1])
         npt.assert_equal(r_act, rf_1.rotation[:-1])
 
-        t_act, r_act = matcher.transform_from_frame(rf_2, ts)
+        t_act, r_act = matcher._transform_from_frame(rf_2, ts)
         npt.assert_equal(t_act, t[1:])
         npt.assert_equal(r_act, rf_2.rotation[1:])
 
-        t_act, r_act = matcher.transform_from_frame(rf_3, ts)
+        t_act, r_act = matcher._transform_from_frame(rf_3, ts)
         npt.assert_equal(t_act, t[[0, 0, 0, 0, 0, 1, 1, 2, 2]])
 
     def test_transform_from_frame_datetime(self, matcher, mock_frame):
@@ -384,13 +384,13 @@ class TestTransformMatcher:
         matcher.add_reference_frame(rf_3)
         ts = matcher.get_timestamps()
 
-        t_act, r_act = matcher.transform_from_frame(rf_1, ts)
+        t_act, r_act = matcher._transform_from_frame(rf_1, ts)
         npt.assert_equal(t_act, t[:-1])
         npt.assert_equal(r_act, rf_1.rotation[:-1])
 
-        t_act, r_act = matcher.transform_from_frame(rf_2, ts)
+        t_act, r_act = matcher._transform_from_frame(rf_2, ts)
         npt.assert_equal(t_act, t[1:])
         npt.assert_equal(r_act, rf_2.rotation[1:])
 
-        t_act, r_act = matcher.transform_from_frame(rf_3, ts)
+        t_act, r_act = matcher._transform_from_frame(rf_3, ts)
         npt.assert_equal(t_act, t[[0, 0, 0, 0, 0, 1, 1, 2, 2]])

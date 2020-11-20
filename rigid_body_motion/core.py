@@ -180,13 +180,11 @@ class TransformMatcher:
             The timestamps for which the transformation is defined.
         """
         ts_range = self.get_range()
-        if ts_range == (None, None):
-            return None
-        elif ts_range[0] is None:
-            # first timestamp can be None for only discrete transforms
+
+        # first and last timestamp can be None for only discrete transforms
+        if ts_range[0] is None:
             ts_range = (-np.inf, ts_range[1])
         elif ts_range[1] is None:
-            # last timestamp can be None for only discrete transforms
             ts_range = (ts_range[0], np.inf)
 
         arrays = [

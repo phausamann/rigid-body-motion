@@ -1,5 +1,6 @@
 """"""
 import warnings
+from collections import namedtuple
 
 import numpy as np
 from quaternion import (
@@ -7,9 +8,179 @@ from quaternion import (
     as_quat_array,
     as_rotation_vector,
     derivative,
+    quaternion,
+    squad,
 )
 from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
+
+from rigid_body_motion.utils import rotate_vectors
+
+Frame = namedtuple(
+    "Frame",
+    ("translation", "rotation", "timestamps", "event_based", "inverse"),
+)
+Array = namedtuple("Array", ("data", "timestamps"))
+
+
+class TransformMatcher:
+    """"""
+
+    def __init__(self):
+        """"""
+        self.frames = []
+        self.arrays = []
+
+    @classmethod
+    def _check_timestamps(cls, timestamps):
+        """ Make sure timestamps are monotonic. """
+        if timestamps is not None and np.any(
+            np.diff(timestamps.astype(float)) < 0
+        ):
+            raise ValueError("Timestamps must be monotonic")
+
+    def add_reference_frame(self, frame, inverse=False):
+        """"""
+        self._check_timestamps(frame.timestamps)
+        self.frames.append(
+            Frame(
+                frame.translation,
+                frame.rotation,
+                frame.timestamps,
+                frame.event_based,
+                inverse,
+            )
+        )
+
+    def add_array(self, array, timestamps=None):
+        """"""
+        self._check_timestamps(timestamps)
+        self.arrays.append(Array(array, timestamps))
+
+    def get_range(self):
+        """"""
+        first_stamps = []
+        for frame in self.frames:
+            if frame.timestamps is not None:
+                first_stamps.append(frame.timestamps[0])
+        for array in self.arrays:
+            if array.timestamps is not None:
+                first_stamps.append(array.timestamps[0])
+
+        last_stamps = []
+        for frame in self.frames:
+            if frame.timestamps is not None and not frame.event_based:
+                last_stamps.append(frame.timestamps[-1])
+        for array in self.arrays:
+            if array.timestamps is not None:
+                last_stamps.append(array.timestamps[-1])
+
+        first = np.max(first_stamps) if len(first_stamps) else None
+        last = np.min(last_stamps) if len(last_stamps) else None
+
+        return first, last
+
+    def get_timestamps(self, arrays_first=True):
+        """"""
+        ts_range = self.get_range()
+        if ts_range is (None, None):
+            return None
+        elif ts_range[1] is None:
+            # last timestamp can be None for only discrete transforms
+            ts_range = (ts_range[0], np.inf)
+
+        arrays = [
+            array for array in self.arrays if array.timestamps is not None
+        ]
+        discrete_frames = [
+            frame
+            for frame in self.frames
+            if frame.event_based and frame.timestamps is not None
+        ]
+        continuous_frames = [
+            frame
+            for frame in self.frames
+            if not frame.event_based and frame.timestamps is not None
+        ]
+
+        if arrays_first:
+            elements = arrays + continuous_frames
+        else:
+            elements = continuous_frames + arrays
+
+        if len(elements):
+            # The first element with timestamps determines the timestamps
+            timestamps = elements[0].timestamps
+            timestamps = timestamps[
+                (timestamps >= ts_range[0]) & (timestamps <= ts_range[-1])
+            ]
+        elif len(discrete_frames):
+            # If there are no continuous frames or arrays with timestamps
+            # we merge together all discrete timestamps that are greater than
+            # the start of the range
+            timestamps = np.concatenate(
+                [d.timestamps for d in discrete_frames]
+            )
+            timestamps = np.unique(timestamps[timestamps >= ts_range[0]])
+        else:
+            timestamps = None
+
+        return timestamps
+
+    @classmethod
+    def transform_from_frame(cls, frame, timestamps):
+        """"""
+        if timestamps is None and frame.timestamps is not None:
+            raise ValueError("Cannot convert timestamped to static transform")
+
+        if frame.timestamps is None:
+            if timestamps is None:
+                translation = frame.translation
+                rotation = frame.rotation
+            else:
+                translation = np.tile(frame.translation, (len(timestamps), 1))
+                rotation = np.tile(frame.rotation, (len(timestamps), 1))
+        elif frame.event_based:
+            translation = np.zeros((len(timestamps), 3))
+            for t, ts in zip(frame.translation, frame.timestamps):
+                translation[timestamps >= ts, :] = t
+            rotation = np.zeros((len(timestamps), 4))
+            for r, ts in zip(frame.rotation, frame.timestamps):
+                rotation[timestamps >= ts, :] = r
+        else:
+            translation = interp1d(
+                frame.timestamps.astype(float), frame.translation, axis=0
+            )(timestamps.astype(float))
+            rotation = as_float_array(
+                squad(
+                    as_quat_array(frame.rotation),
+                    frame.timestamps.astype(float),
+                    timestamps.astype(float),
+                )
+            )
+
+        return translation, rotation
+
+    def get_transformation(self, array_first=True):
+        """"""
+        timestamps = self.get_timestamps(array_first)
+        translation = np.zeros(3) if timestamps is None else np.zeros((1, 3))
+        rotation = quaternion(1.0, 0.0, 0.0, 0.0)
+
+        for frame in self.frames:
+            t, r = self.transform_from_frame(frame, timestamps)
+            if frame.inverse:
+                translation = rotate_vectors(
+                    1 / as_quat_array(r), translation - np.array(t)
+                )
+                rotation = 1 / as_quat_array(r) * rotation
+            else:
+                translation = rotate_vectors(
+                    as_quat_array(r), translation
+                ) + np.array(t)
+                rotation = as_quat_array(r) * rotation
+
+        return translation, as_float_array(rotation), timestamps
 
 
 def _resolve_axis(axis, ndim):

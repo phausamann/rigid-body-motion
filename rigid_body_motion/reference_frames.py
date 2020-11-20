@@ -10,6 +10,7 @@ from quaternion import (
 from scipy.interpolate import interp1d
 
 from rigid_body_motion.core import (
+    TransformMatcher,
     _estimate_angular_velocity,
     _estimate_linear_velocity,
     _resolve_rf,
@@ -756,22 +757,13 @@ class ReferenceFrame(NodeMixin):
         """
         up, down = self._walk(to_frame)
 
-        t = np.zeros(3)
-        r = np.array((1.0, 0.0, 0.0, 0.0))
-        ts = None
-        event_based = self.event_based
-
+        matcher = TransformMatcher()
         for rf in up:
-            t, r, ts, event_based = self._add_transformation(
-                rf, t, r, ts, event_based
-            )
-
+            matcher.add_reference_frame(rf)
         for rf in down:
-            t, r, ts, event_based = self._add_transformation(
-                rf, t, r, ts, event_based, inverse=True
-            )
+            matcher.add_reference_frame(rf, inverse=True)
 
-        return t, r, ts
+        return matcher.get_transformation()
 
     def transform_vectors(
         self,

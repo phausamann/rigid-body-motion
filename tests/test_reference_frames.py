@@ -323,31 +323,6 @@ class TestReferenceFrame(object):
         with pytest.raises(ValueError):
             rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
 
-    def test_match_events(self):
-        """"""
-        arr1 = np.random.randn(10, 3)
-        ts1 = np.arange(10)
-        arr2 = np.random.randn(5, 3)
-        ts2 = np.array([1.0, 2.0, 3.0, 5.0, 12.0])
-
-        # float timestamps
-        (
-            arr1_out,
-            arr2_out,
-            ts1_out,
-            ts2_out,
-        ) = rbm.ReferenceFrame._match_events(arr1, arr2, ts1, ts2)
-        npt.assert_equal(arr1_out, arr1[1:])
-        npt.assert_equal(arr2_out, arr2[[0, 1, 2, 2, 3, 3, 3, 3, 3]])
-        npt.assert_equal(ts1_out, ts1[1:])
-        npt.assert_equal(ts2_out, ts2)
-
-        # not sorted
-        with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1[::-1], ts2)
-        with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
-
     def test_get_transformation(self, rf_grid, get_rf_tree):
         """"""
         r, rc1, rc2, t, tc1, tc2 = rf_grid
@@ -442,8 +417,12 @@ class TestReferenceFrame(object):
         vt_act = rf_child3.transform_vectors(
             np.tile(p, (10, 1)), rf_child2, timestamps=np.arange(10)
         )
-        v0t = rf_child3.transform_points((0.0, 0.0, 0.0), rf_child2)
-        vt = np.tile(pt, (5, 1)) - np.array(v0t)
+        v0t = rf_child3.transform_points(
+            np.tile((0.0, 0.0, 0.0), (10, 1)),
+            rf_child2,
+            timestamps=np.arange(10),
+        )
+        vt = np.tile(pt, (4, 1)) - np.array(v0t)
         np.testing.assert_allclose(vt_act, vt, rtol=1.0)
 
         # moving reference frame + multiple n-dimensional vectors
@@ -453,8 +432,12 @@ class TestReferenceFrame(object):
             timestamps=np.arange(10),
             time_axis=1,
         )
-        v0t = rf_child3.transform_points((0.0, 0.0, 0.0), rf_child2)
-        vt = np.tile(pt, (10, 5, 1)) - np.array(v0t[np.newaxis, :, :])
+        v0t = rf_child3.transform_points(
+            np.tile((0.0, 0.0, 0.0), (10, 1)),
+            rf_child2,
+            timestamps=np.arange(10),
+        )
+        vt = np.tile(pt, (10, 4, 1)) - np.array(v0t[np.newaxis, :, :])
         np.testing.assert_allclose(vt_act, vt, rtol=1.0)
 
     def test_transform_points(self, transform_grid, get_rf_tree):
@@ -477,7 +460,7 @@ class TestReferenceFrame(object):
         pt_act = rf_child3.transform_points(
             np.tile(p, (10, 1)), rf_child2, timestamps=np.arange(10)
         )
-        np.testing.assert_allclose(pt_act, np.tile(pt, (5, 1)), rtol=1.0)
+        np.testing.assert_allclose(pt_act, np.tile(pt, (4, 1)), rtol=1.0)
 
         # moving reference frame + multiple n-dimensional points
         pt_act = rf_child3.transform_points(
@@ -486,7 +469,7 @@ class TestReferenceFrame(object):
             timestamps=np.arange(10),
             time_axis=1,
         )
-        np.testing.assert_allclose(pt_act, np.tile(pt, (10, 5, 1)), rtol=1.0)
+        np.testing.assert_allclose(pt_act, np.tile(pt, (10, 4, 1)), rtol=1.0)
 
     def test_transform_quaternions(self, transform_grid, get_rf_tree):
         """"""
@@ -511,7 +494,7 @@ class TestReferenceFrame(object):
             np.tile(o, (10, 1)), rf_child2, timestamps=np.arange(10)
         )
         np.testing.assert_allclose(
-            np.abs(ot_act), np.tile(np.abs(ot), (5, 1)), rtol=1.0
+            np.abs(ot_act), np.tile(np.abs(ot), (4, 1)), rtol=1.0
         )
 
         # moving reference frame + multiple n-dimensional points
@@ -522,7 +505,7 @@ class TestReferenceFrame(object):
             time_axis=1,
         )
         np.testing.assert_allclose(
-            np.abs(ot_act), np.tile(np.abs(ot), (10, 5, 1)), rtol=1.0
+            np.abs(ot_act), np.tile(np.abs(ot), (10, 4, 1)), rtol=1.0
         )
 
     def test_lookup_twist(self, compensated_tree):

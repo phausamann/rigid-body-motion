@@ -70,6 +70,32 @@ class TransformMatcher:
 
         return translation, rotation
 
+    @classmethod
+    def _resample_array(cls, array, timestamps):
+        """ Resample an array to the timestamps. """
+        if timestamps is None and array.timestamps is not None:
+            raise ValueError("Cannot convert timestamped to static array")
+
+        if array.timestamps is None:
+            if timestamps is None:
+                return array.data
+            else:
+                return np.tile(array.data, (len(timestamps), 1))
+        else:
+            # TODO better way to check if quaternion
+            if array.data.shape[-1] == 4:
+                return as_float_array(
+                    squad(
+                        as_quat_array(array.data),
+                        array.timestamps.astype(float),
+                        timestamps.astype(float),
+                    )
+                )
+            else:
+                return interp1d(
+                    array.timestamps.astype(float), array.data, axis=0
+                )(timestamps.astype(float))
+
     def add_reference_frame(self, frame, inverse=False):
         """ Add a reference frame to the matcher.
 
@@ -154,7 +180,7 @@ class TransformMatcher:
             The timestamps for which the transformation is defined.
         """
         ts_range = self.get_range()
-        if ts_range is (None, None):
+        if ts_range == (None, None):
             return None
         elif ts_range[0] is None:
             # first timestamp can be None for only discrete transforms
@@ -202,7 +228,7 @@ class TransformMatcher:
 
         return timestamps
 
-    def get_transformation(self, arrays_first=True):
+    def get_transformation(self, arrays_first=True, return_arrays=False):
         """ Get the transformation across all reference frames.
 
         Parameters
@@ -242,7 +268,14 @@ class TransformMatcher:
                 ) + np.array(t)
                 rotation = as_quat_array(r) * rotation
 
-        return translation, as_float_array(rotation), timestamps
+        if return_arrays:
+            arrays = [
+                self._resample_array(array, timestamps)
+                for array in self.arrays
+            ]
+            return translation, as_float_array(rotation), arrays, timestamps
+        else:
+            return translation, as_float_array(rotation), timestamps
 
 
 def _resolve_axis(axis, ndim):

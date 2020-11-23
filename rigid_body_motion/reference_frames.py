@@ -1,13 +1,7 @@
 """"""
 import numpy as np
 from anytree import NodeMixin, Walker
-from quaternion import (
-    as_float_array,
-    as_quat_array,
-    from_rotation_matrix,
-    squad,
-)
-from scipy.interpolate import interp1d
+from quaternion import as_float_array, as_quat_array, from_rotation_matrix
 
 from rigid_body_motion.core import (
     TransformMatcher,
@@ -258,108 +252,6 @@ class ReferenceFrame(NodeMixin):
             raise ValueError("timestamps specified without parent frame.")
 
     @classmethod
-    def _broadcast(cls, arr, timestamps):
-        """ Broadcast scalar array along timestamp axis. """
-        # TODO test
-        return np.tile(arr, (len(timestamps), 1))
-
-    @classmethod
-    def _interpolate(cls, source_arr, target_arr, source_ts, target_ts):
-        """ Interpolate source array at target array timestamps. """
-        # TODO specify time_axis as parameter
-        # TODO priority=None/<rf_name>
-        # TODO method + optional scipy dependency?
-        source_ts_dtype = source_ts.dtype
-        source_ts = source_ts.astype(float)
-        target_ts_dtype = target_ts.dtype
-        target_ts = target_ts.astype(float)
-
-        # make sure timestamps are sorted
-        # TODO sort somewhere and turn these into assertions or use min/max
-        #  with boolean indexing
-        if np.any(np.diff(source_ts) < 0):
-            raise ValueError("source_ts is not sorted.")
-        if np.any(np.diff(target_ts) < 0):
-            raise ValueError("target_ts is not sorted.")
-
-        # get overlapping range of source_ts and target_ts
-        # TODO raise error when intersection is empty
-        if target_ts[0] < source_ts[0]:
-            target_arr = target_arr[target_ts >= source_ts[0]]
-            target_ts = target_ts[target_ts >= source_ts[0]]
-        if target_ts[-1] > source_ts[-1]:
-            target_arr = target_arr[target_ts <= source_ts[-1]]
-            target_ts = target_ts[target_ts <= source_ts[-1]]
-
-        # do interpolation
-        if source_arr.shape[1] == 7:
-            # ugly edge case of t and r stacked
-            source_arr_interp = np.hstack(
-                (
-                    interp1d(source_ts, source_arr[:, :3], axis=0)(target_ts),
-                    as_float_array(
-                        squad(
-                            as_quat_array(source_arr[:, 3:]),
-                            source_ts,
-                            target_ts,
-                        )
-                    ),
-                )
-            )
-        elif source_arr.shape[1] == 4:
-            source_arr_interp = as_float_array(
-                squad(as_quat_array(source_arr), source_ts, target_ts)
-            )
-        else:
-            source_arr_interp = interp1d(source_ts, source_arr, axis=0)(
-                target_ts
-            )
-
-        return (
-            source_arr_interp,
-            target_arr,
-            source_ts.astype(source_ts_dtype),
-            target_ts.astype(target_ts_dtype),
-        )
-
-    @classmethod
-    def _match_timestamps_multi(cls, arr_list, ts_list):
-        """ Match multiple arrays and timestamps at once. """
-        # get earliest and latest timestamp
-        earliest = np.max([ts[0] for ts in ts_list if ts is not None])
-        latest = np.min([ts[-1] for ts in ts_list if ts is not None])
-
-        return_ts = None
-        for ts in ts_list:
-            # get output timestamps from the first timestamp array in the list,
-            # limited to the (earliest, latest) interval
-            if return_ts is None and ts is not None:
-                return_ts = ts[(ts >= earliest) & (ts <= latest)]
-                break
-        else:
-            # or return the arrays as they were if none of them had timestamps
-            return arr_list, None
-
-        return_arr_list = []
-        for arr, ts in zip(arr_list, ts_list):
-            if ts is None:
-                # add array as-is if it doesn't have timestamps
-                return_arr_list.append(cls._broadcast(arr, return_ts))
-            else:
-                # or interpolate to return_ts
-                if arr.shape[1] == 4:
-                    arr_t = as_float_array(
-                        squad(arr, ts.astype(float), return_ts.astype(float))
-                    )
-                else:
-                    arr_t = interp1d(ts.astype(float), arr, axis=0)(
-                        return_ts.astype(float)
-                    )
-                return_arr_list.append(arr_t)
-
-        return return_arr_list, return_ts
-
-    @classmethod
     def _validate_input(cls, arr, axis, n_axis, timestamps, time_axis):
         """ Validate shape of array and timestamps. """
         # TODO process DataArray (dim=str, timestamps=str)
@@ -394,12 +286,38 @@ class ReferenceFrame(NodeMixin):
 
         return t_or_r
 
+    @classmethod
+    def _match_arrays(cls, arrays, timestamps=None):
+        """ Match multiple arrays with timestamps. """
+        matcher = TransformMatcher()
+
+        for array in arrays:
+            matcher.add_array(*array)
+
+        return matcher.get_arrays(timestamps)
+
     def _walk(self, to_rf):
         """ Walk from this frame to a target frame along the tree. """
         to_rf = _resolve_rf(to_rf)
         walker = Walker()
         up, _, down = walker.walk(self, to_rf)
         return up, down
+
+    def _get_matcher(self, to_frame, arrays=None):
+        """ Get a TransformMatcher from this frame to another. """
+        up, down = self._walk(to_frame)
+
+        matcher = TransformMatcher()
+        for rf in up:
+            matcher.add_reference_frame(rf)
+        for rf in down:
+            matcher.add_reference_frame(rf, inverse=True)
+
+        if arrays is not None:
+            for array in arrays:
+                matcher.add_array(*array)
+
+        return matcher
 
     @classmethod
     def from_dataset(
@@ -598,7 +516,7 @@ class ReferenceFrame(NodeMixin):
             inverse=inverse,
         )
 
-    def get_transformation(self, to_frame, arrays=None):
+    def get_transformation(self, to_frame):
         """ Calculate the transformation from this frame to another.
 
         The transformation is a rotation followed by a translation which,
@@ -623,20 +541,9 @@ class ReferenceFrame(NodeMixin):
         ts: array_like, shape (n_timestamps,) or None
             The timestamps for which the transformation is defined.
         """
-        up, down = self._walk(to_frame)
+        matcher = self._get_matcher(to_frame)
 
-        matcher = TransformMatcher()
-        for rf in up:
-            matcher.add_reference_frame(rf)
-        for rf in down:
-            matcher.add_reference_frame(rf, inverse=True)
-
-        if arrays is not None:
-            for array in arrays:
-                matcher.add_array(*array)
-            return matcher.get_transformation(return_arrays=True)
-        else:
-            return matcher.get_transformation()
+        return matcher.get_transformation()
 
     def transform_vectors(
         self,
@@ -683,10 +590,9 @@ class ReferenceFrame(NodeMixin):
             The timestamps after the transformation.
         """
         arr, arr_ts = self._validate_input(arr, axis, 3, timestamps, time_axis)
-
-        t, r, (arr,), ts = self.get_transformation(
-            to_frame, arrays=[(arr, arr_ts)]
-        )
+        matcher = self._get_matcher(to_frame, arrays=[(arr, arr_ts)])
+        t, r, ts = matcher.get_transformation()
+        arr, _ = matcher.get_arrays(ts)
 
         r = self._expand_singleton_axes(r, arr.ndim)
         arr = rotate_vectors(r, arr, axis=axis)
@@ -745,10 +651,9 @@ class ReferenceFrame(NodeMixin):
             The timestamps after the transformation.
         """
         arr, arr_ts = self._validate_input(arr, axis, 3, timestamps, time_axis)
-
-        t, r, (arr,), ts = self.get_transformation(
-            to_frame, arrays=[(arr, arr_ts)]
-        )
+        matcher = self._get_matcher(to_frame, arrays=[(arr, arr_ts)])
+        t, r, ts = matcher.get_transformation()
+        arr, _ = matcher.get_arrays(ts)
 
         t = self._expand_singleton_axes(t, arr.ndim)
         r = self._expand_singleton_axes(r, arr.ndim)
@@ -810,10 +715,9 @@ class ReferenceFrame(NodeMixin):
             The timestamps after the transformation.
         """
         arr, arr_ts = self._validate_input(arr, axis, 4, timestamps, time_axis)
-
-        t, r, (arr,), ts = self.get_transformation(
-            to_frame, arrays=[(arr, arr_ts)]
-        )
+        matcher = self._get_matcher(to_frame, arrays=[(arr, arr_ts)])
+        t, r, ts = matcher.get_transformation()
+        arr, _ = matcher.get_arrays(ts)
 
         r = self._expand_singleton_axes(r, arr.ndim)
         arr = np.swapaxes(arr, axis, -1)
@@ -926,8 +830,8 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        angular, arr, _, timestamps = self._interpolate(
-            angular, arr, angular_ts, ts
+        angular, arr, timestamps = self._match_arrays(
+            [(arr, ts), (angular, angular_ts)]
         )
 
         arr += angular
@@ -1076,9 +980,13 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        (arr, linear, angular, translation), ts = self._match_timestamps_multi(
-            [arr, linear, angular, translation],
-            [ts, linear_ts, angular_ts, translation_ts],
+        arr, linear, angular, translation, ts = self._match_arrays(
+            [
+                (arr, ts),
+                (linear, linear_ts),
+                (angular, angular_ts),
+                (translation, translation_ts),
+            ]
         )
 
         arr = arr + linear + np.cross(angular, translation)
@@ -1165,8 +1073,8 @@ class ReferenceFrame(NodeMixin):
             timestamps=timestamps,
             return_timestamps=True,
         )
-        angular, linear, _, timestamps = self._interpolate(
-            angular, linear, angular_ts, linear_ts
+        angular, linear, timestamps = self._match_arrays(
+            [(angular, angular_ts), (linear, linear_ts)],
         )
 
         return linear, angular, timestamps

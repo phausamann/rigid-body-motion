@@ -283,7 +283,7 @@ class TestReferenceFrame(object):
         with pytest.raises(ValueError):
             rbm.ReferenceFrame.from_rotation_matrix(np.zeros((4, 4)), rf_world)
 
-    def test_interpolate(self):
+    def test_match_arrays(self):
         """"""
         arr1 = np.ones((10, 3))
         ts1 = np.arange(10)
@@ -291,37 +291,23 @@ class TestReferenceFrame(object):
         ts2 = np.arange(5) + 2.5
 
         # float timestamps
-        arr1_out, arr2_out, _, ts_out = rbm.ReferenceFrame._interpolate(
-            arr1, arr2, ts1, ts2
+        arr1_out, arr2_out, ts_out = rbm.ReferenceFrame._match_arrays(
+            [(arr1, ts1), (arr2, ts2)],
         )
-        npt.assert_allclose(arr1_out, arr1[:5])
-        npt.assert_allclose(arr2_out, arr2)
-        npt.assert_allclose(ts_out, ts2)
-
-        # target range greater than source range
-        arr2_out, arr1_out, _, ts_out = rbm.ReferenceFrame._interpolate(
-            arr2, arr1, ts2, ts1
-        )
-        npt.assert_allclose(arr2_out, arr2[:-1])
         npt.assert_allclose(arr1_out, arr1[:4])
-        npt.assert_allclose(ts_out, ts1[3:7])
+        npt.assert_allclose(arr2_out, arr2[:4])
+        npt.assert_equal(ts_out, ts1[3:7])
 
         # datetime timestamps
         ts1 = pd.date_range(start=0, freq="1s", periods=10).values
         ts2 = pd.date_range(start=0, freq="1s", periods=5).values
-        arr1_out, arr2_out, _, ts_out = rbm.ReferenceFrame._interpolate(
-            arr1, arr2, ts1, ts2
+        arr1_out, arr2_out, ts_out = rbm.ReferenceFrame._match_arrays(
+            [(arr1, ts1), (arr2, ts2)],
         )
         npt.assert_allclose(arr1_out, arr1[:5])
         npt.assert_allclose(arr2_out, arr2)
         npt.assert_allclose(ts_out.astype(float), ts1[:5].astype(float))
         assert ts_out.dtype == ts1.dtype
-
-        # not sorted
-        with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1[::-1], ts2)
-        with pytest.raises(ValueError):
-            rbm.ReferenceFrame._interpolate(arr1, arr2, ts1, ts2[::-1])
 
     def test_get_transformation(self, rf_grid, get_rf_tree):
         """"""

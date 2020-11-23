@@ -57,6 +57,7 @@ class TransformMatcher:
             for r, ts in zip(frame.rotation, frame.timestamps):
                 rotation[timestamps >= ts, :] = r
         else:
+            # TODO method + optional scipy dependency?
             translation = interp1d(
                 frame.timestamps.astype(float), frame.translation, axis=0
             )(timestamps.astype(float))
@@ -92,6 +93,7 @@ class TransformMatcher:
                     )
                 )
             else:
+                # TODO method + optional scipy dependency?
                 return interp1d(
                     array.timestamps.astype(float), array.data, axis=0
                 )(timestamps.astype(float))
@@ -179,6 +181,7 @@ class TransformMatcher:
         timestamps: array_like
             The timestamps for which the transformation is defined.
         """
+        # TODO specify rf name as priority?
         ts_range = self.get_range()
 
         # first and last timestamp can be None for only discrete transforms
@@ -215,8 +218,7 @@ class TransformMatcher:
             ]
         elif len(discrete_frames):
             # If there are no continuous frames or arrays with timestamps
-            # we merge together all discrete timestamps that are greater than
-            # the start of the range
+            # we merge together all discrete timestamps
             timestamps = np.concatenate(
                 [d.timestamps for d in discrete_frames]
             )
@@ -226,15 +228,20 @@ class TransformMatcher:
 
         return timestamps
 
-    def get_transformation(self, arrays_first=True, return_arrays=False):
+    def get_transformation(self, timestamps=None, arrays_first=True):
         """ Get the transformation across all reference frames.
 
         Parameters
         ----------
+        timestamps: array_like, shape (n_timestamps,), optional
+            Timestamps to which the transformation should be matched. If not
+            provided the matcher will call `get_timestamps` for the target
+            timestamps.
+
         arrays_first: bool, default True
-            If True, the first array in the list defines the sampling of the
-            timestamps. Otherwise, the first reference frame in the list
-            defines the sampling.
+            If True and timestamps aren't provided, the first array in the
+            list defines the sampling of the timestamps. Otherwise, the first
+            reference frame in the list defines the sampling.
 
         Returns
         -------
@@ -249,7 +256,9 @@ class TransformMatcher:
         """
         from rigid_body_motion.utils import rotate_vectors
 
-        timestamps = self.get_timestamps(arrays_first)
+        if timestamps is None:
+            timestamps = self.get_timestamps(arrays_first)
+
         translation = np.zeros(3) if timestamps is None else np.zeros((1, 3))
         rotation = quaternion(1.0, 0.0, 0.0, 0.0)
 
@@ -266,14 +275,38 @@ class TransformMatcher:
                 ) + np.array(t)
                 rotation = as_quat_array(r) * rotation
 
-        if return_arrays:
-            arrays = [
-                self._resample_array(array, timestamps)
-                for array in self.arrays
-            ]
-            return translation, as_float_array(rotation), arrays, timestamps
-        else:
-            return translation, as_float_array(rotation), timestamps
+        return translation, as_float_array(rotation), timestamps
+
+    def get_arrays(self, timestamps=None, arrays_first=True):
+        """ Get
+
+        Parameters
+        ----------
+        timestamps: array_like, shape (n_timestamps,), optional
+            Timestamps to which the arrays should be matched. If not provided
+            the matcher will call `get_timestamps` for the target timestamps.
+
+        arrays_first: bool, default True
+            If True and timestamps aren't provided, the first array in the
+            list defines the sampling of the timestamps. Otherwise, the first
+            reference frame in the list defines the sampling.
+
+        Returns
+        -------
+        *arrays: one or more array_like
+            Input arrays, matched to the timestamps.
+
+        timestamps: array_like, shape (n_timestamps,) or None
+            The timestamps for which the transformation is defined.
+        """
+        if timestamps is None:
+            timestamps = self.get_timestamps(arrays_first)
+
+        arrays = tuple(
+            self._resample_array(array, timestamps) for array in self.arrays
+        )
+
+        return (*arrays, timestamps)
 
 
 def _resolve_axis(axis, ndim):

@@ -18,6 +18,10 @@ New features
 Improvements
 ~~~~~~~~~~~~
 
+* Refactor of internal timestamp matching mechanism defining a clear priority
+  for target timestamps. This can result in slight changes of timestamps
+  and arrays returned by transformations but will generally produce more
+  accurate .
 * Added ``mode`` and ``outlier_thresh`` arguments to
   ``estimate_angular_velocity``.
 

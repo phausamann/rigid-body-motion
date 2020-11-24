@@ -15,8 +15,8 @@ New features
   methods.
 * New ``best_fit_rotation`` and ``qinterp`` top-level methods.
 
-Improvements
-~~~~~~~~~~~~
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Refactor of internal timestamp matching mechanism defining a clear priority
   for target timestamps. This can result in slight changes of timestamps
@@ -24,6 +24,7 @@ Improvements
   accurate .
 * Added ``mode`` and ``outlier_thresh`` arguments to
   ``estimate_angular_velocity``.
+* Fixed issues with ``iterative_closest_point``.
 
 
 0.2.0 (October 22nd, 2020)

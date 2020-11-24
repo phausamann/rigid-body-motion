@@ -1,6 +1,7 @@
 """"""
 import numpy as np
 from quaternion import as_float_array, from_rotation_matrix
+from scipy.spatial import cKDTree
 
 from rigid_body_motion.core import (
     _estimate_angular_velocity,
@@ -12,7 +13,7 @@ from rigid_body_motion.core import (
 from rigid_body_motion.utils import rotate_vectors
 
 
-def _reshape_vectors(v1, v2, axis, dim):
+def _reshape_vectors(v1, v2, axis, dim, same_shape=True):
     """ Reshape input vectors to two dimensions. """
     # TODO v2 as DataArray with possibly different dimension order
     v1, axis, _, _, _, _, coords, *_ = _maybe_unpack_dataarray(
@@ -20,18 +21,20 @@ def _reshape_vectors(v1, v2, axis, dim):
     )
     v2, *_ = _maybe_unpack_dataarray(v2, None, axis, None)
 
-    if v1.shape[axis] != 3:
+    if v1.shape[axis] != 3 or v2.shape[axis] != 3:
         raise ValueError(
-            f"Shape of v1 along axis {axis} must be 3, got {v1.shape[axis]}"
+            f"Shape of v1 and v2 along axis {axis} must be 3, got "
+            f"{v1.shape[axis]} for v1 and {v2.shape[axis]} for v2"
         )
     if v1.ndim < 2:
         raise ValueError("v1 must have at least two dimensions")
-    if v1.shape != v2.shape:
-        raise ValueError("v1 and v2 must have the same shape")
 
     # flatten everything except spatial dimension
     v1 = np.swapaxes(v1, axis, -1).reshape(-1, 3)
     v2 = np.swapaxes(v2, axis, -1).reshape(-1, 3)
+
+    if same_shape and v1.shape != v2.shape:
+        raise ValueError("v1 and v2 must have the same shape")
 
     return v1, v2, coords is not None
 
@@ -303,6 +306,10 @@ def best_fit_rotation(v1, v2, dim=None, axis=None):
     References
     ----------
     Adapted from https://github.com/ClayFlannigan/icp
+
+    See Also
+    --------
+    iterative_closest_point, best_fit_transform
     """
     v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
 
@@ -310,11 +317,6 @@ def best_fit_rotation(v1, v2, dim=None, axis=None):
     H = np.dot(v1.T, v2)
     U, S, Vt = np.linalg.svd(H)
     R = np.dot(Vt.T, U.T)
-
-    # special reflection case
-    if np.linalg.det(R) < 0:
-        Vt[2, :] *= -1
-        R = np.dot(Vt.T, U.T)
 
     # rotation as quaternion
     rotation = as_float_array(from_rotation_matrix(R))
@@ -366,6 +368,10 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
     References
     ----------
     Adapted from https://github.com/ClayFlannigan/icp
+
+    See Also
+    --------
+    iterative_closest_point, best_fit_rotation
     """
     v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
 
@@ -397,6 +403,14 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
         )
 
     return translation, rotation
+
+
+def _nearest_neighbor(v1, v2):
+    """ Find the nearest neighbor in v2 for each point in v1. """
+    kd_tree = cKDTree(v2)
+    distances, idx = kd_tree.query(v1, 1)
+
+    return idx.ravel(), distances.ravel()
 
 
 def iterative_closest_point(
@@ -451,8 +465,20 @@ def iterative_closest_point(
     References
     ----------
     Adapted from https://github.com/ClayFlannigan/icp
+
+    Notes
+    -----
+    For points with known correspondences (e.g. timeseries of positions), it is
+    recommended to interpolate the points to a common sampling base and use the
+    `best_fit_transform` method.
+
+    See Also
+    --------
+    best_fit_transform, best_fit_rotation
     """  # noqa
-    v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
+    v1, v2, was_dataarray = _reshape_vectors(
+        v1, v2, axis, dim, same_shape=False
+    )
 
     v1_new = np.copy(v1)
 
@@ -464,11 +490,13 @@ def iterative_closest_point(
     prev_error = 0
 
     for i in range(max_iterations):
-        distances = np.linalg.norm(v1_new - v2, axis=1)
+        # find the nearest neighbors between the current source and destination
+        # points
+        idx, distances = _nearest_neighbor(v1_new, v2)
 
         # compute the transformation between the current source and nearest
         # destination points
-        t, r = best_fit_transform(v1_new, v2)
+        t, r = best_fit_transform(v1_new, v2[idx])
 
         # update the current source
         v1_new = rotate_vectors(r, v1_new) + t

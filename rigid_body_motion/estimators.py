@@ -1,6 +1,7 @@
 """"""
 import numpy as np
 from quaternion import as_float_array, from_rotation_matrix
+from scipy.spatial import cKDTree
 
 from rigid_body_motion.core import (
     _estimate_angular_velocity,
@@ -12,7 +13,7 @@ from rigid_body_motion.core import (
 from rigid_body_motion.utils import rotate_vectors
 
 
-def _reshape_vectors(v1, v2, axis, dim):
+def _reshape_vectors(v1, v2, axis, dim, same_shape=True):
     """ Reshape input vectors to two dimensions. """
     # TODO v2 as DataArray with possibly different dimension order
     v1, axis, _, _, _, _, coords, *_ = _maybe_unpack_dataarray(
@@ -20,18 +21,20 @@ def _reshape_vectors(v1, v2, axis, dim):
     )
     v2, *_ = _maybe_unpack_dataarray(v2, None, axis, None)
 
-    if v1.shape[axis] != 3:
+    if v1.shape[axis] != 3 or v2.shape[axis] != 3:
         raise ValueError(
-            f"Shape of v1 along axis {axis} must be 3, got {v1.shape[axis]}"
+            f"Shape of v1 and v2 along axis {axis} must be 3, got "
+            f"{v1.shape[axis]} for v1 and {v2.shape[axis]} for v2"
         )
     if v1.ndim < 2:
         raise ValueError("v1 must have at least two dimensions")
-    if v1.shape != v2.shape:
-        raise ValueError("v1 and v2 must have the same shape")
 
     # flatten everything except spatial dimension
     v1 = np.swapaxes(v1, axis, -1).reshape(-1, 3)
     v2 = np.swapaxes(v2, axis, -1).reshape(-1, 3)
+
+    if same_shape and v1.shape != v2.shape:
+        raise ValueError("v1 and v2 must have the same shape")
 
     return v1, v2, coords is not None
 
@@ -142,7 +145,14 @@ def estimate_linear_velocity(
 
 
 def estimate_angular_velocity(
-    arr, dim=None, axis=None, timestamps=None, time_axis=None, cutoff=None,
+    arr,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    mode="quaternion",
+    outlier_thresh=None,
+    cutoff=None,
 ):
     """ Estimate angular velocity from a time series of rotations.
 
@@ -170,6 +180,15 @@ def estimate_angular_velocity(
         The axis of the array representing the timestamps of the quaternions.
         Defaults to the first axis of the array.
 
+    mode: str, default "quaternion"
+        If "quaternion", compute the angular velocity from the quaternion
+        derivative. If "rotation_vector", compute the angular velocity from
+        the gradient of the axis-angle representation of the rotations.
+
+    outlier_thresh: float, optional
+        Suppress samples where the norm of the second-order differences of the
+        rotation is above `outlier_thresh` and interpolate the missing values.
+
     cutoff: float, optional
         Frequency of a low-pass filter applied to the angular velocity after
         the estimation as a fraction of the Nyquist frequency.
@@ -195,7 +214,13 @@ def estimate_angular_velocity(
     )
 
     angular = _estimate_angular_velocity(
-        arr, timestamps, axis=axis, time_axis=time_axis, cutoff=cutoff
+        arr,
+        timestamps,
+        axis=axis,
+        time_axis=time_axis,
+        mode=mode,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
     )
 
     if coords is not None:
@@ -250,6 +275,65 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
         return rotation
 
 
+def best_fit_rotation(v1, v2, dim=None, axis=None):
+    """ Least-squares best-fit rotation between two arrays of vectors.
+
+    Finds the rotation `r` that minimizes:
+
+    .. math:: || v_2 - rot(r, v_1) ||
+
+    Parameters
+    ----------
+    v1: array_like, shape (..., 3, ...)
+        The first array of vectors.
+
+    v2: array_like, shape (..., 3, ...)
+        The second array of vectors.
+
+    dim: str, optional
+        If the first array is a DataArray, the name of the dimension
+        representing the spatial coordinates of the vectors.
+
+    axis: int, optional
+        The axis of the arrays representing the spatial coordinates of the
+        vectors. Defaults to the last axis of the arrays.
+
+    Returns
+    -------
+    rotation: array_like, shape (4,)
+        Rotation of transform.
+
+    References
+    ----------
+    Adapted from https://github.com/ClayFlannigan/icp
+
+    See Also
+    --------
+    iterative_closest_point, best_fit_transform
+    """
+    v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
+
+    # rotation matrix
+    H = np.dot(v1.T, v2)
+    U, S, Vt = np.linalg.svd(H)
+    R = np.dot(Vt.T, U.T)
+
+    # rotation as quaternion
+    rotation = as_float_array(from_rotation_matrix(R))
+
+    if was_dataarray:
+        import xarray as xr
+
+        rotation = xr.DataArray(
+            rotation,
+            {"quaternion_axis": ["w", "x", "y", "z"]},
+            "quaternion_axis",
+            name="rotation",
+        )
+
+    return rotation
+
+
 def best_fit_transform(v1, v2, dim=None, axis=None):
     """ Least-squares best-fit transform between two arrays of vectors.
 
@@ -284,6 +368,10 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
     References
     ----------
     Adapted from https://github.com/ClayFlannigan/icp
+
+    See Also
+    --------
+    iterative_closest_point, best_fit_rotation
     """
     v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
 
@@ -299,9 +387,8 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
     R = np.dot(Vt.T, U.T)
 
     # special reflection case
-    m = 3
     if np.linalg.det(R) < 0:
-        Vt[m - 1, :] *= -1
+        Vt[2, :] *= -1
         R = np.dot(Vt.T, U.T)
 
     # rotation as quaternion
@@ -316,6 +403,14 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
         )
 
     return translation, rotation
+
+
+def _nearest_neighbor(v1, v2):
+    """ Find the nearest neighbor in v2 for each point in v1. """
+    kd_tree = cKDTree(v2)
+    distances, idx = kd_tree.query(v1, 1)
+
+    return idx.ravel(), distances.ravel()
 
 
 def iterative_closest_point(
@@ -370,8 +465,20 @@ def iterative_closest_point(
     References
     ----------
     Adapted from https://github.com/ClayFlannigan/icp
+
+    Notes
+    -----
+    For points with known correspondences (e.g. timeseries of positions), it is
+    recommended to interpolate the points to a common sampling base and use the
+    `best_fit_transform` method.
+
+    See Also
+    --------
+    best_fit_transform, best_fit_rotation
     """  # noqa
-    v1, v2, was_dataarray = _reshape_vectors(v1, v2, axis, dim)
+    v1, v2, was_dataarray = _reshape_vectors(
+        v1, v2, axis, dim, same_shape=False
+    )
 
     v1_new = np.copy(v1)
 
@@ -383,11 +490,13 @@ def iterative_closest_point(
     prev_error = 0
 
     for i in range(max_iterations):
-        distances = np.linalg.norm(v1_new - v2, axis=1)
+        # find the nearest neighbors between the current source and destination
+        # points
+        idx, distances = _nearest_neighbor(v1_new, v2)
 
         # compute the transformation between the current source and nearest
         # destination points
-        t, r = best_fit_transform(v1_new, v2)
+        t, r = best_fit_transform(v1_new, v2[idx])
 
         # update the current source
         v1_new = rotate_vectors(r, v1_new) + t

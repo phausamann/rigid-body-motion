@@ -1,7 +1,7 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 from pathlib import Path
 
 from pkg_resources import resource_filename
@@ -23,6 +23,7 @@ from .core import (
     _transform,
 )
 from .estimators import (
+    best_fit_rotation,
     best_fit_transform,
     estimate_angular_velocity,
     estimate_linear_velocity,
@@ -32,7 +33,12 @@ from .estimators import (
 from .reference_frames import ReferenceFrame
 from .reference_frames import _registry as registry
 from .reference_frames import clear_registry, deregister_frame, register_frame
-from .utils import qinv, qmean, qmul, rotate_vectors
+from .utils import qinterp, qinv, qmean, qmul, rotate_vectors
+
+try:
+    import rigid_body_motion.accessors  # noqa
+except ImportError:
+    pass
 
 __all__ = [
     "transform_points",
@@ -55,12 +61,14 @@ __all__ = [
     "estimate_linear_velocity",
     "estimate_angular_velocity",
     "shortest_arc_rotation",
+    "best_fit_rotation",
     "best_fit_transform",
     "iterative_closest_point",
     "lookup_transform",
     "lookup_twist",
     # utils
     "example_data",
+    "qinterp",
     "qinv",
     "qmean",
     "qmul",

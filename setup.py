@@ -29,11 +29,12 @@ setup(
     install_requires=requirements,
     license="MIT license",
     long_description=readme + "\n\n" + history,
+    long_description_content_type="text/x-rst",
     include_package_data=True,
     keywords="rigid_body_motion",
     name="rigid-body-motion",
     packages=find_packages(exclude=["tests"]),
     url="https://github.com/phausamann/rigid-body-motion",
-    version="0.2.0",
+    version="0.3.0",
     zip_safe=False,
 )

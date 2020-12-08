@@ -60,6 +60,7 @@ Estimators
     lookup_transform
     lookup_twist
     shortest_arc_rotation
+    best_fit_rotation
     best_fit_transform
     iterative_closest_point
 
@@ -74,7 +75,24 @@ Utility functions
     qinv
     qmul
     qmean
+    qinterp
     rotate_vectors
+
+
+xarray Accessors
+----------------
+
+.. currentmodule:: xarray
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+    :template: autosummary/accessor_method.rst
+
+    DataArray.rbm.qinterp
+    DataArray.rbm.qinv
+
+
 
 Class member details
 --------------------

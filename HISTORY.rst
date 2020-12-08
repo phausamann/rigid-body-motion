@@ -2,8 +2,33 @@
 History
 =======
 
+0.3.0 (December 8th, 2020)
+--------------------------
+
+New features
+~~~~~~~~~~~~
+
+* Reference frames with timestamps now accept the ``discrete`` parameter,
+  allowing for transformations to be fixed from their timestamp into the
+  future.
+* ``rbm`` accessor for DataArrays implementing ``qinterp`` and ``qinv``
+  methods.
+* New ``best_fit_rotation`` and ``qinterp`` top-level methods.
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Refactor of internal timestamp matching mechanism defining a clear priority
+  for target timestamps. This can result in slight changes of timestamps
+  and arrays returned by transformations but will generally produce more
+  accurate .
+* Added ``mode`` and ``outlier_thresh`` arguments to
+  ``estimate_angular_velocity``.
+* Fixed issues with ``iterative_closest_point``.
+
+
 0.2.0 (October 22nd, 2020)
--------------------------
+--------------------------
 
 New features
 ~~~~~~~~~~~~

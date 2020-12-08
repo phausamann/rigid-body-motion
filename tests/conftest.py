@@ -48,6 +48,31 @@ def mock_quaternion():
 
 
 @pytest.fixture()
+def mock_frame():
+    rbm.register_frame("world")
+
+    def _mock_frame(
+        t=None,
+        r=None,
+        ts=None,
+        name="mock",
+        parent="world",
+        inverse=False,
+        discrete=False,
+    ):
+        """"""
+        if t is None and r is None:
+            t = (0.0, 0.0, 0.0)
+            r = (1.0, 0.0, 0.0, 0.0)
+
+        return rbm.ReferenceFrame(name, parent, t, r, ts, inverse, discrete)
+
+    yield _mock_frame
+
+    rbm.clear_registry()
+
+
+@pytest.fixture()
 def get_rf_tree():
     def _get_rf_tree(
         tc1=(0.0, 0.0, 0.0),
@@ -123,6 +148,15 @@ def head_dataset():
     pytest.importorskip("netCDF4")
 
     return xr.load_dataset(rbm.example_data["head"])
+
+
+@pytest.fixture()
+def left_eye_dataset():
+    """"""
+    xr = pytest.importorskip("xarray")
+    pytest.importorskip("netCDF4")
+
+    return xr.load_dataset(rbm.example_data["left_eye"])
 
 
 @pytest.fixture()

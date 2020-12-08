@@ -1,10 +1,312 @@
 """"""
 import warnings
+from collections import namedtuple
 
 import numpy as np
-from quaternion import as_float_array, as_quat_array, derivative
+from quaternion import (
+    as_float_array,
+    as_quat_array,
+    as_rotation_vector,
+    derivative,
+    quaternion,
+    squad,
+)
 from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
+
+Frame = namedtuple(
+    "Frame", ("translation", "rotation", "timestamps", "discrete", "inverse"),
+)
+Array = namedtuple("Array", ("data", "timestamps"))
+
+
+class TransformMatcher:
+    """ Matcher for timestamps from reference frames and arrays. """
+
+    def __init__(self):
+        """ Constructor. """
+        self.frames = []
+        self.arrays = []
+
+    @classmethod
+    def _check_timestamps(cls, timestamps):
+        """ Make sure timestamps are monotonic. """
+        if timestamps is not None and np.any(
+            np.diff(timestamps.astype(float)) < 0
+        ):
+            raise ValueError("Timestamps must be monotonic")
+
+    @classmethod
+    def _transform_from_frame(cls, frame, timestamps):
+        """ Get the transform from a frame resampled to the timestamps. """
+        if timestamps is None and frame.timestamps is not None:
+            raise ValueError("Cannot convert timestamped to static transform")
+
+        if frame.timestamps is None:
+            if timestamps is None:
+                translation = frame.translation
+                rotation = frame.rotation
+            else:
+                translation = np.tile(frame.translation, (len(timestamps), 1))
+                rotation = np.tile(frame.rotation, (len(timestamps), 1))
+        elif frame.discrete:
+            translation = np.tile(frame.translation[0], (len(timestamps), 1))
+            for t, ts in zip(frame.translation, frame.timestamps):
+                translation[timestamps >= ts, :] = t
+            rotation = np.tile(frame.rotation[0], (len(timestamps), 1))
+            for r, ts in zip(frame.rotation, frame.timestamps):
+                rotation[timestamps >= ts, :] = r
+        else:
+            # TODO method + optional scipy dependency?
+            translation = interp1d(
+                frame.timestamps.astype(float), frame.translation, axis=0
+            )(timestamps.astype(float))
+            rotation = as_float_array(
+                squad(
+                    as_quat_array(frame.rotation),
+                    frame.timestamps.astype(float),
+                    timestamps.astype(float),
+                )
+            )
+
+        return translation, rotation
+
+    @classmethod
+    def _resample_array(cls, array, timestamps):
+        """ Resample an array to the timestamps. """
+        if timestamps is None and array.timestamps is not None:
+            raise ValueError("Cannot convert timestamped to static array")
+
+        if array.timestamps is None:
+            if timestamps is None:
+                return array.data
+            else:
+                return np.tile(array.data, (len(timestamps), 1))
+        else:
+            # TODO better way to check if quaternion
+            if array.data.shape[-1] == 4:
+                return as_float_array(
+                    squad(
+                        as_quat_array(array.data),
+                        array.timestamps.astype(float),
+                        timestamps.astype(float),
+                    )
+                )
+            else:
+                # TODO method + optional scipy dependency?
+                return interp1d(
+                    array.timestamps.astype(float), array.data, axis=0
+                )(timestamps.astype(float))
+
+    def add_reference_frame(self, frame, inverse=False):
+        """ Add a reference frame to the matcher.
+
+        Parameters
+        ----------
+        frame: ReferenceFrame
+            The frame to add.
+
+        inverse: bool, default False
+            If True, invert the transformation of the reference frame.
+        """
+        self._check_timestamps(frame.timestamps)
+        self.frames.append(
+            Frame(
+                frame.translation,
+                frame.rotation,
+                frame.timestamps,
+                frame.discrete,
+                inverse,
+            )
+        )
+
+    def add_array(self, array, timestamps=None):
+        """ Add an array to the matcher.
+
+        Parameters
+        ----------
+        array: array_like
+            The array to add.
+
+        timestamps: array_like, optional
+            If provided, the timestamps of the array.
+        """
+        self._check_timestamps(timestamps)
+        self.arrays.append(Array(array, timestamps))
+
+    def get_range(self):
+        """ Get the range for which the transformation is defined.
+
+        Returns
+        -------
+        first: numeric or None
+            The first timestamp for which the transformation is defined.
+
+        last: numeric or None
+            The last timestamp for which the transformation is defined.
+        """
+        first_stamps = []
+        for frame in self.frames:
+            if frame.timestamps is not None and not frame.discrete:
+                first_stamps.append(frame.timestamps[0])
+        for array in self.arrays:
+            if array.timestamps is not None:
+                first_stamps.append(array.timestamps[0])
+
+        last_stamps = []
+        for frame in self.frames:
+            if frame.timestamps is not None and not frame.discrete:
+                last_stamps.append(frame.timestamps[-1])
+        for array in self.arrays:
+            if array.timestamps is not None:
+                last_stamps.append(array.timestamps[-1])
+
+        first = np.max(first_stamps) if len(first_stamps) else None
+        last = np.min(last_stamps) if len(last_stamps) else None
+
+        return first, last
+
+    def get_timestamps(self, arrays_first=True):
+        """ Get the timestamps for which the transformation is defined.
+
+        Parameters
+        ----------
+        arrays_first: bool, default True
+            If True, the first array in the list defines the sampling of the
+            timestamps. Otherwise, the first reference frame in the list
+            defines the sampling.
+
+        Returns
+        -------
+        timestamps: array_like
+            The timestamps for which the transformation is defined.
+        """
+        # TODO specify rf name as priority?
+        ts_range = self.get_range()
+
+        # first and last timestamp can be None for only discrete transforms
+        if ts_range[0] is None:
+            ts_range = (-np.inf, ts_range[1])
+        elif ts_range[1] is None:
+            ts_range = (ts_range[0], np.inf)
+
+        arrays = [
+            array for array in self.arrays if array.timestamps is not None
+        ]
+        discrete_frames = [
+            frame
+            for frame in self.frames
+            if frame.discrete and frame.timestamps is not None
+        ]
+        continuous_frames = [
+            frame
+            for frame in self.frames
+            if not frame.discrete and frame.timestamps is not None
+        ]
+
+        if arrays_first:
+            elements = arrays + continuous_frames
+        else:
+            elements = continuous_frames + arrays
+
+        if len(elements):
+            # The first element with timestamps determines the timestamps
+            # TODO check if this fails for datetime timestamps
+            timestamps = elements[0].timestamps
+            timestamps = timestamps[
+                (timestamps >= ts_range[0]) & (timestamps <= ts_range[-1])
+            ]
+        elif len(discrete_frames):
+            # If there are no continuous frames or arrays with timestamps
+            # we merge together all discrete timestamps
+            timestamps = np.concatenate(
+                [d.timestamps for d in discrete_frames]
+            )
+            timestamps = np.unique(timestamps)
+        else:
+            timestamps = None
+
+        return timestamps
+
+    def get_transformation(self, timestamps=None, arrays_first=True):
+        """ Get the transformation across all reference frames.
+
+        Parameters
+        ----------
+        timestamps: array_like, shape (n_timestamps,), optional
+            Timestamps to which the transformation should be matched. If not
+            provided the matcher will call `get_timestamps` for the target
+            timestamps.
+
+        arrays_first: bool, default True
+            If True and timestamps aren't provided, the first array in the
+            list defines the sampling of the timestamps. Otherwise, the first
+            reference frame in the list defines the sampling.
+
+        Returns
+        -------
+        translation: array_like, shape (3,) or (n_timestamps, 3)
+            The translation across all reference frames.
+
+        rotation: array_like, shape (4,) or (n_timestamps, 4)
+            The rotation across all reference frames.
+
+        timestamps: array_like, shape (n_timestamps,) or None
+            The timestamps for which the transformation is defined.
+        """
+        from rigid_body_motion.utils import rotate_vectors
+
+        if timestamps is None:
+            timestamps = self.get_timestamps(arrays_first)
+
+        translation = np.zeros(3) if timestamps is None else np.zeros((1, 3))
+        rotation = quaternion(1.0, 0.0, 0.0, 0.0)
+
+        for frame in self.frames:
+            t, r = self._transform_from_frame(frame, timestamps)
+            if frame.inverse:
+                translation = rotate_vectors(
+                    1 / as_quat_array(r), translation - np.array(t)
+                )
+                rotation = 1 / as_quat_array(r) * rotation
+            else:
+                translation = rotate_vectors(
+                    as_quat_array(r), translation
+                ) + np.array(t)
+                rotation = as_quat_array(r) * rotation
+
+        return translation, as_float_array(rotation), timestamps
+
+    def get_arrays(self, timestamps=None, arrays_first=True):
+        """ Get
+
+        Parameters
+        ----------
+        timestamps: array_like, shape (n_timestamps,), optional
+            Timestamps to which the arrays should be matched. If not provided
+            the matcher will call `get_timestamps` for the target timestamps.
+
+        arrays_first: bool, default True
+            If True and timestamps aren't provided, the first array in the
+            list defines the sampling of the timestamps. Otherwise, the first
+            reference frame in the list defines the sampling.
+
+        Returns
+        -------
+        *arrays: one or more array_like
+            Input arrays, matched to the timestamps.
+
+        timestamps: array_like, shape (n_timestamps,) or None
+            The timestamps for which the transformation is defined.
+        """
+        if timestamps is None:
+            timestamps = self.get_timestamps(arrays_first)
+
+        arrays = tuple(
+            self._resample_array(array, timestamps) for array in self.arrays
+        )
+
+        return (*arrays, timestamps)
 
 
 def _resolve_axis(axis, ndim):
@@ -381,19 +683,55 @@ def _make_twist_dataset(
 
 
 def _estimate_angular_velocity(
-    rotation, timestamps, axis=-1, time_axis=0, cutoff=None
+    rotation,
+    timestamps,
+    axis=-1,
+    time_axis=0,
+    mode="quaternion",
+    outlier_thresh=None,
+    cutoff=None,
 ):
     """ Estimate angular velocity of transform. """
     timestamps = timestamps.astype(float) / 1e9
 
-    dq = derivative(rotation, timestamps, axis=time_axis)
-    rotation = as_quat_array(np.swapaxes(rotation, axis, -1))
-    dq = as_quat_array(np.swapaxes(dq, axis, -1))
-    angular = as_float_array(2 * rotation.conjugate() * dq)[..., 1:]
-    angular = np.swapaxes(angular, axis, -1)
+    axis = axis % rotation.ndim
+    time_axis = time_axis % rotation.ndim
+
+    # fix time axis if it's the last axis of the array and will be swapped with
+    # axis when converting to quaternion dtype
+    if time_axis == rotation.ndim - 1:
+        time_axis = axis
+
+    r = np.swapaxes(rotation, axis, -1)
+    q = as_quat_array(r)
+
+    if mode == "quaternion":
+        dq = as_quat_array(derivative(r, timestamps, axis=time_axis))
+        angular = as_float_array(2 * q.conjugate() * dq)[..., 1:]
+    elif mode == "rotation_vector":
+        rv = as_rotation_vector(q)
+        angular = np.gradient(rv, timestamps, axis=time_axis)
+    else:
+        raise ValueError(
+            f"'mode' can be 'quaternion' or 'rotation_vector', got {mode}"
+        )
+
+    if outlier_thresh is not None:
+        dr = np.linalg.norm(
+            np.diff(as_rotation_vector(q), n=2, axis=time_axis), axis=-1
+        )
+        dr = np.hstack((dr, 0.0, 0.0)) + np.hstack((0.0, dr, 0.0))
+        angular = interp1d(
+            timestamps[dr <= outlier_thresh],
+            angular[dr <= outlier_thresh],
+            axis=time_axis,
+            bounds_error=False,
+        )(timestamps)
 
     if cutoff is not None:
         angular = filtfilt(*butter(7, cutoff), angular, axis=time_axis)
+
+    angular = np.swapaxes(angular, axis, -1)
 
     return angular
 

@@ -5,6 +5,7 @@ from numpy import testing as npt
 from rigid_body_motion import lookup_transform
 from rigid_body_motion.estimators import (
     _reshape_vectors,
+    best_fit_rotation,
     best_fit_transform,
     estimate_angular_velocity,
     estimate_linear_velocity,
@@ -36,7 +37,7 @@ class TestEstimators:
 
     def test_estimate_angular_velocity_xr(self, compensated_tree):
         """"""
-        pytest.importorskip("xarray")
+        xr = pytest.importorskip("xarray")
 
         gaze = lookup_transform("eyes", "world", as_dataset=True)
 
@@ -49,6 +50,15 @@ class TestEstimators:
         )
         assert angular.dims == ("cartesian_axis", "time")
         assert (angular < 1e-10).all()
+
+        angular_rv = estimate_angular_velocity(
+            gaze.rotation.T,
+            dim="quaternion_axis",
+            timestamps="time",
+            mode="rotation_vector",
+            outlier_thresh=1,
+        )
+        xr.testing.assert_allclose(angular, angular_rv)
 
     def test_estimate_linear_velocity_xr(self, compensated_tree):
         """"""
@@ -99,7 +109,21 @@ class TestEstimators:
 
         xr.testing.assert_allclose(actual, expected)
 
-    def test_best_fit_transform(self, get_rf_tree, mock_quaternion):
+    def test_best_fit_rotation(self, get_rf_tree, mock_quaternion):
+        """"""
+        rf_world, rf_child1, _ = get_rf_tree(
+            (0.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
+        )
+        v1 = np.random.randn(10, 3)
+        v2 = rf_world.transform_points(v1, rf_child1)
+
+        r = best_fit_rotation(v1, v2)
+        _, r_exp, _ = rf_world.get_transformation(rf_child1)
+        npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
+
+    def test_best_fit_transform(
+        self, get_rf_tree, mock_quaternion, icp_test_data
+    ):
         """"""
         rf_world, rf_child1, _ = get_rf_tree(
             (1.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
@@ -111,6 +135,16 @@ class TestEstimators:
         t_exp, r_exp, _ = rf_world.get_transformation(rf_child1)
         npt.assert_allclose(t, t_exp, rtol=1.0, atol=1e-10)
         npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
+
+        # real data
+        v1 = icp_test_data["t265"]
+        v2 = icp_test_data["vicon"]
+        t, r = best_fit_transform(v1, v2)
+        npt.assert_allclose(t, [-1.89872037, 0.61755277, 0.95930489])
+        npt.assert_allclose(
+            r,
+            [-6.87968663e-01, 4.73801246e-04, 9.12595868e-03, 7.25682859e-01],
+        )
 
     def test_best_fit_transform_xr(self, get_rf_tree, mock_quaternion):
         """"""
@@ -130,17 +164,25 @@ class TestEstimators:
         assert t.dims == ("cartesian_axis",)
         assert r.dims == ("quaternion_axis",)
 
-    def test_iterative_closest_point(self, icp_test_data):
+    def test_iterative_closest_point(self, get_rf_tree, mock_quaternion):
         """"""
-        v1 = icp_test_data["t265"]
-        v2 = icp_test_data["vicon"]
+        np.random.seed(42)
+
+        rf_world, rf_child1, _ = get_rf_tree(
+            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 6, 0.0, 0.0)
+        )
+        x, y = np.meshgrid(np.arange(10), np.arange(20))
+        v1 = np.column_stack(
+            (x.flatten() ** 2, y.flatten() ** 2, np.ones(x.size))
+        ) + 0.01 * np.random.randn(x.size, 3)
+        v2 = np.random.permutation(
+            rf_world.transform_points(v1, rf_child1)[1:]
+        )
 
         t, r = iterative_closest_point(v1, v2)
-        npt.assert_allclose(t, [-1.89872037, 0.61755277, 0.95930489])
-        npt.assert_allclose(
-            r,
-            [-6.87968663e-01, 4.73801246e-04, 9.12595868e-03, 7.25682859e-01],
-        )
+        t_exp, r_exp, _ = rf_world.get_transformation(rf_child1)
+        npt.assert_allclose(t, t_exp, rtol=1.0, atol=0.01)
+        npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-4)
 
     def test_iterative_closest_point_xr(self, get_rf_tree, mock_quaternion):
         """"""

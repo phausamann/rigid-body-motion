@@ -13,7 +13,7 @@ dependencies:
   - quaternion=2020.9.5.14.42.2
   - numba=0.48
   - anytree=2.8
-  - pytest=5.4.3
+  - pytest=6.2.2
   - pytest-cov=2.7.1
   - sphinx=2.4.4
   - sphinx_rtd_theme=0.4.3

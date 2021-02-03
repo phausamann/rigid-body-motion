@@ -35,6 +35,7 @@ Reference Frames
     deregister_frame
     clear_registry
     ReferenceFrame
+    render_tree
 
 Coordinate Systems
 ~~~~~~~~~~~~~~~~~~

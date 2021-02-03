@@ -1,6 +1,6 @@
 """"""
 import numpy as np
-from anytree import NodeMixin, Walker
+from anytree import NodeMixin, RenderTree, Walker
 from quaternion import as_float_array, as_quat_array, from_rotation_matrix
 
 from rigid_body_motion.core import (
@@ -39,6 +39,18 @@ def _deregister(name):
         )
 
     _registry.pop(name)
+
+
+def render_tree(root):
+    """ Render a reference frame tree.
+
+    Parameters
+    ----------
+    root: str or ReferenceFrame
+        The root of the rendered tree.
+    """
+    for pre, _, node in RenderTree(_resolve_rf(root)):
+        print(f"{pre}{node.name}")
 
 
 def register_frame(

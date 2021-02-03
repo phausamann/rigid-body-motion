@@ -32,7 +32,12 @@ from .estimators import (
 )
 from .reference_frames import ReferenceFrame
 from .reference_frames import _registry as registry
-from .reference_frames import clear_registry, deregister_frame, register_frame
+from .reference_frames import (
+    clear_registry,
+    deregister_frame,
+    register_frame,
+    render_tree,
+)
 from .utils import qinterp, qinv, qmean, qmul, rotate_vectors
 
 try:
@@ -57,6 +62,7 @@ __all__ = [
     "deregister_frame",
     "clear_registry",
     "ReferenceFrame",
+    "render_tree",
     # estimators
     "estimate_linear_velocity",
     "estimate_angular_velocity",

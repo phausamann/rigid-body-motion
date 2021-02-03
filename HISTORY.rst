@@ -2,6 +2,16 @@
 History
 =======
 
+0.4.0 (unreleased)
+------------------
+
+New features
+~~~~~~~~~~~~
+
+* New ``render_tree`` top-level method for printing out a graphical
+  representation of a reference frame tree.
+
+
 0.3.0 (December 8th, 2020)
 --------------------------
 

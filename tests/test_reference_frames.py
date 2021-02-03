@@ -7,7 +7,7 @@ import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _deregister, _register
 
 
-class TestReferenceFrameRegistry(object):
+class TestReferenceFrameRegistry:
     def test_register(self):
         """"""
         rf_world = rbm.ReferenceFrame("world")
@@ -57,8 +57,15 @@ class TestReferenceFrameRegistry(object):
         rbm.clear_registry()
         assert len(rbm.registry) == 0
 
+    def test_render_tree(self, register_rf_tree, capfd):
+        """"""
+        register_rf_tree()
+        rbm.render_tree("world")
+        out, err = capfd.readouterr()
+        assert out == "world\n├── child1\n└── child2\n"
 
-class TestReferenceFrame(object):
+
+class TestReferenceFrame:
     @pytest.fixture(autouse=True)
     def clear_registry(self):
         """"""

@@ -404,7 +404,7 @@ class TestReferenceFrame:
         vt_act = rf_child3.transform_vectors(p, rf_child2)
         v0t = rf_child3.transform_points((0.0, 0.0, 0.0), rf_child2)
         vt = np.tile(pt, (5, 1)) - np.array(v0t)
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
         # moving reference frame + multiple vectors
         vt_act = rf_child3.transform_vectors(
@@ -416,7 +416,7 @@ class TestReferenceFrame:
             timestamps=np.arange(10),
         )
         vt = np.tile(pt, (4, 1)) - np.array(v0t)
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
         # moving reference frame + multiple n-dimensional vectors
         vt_act = rf_child3.transform_vectors(
@@ -431,7 +431,7 @@ class TestReferenceFrame:
             timestamps=np.arange(10),
         )
         vt = np.tile(pt, (10, 4, 1)) - np.array(v0t[np.newaxis, :, :])
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
     def test_transform_points(self, transform_grid, get_rf_tree):
         """"""

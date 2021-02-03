@@ -398,7 +398,7 @@ class TestReferenceFrame:
         vt_act = rf_child1.transform_vectors(p, rf_child2)
         v0t = rf_child1.transform_points((0.0, 0.0, 0.0), rf_child2)
         vt = np.array(pt) - np.array(v0t)
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
         # moving reference frame + single vector
         vt_act = rf_child3.transform_vectors(p, rf_child2)

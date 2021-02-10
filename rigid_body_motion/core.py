@@ -682,6 +682,38 @@ def _make_twist_dataset(
     return twist
 
 
+def _make_velocity_dataarray(
+    velocity, motion_type, moving_frame, reference, represent_in, timestamps
+):
+    """ Create DataArray with linear or angular velocity. """
+    import xarray as xr
+
+    if motion_type not in ("linear", "angular"):
+        raise ValueError(
+            f"motion_type must be 'linear' or 'angular', got {motion_type}"
+        )
+
+    da = xr.DataArray(
+        velocity,
+        coords={"time": timestamps, "cartesian_axis": ["x", "y", "z"]},
+        dims=("time", "cartesian_axis"),
+        name=f"{motion_type}_velocity",
+    )
+
+    da.attrs.update(
+        {
+            "representation_frame": represent_in.name,
+            "reference_frame": reference.name,
+            "moving_frame": moving_frame.name,
+            "motion_type": f"{motion_type}_velocity",
+            "long_name": f"{motion_type.upper()} velocity",
+            "units": "rad/s" if motion_type == "angular" else "m/s",
+        }
+    )
+
+    return da
+
+
 def _estimate_angular_velocity(
     rotation,
     timestamps,
@@ -713,6 +745,7 @@ def _estimate_angular_velocity(
         )
         valid_idx = [slice(None)] * r.ndim
         valid_idx[time_axis] = ~nan_idx
+        valid_idx = tuple(valid_idx)
         dq = as_quat_array(
             derivative(r[valid_idx], timestamps[~nan_idx], axis=time_axis)
         )

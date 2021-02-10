@@ -354,3 +354,36 @@ class TestTopLevel:
             - head_dataset.interp(time=twist.time).angular_velocity
         ) ** 2
         assert err_w.mean() < 1e-3
+
+    def test_lookup_linear_velocity_xr(self, head_dataset):
+        """"""
+        rbm.register_frame("world")
+        rbm.ReferenceFrame.from_dataset(
+            head_dataset, "position", "orientation", "time", "world", "head",
+        ).register(update=True)
+
+        da = rbm.lookup_linear_velocity(
+            "head",
+            "world",
+            "world",
+            outlier_thresh=1e-3,
+            cutoff=0.25,
+            as_dataarray=True,
+        )
+
+        err_v = (da - head_dataset.linear_velocity.interp(time=da.time)) ** 2
+        assert err_v.mean() < 1e-4
+
+    def test_lookup_angular_velocity_xr(self, head_dataset):
+        """"""
+        rbm.register_frame("world")
+        rbm.ReferenceFrame.from_dataset(
+            head_dataset, "position", "orientation", "time", "world", "head",
+        ).register(update=True)
+
+        da = rbm.lookup_angular_velocity(
+            "head", "world", "world", cutoff=0.25, as_dataarray=True,
+        )
+
+        err_v = (da - head_dataset.angular_velocity.interp(time=da.time)) ** 2
+        assert err_v.mean() < 1e-3

@@ -606,6 +606,7 @@ def lookup_twist(
     represent_in=None,
     outlier_thresh=None,
     cutoff=None,
+    mode="quaternion",
     as_dataset=False,
 ):
     """ Estimate linear and angular velocity of a frame wrt a reference.
@@ -638,6 +639,11 @@ def lookup_twist(
         velocity after the estimation as a fraction of the Nyquist
         frequency.
 
+    mode: str, default "quaternion"
+        If "quaternion", compute the angular velocity from the quaternion
+        derivative. If "rotation_vector", compute the angular velocity from
+        the gradient of the axis-angle representation of the rotations.
+
     as_dataset: bool, default False
         If True, return an xarray.Dataset. Otherwise, return a tuple of linear
         and angular velocity and timestamps.
@@ -657,7 +663,11 @@ def lookup_twist(
     represent_in = _resolve_rf(represent_in or reference)
 
     linear, angular, timestamps = moving_frame.lookup_twist(
-        reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff
+        reference,
+        represent_in,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
+        mode=mode,
     )
 
     if as_dataset:

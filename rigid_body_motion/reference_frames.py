@@ -1014,6 +1014,7 @@ class ReferenceFrame(NodeMixin):
         represent_in=None,
         outlier_thresh=None,
         cutoff=None,
+        mode="quaternion",
     ):
         """ Estimate linear and angular velocity of this frame wrt a reference.
 
@@ -1041,6 +1042,11 @@ class ReferenceFrame(NodeMixin):
             Frequency of a low-pass filter applied to linear and angular
             velocity after the estimation as a fraction of the Nyquist
             frequency.
+
+        mode: str, default "quaternion"
+            If "quaternion", compute the angular velocity from the quaternion
+            derivative. If "rotation_vector", compute the angular velocity from
+            the gradient of the axis-angle representation of the rotations.
 
         Returns
         -------
@@ -1073,7 +1079,7 @@ class ReferenceFrame(NodeMixin):
             cutoff=cutoff,
         )
         angular = _estimate_angular_velocity(
-            rotation, timestamps, cutoff=cutoff
+            rotation, timestamps, cutoff=cutoff, mode=mode
         )
 
         linear, linear_ts = reference.transform_vectors(

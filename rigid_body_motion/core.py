@@ -692,7 +692,8 @@ def _estimate_angular_velocity(
     cutoff=None,
 ):
     """ Estimate angular velocity of transform. """
-    timestamps = timestamps.astype(float) / 1e9
+    if np.issubdtype(timestamps.dtype, np.datetime64):
+        timestamps = timestamps.astype(float) / 1e9
 
     axis = axis % rotation.ndim
     time_axis = time_axis % rotation.ndim
@@ -703,13 +704,23 @@ def _estimate_angular_velocity(
         time_axis = axis
 
     r = np.swapaxes(rotation, axis, -1)
-    q = as_quat_array(r)
 
     if mode == "quaternion":
-        dq = as_quat_array(derivative(r, timestamps, axis=time_axis))
-        angular = as_float_array(2 * q.conjugate() * dq)[..., 1:]
+        # any NaNs need to be removed because derivative breaks otherwise
+        nan_idx = np.any(
+            np.isnan(r),
+            axis=tuple(a for a in range(r.ndim) if a != time_axis),
+        )
+        valid_idx = [slice(None)] * r.ndim
+        valid_idx[time_axis] = ~nan_idx
+        dq = as_quat_array(
+            derivative(r[valid_idx], timestamps[~nan_idx], axis=time_axis)
+        )
+        q = as_quat_array(r[valid_idx])
+        angular = np.nan * np.ones_like(r[..., :-1])
+        angular[valid_idx] = as_float_array(2 * q.conjugate() * dq)[..., 1:]
     elif mode == "rotation_vector":
-        rv = as_rotation_vector(q)
+        rv = as_rotation_vector(as_quat_array(r))
         angular = np.gradient(rv, timestamps, axis=time_axis)
     else:
         raise ValueError(
@@ -718,7 +729,8 @@ def _estimate_angular_velocity(
 
     if outlier_thresh is not None:
         dr = np.linalg.norm(
-            np.diff(as_rotation_vector(q), n=2, axis=time_axis), axis=-1
+            np.diff(as_rotation_vector(as_quat_array(r)), n=2, axis=time_axis),
+            axis=-1,
         )
         dr = np.hstack((dr, 0.0, 0.0)) + np.hstack((0.0, dr, 0.0))
         angular = interp1d(
@@ -740,7 +752,8 @@ def _estimate_linear_velocity(
     translation, timestamps, time_axis=0, outlier_thresh=None, cutoff=None
 ):
     """ Estimate linear velocity of transform. """
-    timestamps = timestamps.astype(float) / 1e9
+    if np.issubdtype(timestamps.dtype, np.datetime64):
+        timestamps = timestamps.astype(float) / 1e9
 
     linear = np.gradient(translation, timestamps, axis=time_axis)
 

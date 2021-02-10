@@ -5,11 +5,13 @@ from numpy import testing as npt
 
 from rigid_body_motion.core import (
     TransformMatcher,
+    _estimate_angular_velocity,
     _make_dataarray,
     _maybe_unpack_dataarray,
     _replace_dim,
     _resolve_axis,
 )
+from rigid_body_motion.estimators import shortest_arc_rotation
 
 
 class TestCore:
@@ -392,3 +394,16 @@ class TestTransformMatcher:
 
         t_act, r_act = matcher._transform_from_frame(rf_3, ts)
         npt.assert_allclose(t_act, t[[0, 0, 0, 0, 0, 1, 1, 2, 2]])
+
+
+class TestCoreEstimators:
+    def test_estimate_angular_velocity(self, left_eye_dataset):
+        """"""
+        w = _estimate_angular_velocity(
+            left_eye_dataset.orientation.values, left_eye_dataset.time.values,
+        )
+
+        npt.assert_equal(
+            np.any(np.isnan(left_eye_dataset.orientation.values), 1),
+            np.any(np.isnan(w), 1),
+        )

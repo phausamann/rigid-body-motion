@@ -706,7 +706,7 @@ def _make_velocity_dataarray(
             "reference_frame": reference.name,
             "moving_frame": moving_frame.name,
             "motion_type": f"{motion_type}_velocity",
-            "long_name": f"{motion_type.upper()} velocity",
+            "long_name": f"{motion_type.capitalize()} velocity",
             "units": "rad/s" if motion_type == "angular" else "m/s",
         }
     )

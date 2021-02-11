@@ -11,7 +11,6 @@ from rigid_body_motion.core import (
     _replace_dim,
     _resolve_axis,
 )
-from rigid_body_motion.estimators import shortest_arc_rotation
 
 
 class TestCore:

@@ -2,6 +2,26 @@
 History
 =======
 
+0.4.0 (February 11th, 2021)
+---------------------------
+
+New features
+~~~~~~~~~~~~
+
+* New ``lookup_linear_velocity`` and ``lookup_angular_velocity`` top-level
+  methods.
+* New ``render_tree`` top-level method for printing out a graphical
+  representation of a reference frame tree.
+* ``lookup_twist`` now accepts a ``mode`` parameter to specify the mode for
+  angular velocity calculation.
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Fixed a bug where estimated angular velocity was all NaN when orientation
+  contained NaNs.
+
+
 0.3.0 (December 8th, 2020)
 --------------------------
 

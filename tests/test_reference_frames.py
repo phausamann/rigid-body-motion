@@ -7,7 +7,7 @@ import rigid_body_motion as rbm
 from rigid_body_motion.reference_frames import _deregister, _register
 
 
-class TestReferenceFrameRegistry(object):
+class TestReferenceFrameRegistry:
     def test_register(self):
         """"""
         rf_world = rbm.ReferenceFrame("world")
@@ -57,8 +57,15 @@ class TestReferenceFrameRegistry(object):
         rbm.clear_registry()
         assert len(rbm.registry) == 0
 
+    def test_render_tree(self, register_rf_tree, capfd):
+        """"""
+        register_rf_tree()
+        rbm.render_tree("world")
+        out, err = capfd.readouterr()
+        assert out == "world\n├── child1\n└── child2\n"
 
-class TestReferenceFrame(object):
+
+class TestReferenceFrame:
     @pytest.fixture(autouse=True)
     def clear_registry(self):
         """"""
@@ -391,13 +398,13 @@ class TestReferenceFrame(object):
         vt_act = rf_child1.transform_vectors(p, rf_child2)
         v0t = rf_child1.transform_points((0.0, 0.0, 0.0), rf_child2)
         vt = np.array(pt) - np.array(v0t)
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
         # moving reference frame + single vector
         vt_act = rf_child3.transform_vectors(p, rf_child2)
         v0t = rf_child3.transform_points((0.0, 0.0, 0.0), rf_child2)
         vt = np.tile(pt, (5, 1)) - np.array(v0t)
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
         # moving reference frame + multiple vectors
         vt_act = rf_child3.transform_vectors(
@@ -409,7 +416,7 @@ class TestReferenceFrame(object):
             timestamps=np.arange(10),
         )
         vt = np.tile(pt, (4, 1)) - np.array(v0t)
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
         # moving reference frame + multiple n-dimensional vectors
         vt_act = rf_child3.transform_vectors(
@@ -424,7 +431,7 @@ class TestReferenceFrame(object):
             timestamps=np.arange(10),
         )
         vt = np.tile(pt, (10, 4, 1)) - np.array(v0t[np.newaxis, :, :])
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_allclose(vt_act, vt, rtol=1.0, atol=1e-15)
 
     def test_transform_points(self, transform_grid, get_rf_tree):
         """"""

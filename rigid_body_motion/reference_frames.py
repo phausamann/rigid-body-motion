@@ -1,6 +1,6 @@
 """"""
 import numpy as np
-from anytree import NodeMixin, Walker
+from anytree import NodeMixin, RenderTree, Walker
 from quaternion import as_float_array, as_quat_array, from_rotation_matrix
 
 from rigid_body_motion.core import (
@@ -39,6 +39,18 @@ def _deregister(name):
         )
 
     _registry.pop(name)
+
+
+def render_tree(root):
+    """ Render a reference frame tree.
+
+    Parameters
+    ----------
+    root: str or ReferenceFrame
+        The root of the rendered tree.
+    """
+    for pre, _, node in RenderTree(_resolve_rf(root)):
+        print(f"{pre}{node.name}")
 
 
 def register_frame(
@@ -1002,6 +1014,7 @@ class ReferenceFrame(NodeMixin):
         represent_in=None,
         outlier_thresh=None,
         cutoff=None,
+        mode="quaternion",
     ):
         """ Estimate linear and angular velocity of this frame wrt a reference.
 
@@ -1029,6 +1042,11 @@ class ReferenceFrame(NodeMixin):
             Frequency of a low-pass filter applied to linear and angular
             velocity after the estimation as a fraction of the Nyquist
             frequency.
+
+        mode: str, default "quaternion"
+            If "quaternion", compute the angular velocity from the quaternion
+            derivative. If "rotation_vector", compute the angular velocity from
+            the gradient of the axis-angle representation of the rotations.
 
         Returns
         -------
@@ -1061,12 +1079,14 @@ class ReferenceFrame(NodeMixin):
             cutoff=cutoff,
         )
         angular = _estimate_angular_velocity(
-            rotation, timestamps, cutoff=cutoff
+            rotation, timestamps, cutoff=cutoff, mode=mode
         )
 
+        # linear velocity is represented in reference frame after estimation
         linear, linear_ts = reference.transform_vectors(
             linear, represent_in, timestamps=timestamps, return_timestamps=True
         )
+        # angular velocity is represented in moving frame after estimation
         angular, angular_ts = self.transform_vectors(
             angular,
             represent_in,
@@ -1078,6 +1098,146 @@ class ReferenceFrame(NodeMixin):
         )
 
         return linear, angular, timestamps
+
+    def lookup_linear_velocity(
+        self,
+        reference=None,
+        represent_in=None,
+        outlier_thresh=None,
+        cutoff=None,
+    ):
+        """ Estimate linear velocity of this frame wrt a reference.
+
+        Parameters
+        ----------
+        reference: str or ReferenceFrame, optional
+            The reference frame wrt which the twist is estimated. Defaults to
+            the parent frame.
+
+        represent_in: str or ReferenceFrame, optional
+            The reference frame in which the twist is represented. Defaults
+            to the parent frame.
+
+        outlier_thresh: float, optional
+            Some SLAM-based trackers introduce position corrections when a new
+            camera frame becomes available. This introduces outliers in the
+            linear velocity estimate. The estimation algorithm used here
+            can suppress these outliers by throwing out samples where the
+            norm of the second-order differences of the position is above
+            `outlier_thresh` and interpolating the missing values. For
+            measurements from the Intel RealSense T265 tracker, set this value
+            to 1e-3.
+
+        cutoff: float, optional
+            Frequency of a low-pass filter applied to linear and angular
+            velocity after the estimation as a fraction of the Nyquist
+            frequency.
+
+        Returns
+        -------
+        linear: numpy.ndarray, shape (N, 3)
+            Linear velocity of moving frame wrt reference frame, represented
+            in representation frame.
+
+        timestamps: each numpy.ndarray
+            Timestamps of the linear velocity.
+        """
+        try:
+            reference = _resolve_rf(reference or self.parent)
+            represent_in = _resolve_rf(represent_in or self.parent)
+        except TypeError:
+            raise ValueError(f"Frame {self.name} has no parent frame")
+
+        translation, _, timestamps = self.get_transformation(reference)
+
+        if timestamps is None:
+            raise ValueError("Twist cannot be estimated for static transforms")
+
+        linear = _estimate_linear_velocity(
+            translation,
+            timestamps,
+            outlier_thresh=outlier_thresh,
+            cutoff=cutoff,
+        )
+        # linear velocity is represented in reference frame after estimation
+        linear, linear_ts = reference.transform_vectors(
+            linear, represent_in, timestamps=timestamps, return_timestamps=True
+        )
+
+        return linear, timestamps
+
+    def lookup_angular_velocity(
+        self,
+        reference=None,
+        represent_in=None,
+        outlier_thresh=None,
+        cutoff=None,
+        mode="quaternion",
+    ):
+        """ Estimate angular velocity of this frame wrt a reference.
+
+        Parameters
+        ----------
+        reference: str or ReferenceFrame, optional
+            The reference frame wrt which the twist is estimated. Defaults to
+            the parent frame.
+
+        represent_in: str or ReferenceFrame, optional
+            The reference frame in which the twist is represented. Defaults
+            to the parent frame.
+
+        outlier_thresh: float, optional
+            Suppress samples where the norm of the second-order differences of
+            the rotation is above `outlier_thresh` and interpolate the missing
+            values.
+
+        cutoff: float, optional
+            Frequency of a low-pass filter applied to linear and angular
+            velocity after the estimation as a fraction of the Nyquist
+            frequency.
+
+        mode: str, default "quaternion"
+            If "quaternion", compute the angular velocity from the quaternion
+            derivative. If "rotation_vector", compute the angular velocity from
+            the gradient of the axis-angle representation of the rotations.
+
+        Returns
+        -------
+        angular: numpy.ndarray, shape (N, 3)
+            Angular velocity of moving frame wrt reference frame, represented
+            in representation frame.
+
+        timestamps: each numpy.ndarray
+            Timestamps of the angular velocity.
+        """
+        try:
+            reference = _resolve_rf(reference or self.parent)
+            represent_in = _resolve_rf(represent_in or self.parent)
+        except TypeError:
+            raise ValueError(f"Frame {self.name} has no parent frame")
+
+        _, rotation, timestamps = self.get_transformation(reference)
+
+        if timestamps is None:
+            raise ValueError("Twist cannot be estimated for static transforms")
+
+        angular = _estimate_angular_velocity(
+            rotation,
+            timestamps,
+            cutoff=cutoff,
+            mode=mode,
+            outlier_thresh=outlier_thresh,
+        )
+
+        # angular velocity is represented in moving frame after estimation
+        angular, angular_ts = self.transform_vectors(
+            angular,
+            represent_in,
+            timestamps=timestamps,
+            return_timestamps=True,
+        )
+
+        return angular, timestamps
 
     def register(self, update=False):
         """ Register this frame in the registry.

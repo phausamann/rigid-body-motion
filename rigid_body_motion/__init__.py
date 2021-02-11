@@ -1,7 +1,7 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 from pathlib import Path
 
 from pkg_resources import resource_filename
@@ -17,6 +17,7 @@ from .core import (
     _make_dataarray,
     _make_transform_or_pose_dataset,
     _make_twist_dataset,
+    _make_velocity_dataarray,
     _maybe_unpack_dataarray,
     _replace_dim,
     _resolve_rf,
@@ -32,7 +33,12 @@ from .estimators import (
 )
 from .reference_frames import ReferenceFrame
 from .reference_frames import _registry as registry
-from .reference_frames import clear_registry, deregister_frame, register_frame
+from .reference_frames import (
+    clear_registry,
+    deregister_frame,
+    register_frame,
+    render_tree,
+)
 from .utils import qinterp, qinv, qmean, qmul, rotate_vectors
 
 try:
@@ -57,6 +63,7 @@ __all__ = [
     "deregister_frame",
     "clear_registry",
     "ReferenceFrame",
+    "render_tree",
     # estimators
     "estimate_linear_velocity",
     "estimate_angular_velocity",
@@ -66,6 +73,8 @@ __all__ = [
     "iterative_closest_point",
     "lookup_transform",
     "lookup_twist",
+    "lookup_linear_velocity",
+    "lookup_angular_velocity",
     # utils
     "example_data",
     "qinterp",
@@ -600,6 +609,7 @@ def lookup_twist(
     represent_in=None,
     outlier_thresh=None,
     cutoff=None,
+    mode="quaternion",
     as_dataset=False,
 ):
     """ Estimate linear and angular velocity of a frame wrt a reference.
@@ -632,6 +642,11 @@ def lookup_twist(
         velocity after the estimation as a fraction of the Nyquist
         frequency.
 
+    mode: str, default "quaternion"
+        If "quaternion", compute the angular velocity from the quaternion
+        derivative. If "rotation_vector", compute the angular velocity from
+        the gradient of the axis-angle representation of the rotations.
+
     as_dataset: bool, default False
         If True, return an xarray.Dataset. Otherwise, return a tuple of linear
         and angular velocity and timestamps.
@@ -651,7 +666,11 @@ def lookup_twist(
     represent_in = _resolve_rf(represent_in or reference)
 
     linear, angular, timestamps = moving_frame.lookup_twist(
-        reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff
+        reference,
+        represent_in,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
+        mode=mode,
     )
 
     if as_dataset:
@@ -660,3 +679,148 @@ def lookup_twist(
         )
     else:
         return linear, angular, timestamps
+
+
+def lookup_linear_velocity(
+    moving_frame,
+    reference=None,
+    represent_in=None,
+    outlier_thresh=None,
+    cutoff=None,
+    as_dataarray=False,
+):
+    """ Estimate linear velocity of a frame wrt a reference.
+
+    Parameters
+    ----------
+    moving_frame: str or ReferenceFrame
+        The reference frame whose twist is estimated.
+
+    reference: str or ReferenceFrame, optional
+        The reference frame wrt which the twist is estimated. Defaults to
+        the parent frame of the moving frame.
+
+    represent_in: str or ReferenceFrame, optional
+        The reference frame in which the twist is represented. Defaults
+        to the reference frame.
+
+    outlier_thresh: float, optional
+        Some SLAM-based trackers introduce position corrections when a new
+        camera frame becomes available. This introduces outliers in the
+        linear velocity estimate. The estimation algorithm used here
+        can suppress these outliers by throwing out samples where the
+        norm of the second-order differences of the position is above
+        `outlier_thresh` and interpolating the missing values. For
+        measurements from the Intel RealSense T265 tracker, set this value
+        to 1e-3.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to linear and angular
+        velocity after the estimation as a fraction of the Nyquist
+        frequency.
+
+    as_dataarray: bool, default False
+        If True, return an xarray.DataArray. Otherwise, return a tuple of
+        linear velocity and timestamps.
+
+    Returns
+    -------
+    linear, timestamps: each numpy.ndarray
+        Linear velocity and timestamps of moving frame wrt
+        reference frame, represented in representation frame, if `as_dataarray`
+        is False.
+
+    da: xarray.DataArray
+        The above arrays as an xarray.DataArray, if `as_dataarray` is True.
+    """
+    moving_frame = _resolve_rf(moving_frame)
+    reference = _resolve_rf(reference or moving_frame.parent)
+    represent_in = _resolve_rf(represent_in or reference)
+
+    linear, timestamps = moving_frame.lookup_linear_velocity(
+        reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff,
+    )
+
+    if as_dataarray:
+        return _make_velocity_dataarray(
+            linear, "linear", moving_frame, reference, represent_in, timestamps
+        )
+    else:
+        return linear, timestamps
+
+
+def lookup_angular_velocity(
+    moving_frame,
+    reference=None,
+    represent_in=None,
+    outlier_thresh=None,
+    cutoff=None,
+    mode="quaternion",
+    as_dataarray=False,
+):
+    """ Estimate angular velocity of a frame wrt a reference.
+
+    Parameters
+    ----------
+    moving_frame: str or ReferenceFrame
+        The reference frame whose twist is estimated.
+
+    reference: str or ReferenceFrame, optional
+        The reference frame wrt which the twist is estimated. Defaults to
+        the parent frame of the moving frame.
+
+    represent_in: str or ReferenceFrame, optional
+        The reference frame in which the twist is represented. Defaults
+        to the reference frame.
+
+    outlier_thresh: float, optional
+        Suppress samples where the norm of the second-order differences of the
+        rotation is above `outlier_thresh` and interpolate the missing values.
+
+    cutoff: float, optional
+        Frequency of a low-pass filter applied to angular and angular
+        velocity after the estimation as a fraction of the Nyquist
+        frequency.
+
+    mode: str, default "quaternion"
+        If "quaternion", compute the angular velocity from the quaternion
+        derivative. If "rotation_vector", compute the angular velocity from
+        the gradient of the axis-angle representation of the rotations.
+
+    as_dataarray: bool, default False
+        If True, return an xarray.DataArray. Otherwise, return a tuple of
+        angular velocity and timestamps.
+
+    Returns
+    -------
+    angular, timestamps: each numpy.ndarray
+        Angular velocity and timestamps of moving frame wrt
+        reference frame, represented in representation frame, if `as_dataarray`
+        is False.
+
+    da: xarray.DataArray
+        The above arrays as an xarray.DataArray, if `as_dataarray` is True.
+    """
+    moving_frame = _resolve_rf(moving_frame)
+    reference = _resolve_rf(reference or moving_frame.parent)
+    represent_in = _resolve_rf(represent_in or reference)
+
+    angular, timestamps = moving_frame.lookup_angular_velocity(
+        reference,
+        represent_in,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
+        mode=mode,
+    )
+
+    if as_dataarray:
+        return _make_velocity_dataarray(
+            angular,
+            "angular",
+            moving_frame,
+            reference,
+            represent_in,
+            timestamps,
+        )
+    else:
+        return angular, timestamps

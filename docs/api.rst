@@ -35,6 +35,7 @@ Reference Frames
     deregister_frame
     clear_registry
     ReferenceFrame
+    render_tree
 
 Coordinate Systems
 ~~~~~~~~~~~~~~~~~~
@@ -59,6 +60,8 @@ Estimators
     estimate_angular_velocity
     lookup_transform
     lookup_twist
+    lookup_linear_velocity
+    lookup_angular_velocity
     shortest_arc_rotation
     best_fit_rotation
     best_fit_transform

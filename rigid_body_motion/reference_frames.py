@@ -811,13 +811,13 @@ class ReferenceFrame(NodeMixin):
             The timestamps after the transformation.
         """
         if what == "reference_frame":
-            _, angular, angular_ts = self.lookup_twist(
+            angular, angular_ts = self.lookup_angular_velocity(
                 to_frame, to_frame, cutoff=cutoff
             )
         elif what == "moving_frame":
-            _, angular, angular_ts = _resolve_rf(to_frame).lookup_twist(
-                self, to_frame, cutoff=cutoff
-            )
+            angular, angular_ts = _resolve_rf(
+                to_frame
+            ).lookup_angular_velocity(self, to_frame, cutoff=cutoff)
         elif what == "representation_frame":
             return self.transform_vectors(
                 arr,
@@ -953,10 +953,10 @@ class ReferenceFrame(NodeMixin):
 
         elif what == "moving_frame":
             to_frame = _resolve_rf(to_frame)
-            linear, _, linear_ts = to_frame.lookup_twist(
+            linear, linear_ts = to_frame.lookup_linear_velocity(
                 self, to_frame, cutoff=cutoff, outlier_thresh=outlier_thresh,
             )
-            _, angular, angular_ts = self.lookup_twist(
+            angular, angular_ts = self.lookup_angular_velocity(
                 reference_frame, to_frame, cutoff=cutoff
             )
             translation, _, translation_ts = to_frame.get_transformation(self)

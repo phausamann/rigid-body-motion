@@ -778,6 +778,8 @@ def _estimate_angular_velocity(
 
     angular = np.swapaxes(angular, axis, -1)
 
+    # TODO transform representation frame to match linear velocity estimate
+
     return angular
 
 

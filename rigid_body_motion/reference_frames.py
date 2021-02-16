@@ -812,12 +812,14 @@ class ReferenceFrame(NodeMixin):
         """
         if what == "reference_frame":
             angular, angular_ts = self.lookup_angular_velocity(
-                to_frame, to_frame, cutoff=cutoff
+                to_frame, to_frame, cutoff=cutoff, allow_static=True
             )
         elif what == "moving_frame":
             angular, angular_ts = _resolve_rf(
                 to_frame
-            ).lookup_angular_velocity(self, to_frame, cutoff=cutoff)
+            ).lookup_angular_velocity(
+                self, to_frame, cutoff=cutoff, allow_static=True
+            )
         elif what == "representation_frame":
             return self.transform_vectors(
                 arr,
@@ -842,14 +844,13 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        angular, arr, timestamps = self._match_arrays(
+        arr, angular, ts_out = self._match_arrays(
             [(arr, ts), (angular, angular_ts)]
         )
-
         arr += angular
 
         if return_timestamps:
-            return arr, timestamps
+            return arr, ts_out
         else:
             return arr
 
@@ -945,6 +946,7 @@ class ReferenceFrame(NodeMixin):
                 to_frame,
                 cutoff=cutoff,
                 outlier_thresh=outlier_thresh,
+                allow_static=True,
             )
             angular_ts = linear_ts
             translation, _, translation_ts = _resolve_rf(
@@ -954,10 +956,14 @@ class ReferenceFrame(NodeMixin):
         elif what == "moving_frame":
             to_frame = _resolve_rf(to_frame)
             linear, linear_ts = to_frame.lookup_linear_velocity(
-                self, to_frame, cutoff=cutoff, outlier_thresh=outlier_thresh,
+                self,
+                to_frame,
+                cutoff=cutoff,
+                outlier_thresh=outlier_thresh,
+                allow_static=True,
             )
             angular, angular_ts = self.lookup_angular_velocity(
-                reference_frame, to_frame, cutoff=cutoff
+                reference_frame, to_frame, cutoff=cutoff, allow_static=True,
             )
             translation, _, translation_ts = to_frame.get_transformation(self)
 
@@ -992,7 +998,7 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        arr, linear, angular, translation, ts = self._match_arrays(
+        arr, linear, angular, translation, ts_out = self._match_arrays(
             [
                 (arr, ts),
                 (linear, linear_ts),
@@ -1000,11 +1006,10 @@ class ReferenceFrame(NodeMixin):
                 (translation, translation_ts),
             ]
         )
-
         arr = arr + linear + np.cross(angular, translation)
 
         if return_timestamps:
-            return arr, ts
+            return arr, ts_out
         else:
             return arr
 
@@ -1015,6 +1020,7 @@ class ReferenceFrame(NodeMixin):
         outlier_thresh=None,
         cutoff=None,
         mode="quaternion",
+        allow_static=False,
     ):
         """ Estimate linear and angular velocity of this frame wrt a reference.
 
@@ -1048,6 +1054,11 @@ class ReferenceFrame(NodeMixin):
             derivative. If "rotation_vector", compute the angular velocity from
             the gradient of the axis-angle representation of the rotations.
 
+        allow_static: bool, default False
+            If True, return a zero velocity vector and None for timestamps if
+            the transform between this frame and the reference frame is static.
+            Otherwise, a `ValueError` will be raised.
+
         Returns
         -------
         linear: numpy.ndarray, shape (N, 3)
@@ -1070,7 +1081,12 @@ class ReferenceFrame(NodeMixin):
         translation, rotation, timestamps = self.get_transformation(reference)
 
         if timestamps is None:
-            raise ValueError("Twist cannot be estimated for static transforms")
+            if allow_static:
+                return np.zeros(3), np.zeros(3), None
+            else:
+                raise ValueError(
+                    "Twist cannot be estimated for static transforms"
+                )
 
         linear = _estimate_linear_velocity(
             translation,
@@ -1105,6 +1121,7 @@ class ReferenceFrame(NodeMixin):
         represent_in=None,
         outlier_thresh=None,
         cutoff=None,
+        allow_static=False,
     ):
         """ Estimate linear velocity of this frame wrt a reference.
 
@@ -1133,6 +1150,11 @@ class ReferenceFrame(NodeMixin):
             velocity after the estimation as a fraction of the Nyquist
             frequency.
 
+        allow_static: bool, default False
+            If True, return a zero velocity vector and None for timestamps if
+            the transform between this frame and the reference frame is static.
+            Otherwise, a `ValueError` will be raised.
+
         Returns
         -------
         linear: numpy.ndarray, shape (N, 3)
@@ -1151,7 +1173,12 @@ class ReferenceFrame(NodeMixin):
         translation, _, timestamps = self.get_transformation(reference)
 
         if timestamps is None:
-            raise ValueError("Twist cannot be estimated for static transforms")
+            if allow_static:
+                return np.zeros(3), None
+            else:
+                raise ValueError(
+                    "Velocity cannot be estimated for static transforms"
+                )
 
         linear = _estimate_linear_velocity(
             translation,
@@ -1173,6 +1200,7 @@ class ReferenceFrame(NodeMixin):
         outlier_thresh=None,
         cutoff=None,
         mode="quaternion",
+        allow_static=False,
     ):
         """ Estimate angular velocity of this frame wrt a reference.
 
@@ -1201,6 +1229,11 @@ class ReferenceFrame(NodeMixin):
             derivative. If "rotation_vector", compute the angular velocity from
             the gradient of the axis-angle representation of the rotations.
 
+        allow_static: bool, default False
+            If True, return a zero velocity vector and None for timestamps if
+            the transform between this frame and the reference frame is static.
+            Otherwise, a `ValueError` will be raised.
+
         Returns
         -------
         angular: numpy.ndarray, shape (N, 3)
@@ -1219,7 +1252,12 @@ class ReferenceFrame(NodeMixin):
         _, rotation, timestamps = self.get_transformation(reference)
 
         if timestamps is None:
-            raise ValueError("Twist cannot be estimated for static transforms")
+            if allow_static:
+                return np.zeros(3), None
+            else:
+                raise ValueError(
+                    "Velocity cannot be estimated for static transforms"
+                )
 
         angular = _estimate_angular_velocity(
             rotation,

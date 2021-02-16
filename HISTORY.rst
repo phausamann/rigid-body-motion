@@ -9,6 +9,12 @@ Bug fixes & improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~
 * Fixed ``transform_coordinates`` failing when spatial dimension is first
   axis of array.
+* Fixed ``transform_linear_velocity`` and ``transform_angular_velocity``
+  failing when reference frame or moving frame is transformed across only
+  static transforms.
+* Added ``allow_static`` parameter to ``lookup_twist``,
+  ``lookup_angular_velocity`` and ``lookup_linear_velocity`` to return zero
+  velocity and no timestamps across only static transforms.
 
 
 0.4.0 (February 11th, 2021)

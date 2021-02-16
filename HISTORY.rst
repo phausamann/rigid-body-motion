@@ -2,6 +2,15 @@
 History
 =======
 
+0.4.1 (unreleased)
+------------------
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+* Fixed ``transform_coordinates`` failing when spatial dimension is first
+  axis of array.
+
+
 0.4.0 (February 11th, 2021)
 ---------------------------
 

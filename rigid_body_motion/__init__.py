@@ -532,7 +532,7 @@ def transform_coordinates(
     spherical_to_cartesian
     """
     arr, axis, _, _, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
-        arr, dim, axis
+        arr, dim, axis, timestamps=False
     )
 
     if outof is None:

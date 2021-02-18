@@ -1109,11 +1109,11 @@ class ReferenceFrame(NodeMixin):
             timestamps=timestamps,
             return_timestamps=True,
         )
-        angular, linear, timestamps = self._match_arrays(
+        angular, linear, twist_ts = self._match_arrays(
             [(angular, angular_ts), (linear, linear_ts)],
         )
 
-        return linear, angular, timestamps
+        return linear, angular, twist_ts
 
     def lookup_linear_velocity(
         self,
@@ -1191,7 +1191,7 @@ class ReferenceFrame(NodeMixin):
             linear, represent_in, timestamps=timestamps, return_timestamps=True
         )
 
-        return linear, timestamps
+        return linear, linear_ts
 
     def lookup_angular_velocity(
         self,
@@ -1275,7 +1275,7 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        return angular, timestamps
+        return angular, angular_ts
 
     def register(self, update=False):
         """ Register this frame in the registry.

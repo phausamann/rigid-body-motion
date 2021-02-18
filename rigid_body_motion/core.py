@@ -29,12 +29,16 @@ class TransformMatcher:
         self.arrays = []
 
     @classmethod
-    def _check_timestamps(cls, timestamps):
+    def _check_timestamps(cls, timestamps, arr_shape):
         """ Make sure timestamps are monotonic. """
-        if timestamps is not None and np.any(
-            np.diff(timestamps.astype(float)) < 0
-        ):
-            raise ValueError("Timestamps must be monotonic")
+        if timestamps is not None:
+            if np.any(np.diff(timestamps.astype(float)) < 0):
+                raise ValueError("Timestamps must be monotonic")
+            if len(timestamps) != arr_shape[0]:
+                raise ValueError(
+                    "Number of timestamps must match length of first axis "
+                    "of array"
+                )
 
     @classmethod
     def _transform_from_frame(cls, frame, timestamps):
@@ -109,7 +113,7 @@ class TransformMatcher:
         inverse: bool, default False
             If True, invert the transformation of the reference frame.
         """
-        self._check_timestamps(frame.timestamps)
+        self._check_timestamps(frame.timestamps, frame.translation.shape)
         self.frames.append(
             Frame(
                 frame.translation,
@@ -131,7 +135,7 @@ class TransformMatcher:
         timestamps: array_like, optional
             If provided, the timestamps of the array.
         """
-        self._check_timestamps(timestamps)
+        self._check_timestamps(timestamps, array.shape)
         self.arrays.append(Array(array, timestamps))
 
     def get_range(self):
@@ -278,7 +282,7 @@ class TransformMatcher:
         return translation, as_float_array(rotation), timestamps
 
     def get_arrays(self, timestamps=None, arrays_first=True):
-        """ Get
+        """ Get re-sampled arrays
 
         Parameters
         ----------

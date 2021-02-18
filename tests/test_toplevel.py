@@ -293,6 +293,12 @@ class TestTopLevel:
         xr.testing.assert_allclose(actual, expected)
         assert actual.attrs == {"coordinate_system": "spherical"}
 
+        # regression test for time axis being erroneously inferred
+        actual = rbm.transform_coordinates(
+            da.T, into="spherical", outof="cartesian", dim="cartesian_axis"
+        )
+        xr.testing.assert_allclose(actual, expected.T)
+
         da.attrs = {}
         with pytest.raises(ValueError):
             rbm.transform_coordinates(da, into="spherical")

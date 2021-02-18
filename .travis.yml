@@ -13,10 +13,12 @@ jobs:
         - hash -r
         - conda config --set always_yes yes --set changeps1 no
         - conda update -q conda
-        - conda install conda-build anaconda-client
+        - conda install -c conda-forge boa anaconda-client
         - conda config --set anaconda_upload no
+        - conda config --add channels robostack
+        - conda config --add channels conda-forge
       script:
-        - conda build -c conda-forge -c robostack ci/conda_recipe
+        - conda mambabuild ci/conda_recipe
       after_success:
         - chmod +x ci/conda_recipe/conda_upload.sh
     - python: 3.6

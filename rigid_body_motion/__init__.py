@@ -1,7 +1,7 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 from pathlib import Path
 
 from pkg_resources import resource_filename
@@ -532,7 +532,7 @@ def transform_coordinates(
     spherical_to_cartesian
     """
     arr, axis, _, _, _, _, coords, dims, name, attrs = _maybe_unpack_dataarray(
-        arr, dim, axis
+        arr, dim, axis, timestamps=False
     )
 
     if outof is None:

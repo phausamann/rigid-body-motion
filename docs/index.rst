@@ -27,6 +27,7 @@ xarray_ data types.
 
    installation
    usage
+   xarray
    api
    roadmap
    contributing

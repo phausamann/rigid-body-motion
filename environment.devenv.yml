@@ -15,15 +15,16 @@ dependencies:
   - anytree=2.8
   - pytest=6.2.2
   - pytest-cov=2.7.1
+  - coverage=4.5.3
   - sphinx=2.4.4
   - sphinx_rtd_theme=0.4.3
-  - numpydoc=0.9.1
-  - coverage=4.5.3
+  - nbsphinx=0.8.1
   - sphinx-autosummary-accessors=0.1.2
-  - pip:
-      - --editable "{{ root }}"
+  - numpydoc=0.9.1
+  - matplotlib=3.3.4
   # additional dev tools
   {% if "RBM_DEV_TOOLS" in os.environ %}
+  - watchdog=2.0.2
   - tox=3.5.2
   - bump2version=1.0.0
   - flake8=3.7.9
@@ -45,4 +46,8 @@ dependencies:
   - pyyaml=5.3.1
   - pip:
       - jupyros==0.3.0
+      - --editable "{{ root }}"
+  {% else %}
+  - pip:
+      - --editable "{{ root }}"
   {% endif %}

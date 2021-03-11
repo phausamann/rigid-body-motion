@@ -32,7 +32,7 @@ jobs:
     - python: 3.6
       env: TOXENV=docs
       install:
-        - apt-get install pandoc
+        - sudo apt-get install pandoc
     - python: 3.6
       env: TOXENV=lint
 

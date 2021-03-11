@@ -4,7 +4,7 @@ coverage==4.5.1
 Sphinx==2.4.4
 sphinx_rtd_theme==0.4
 numpydoc==0.9.1
-git+https://github.com/keewis/sphinx-autosummary-accessors
+sphinx-autosummary-accessors==0.1.2
 
 pytest==6.2.2
 pytest-cov==2.7.1

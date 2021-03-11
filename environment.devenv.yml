@@ -19,8 +19,8 @@ dependencies:
   - sphinx_rtd_theme=0.4.3
   - numpydoc=0.9.1
   - coverage=4.5.3
+  - sphinx-autosummary-accessors=0.1.2
   - pip:
-      - git+https://github.com/keewis/sphinx-autosummary-accessors
       - --editable "{{ root }}"
   # additional dev tools
   {% if "RBM_DEV_TOOLS" in os.environ %}

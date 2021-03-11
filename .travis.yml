@@ -31,6 +31,8 @@ jobs:
       env: TOXENV=latest
     - python: 3.6
       env: TOXENV=docs
+      install:
+        - apt-get install pandoc
     - python: 3.6
       env: TOXENV=lint
 

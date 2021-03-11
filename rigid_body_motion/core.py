@@ -503,7 +503,7 @@ def _transform(
     axis,
     timestamps,
     time_axis,
-    what="reference_frame",
+    what=None,
     **kwargs,
 ):
     """ Base transform method. """
@@ -538,6 +538,12 @@ def _transform(
                 f"whose ``attrs`` contain a 'motion_type' entry "
                 f"containing any of {method_lookup.keys()}"
             )
+
+    if what is None:
+        if method == "transform_vectors":
+            what = "representation_frame"
+        else:
+            what = "reference_frame"
 
     if outof is None:
         if attrs is not None and what in attrs:

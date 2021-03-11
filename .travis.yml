@@ -33,6 +33,7 @@ jobs:
       env: TOXENV=docs
       install:
         - sudo apt-get install pandoc
+        - pip install -U tox-travis
     - python: 3.6
       env: TOXENV=lint
 

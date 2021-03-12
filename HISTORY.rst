@@ -2,11 +2,34 @@
 History
 =======
 
+0.5.0 (unreleased)
+------------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+* Top-level reference frame transform methods now all accept a
+  ``return_timestamps`` argument that is ``True`` for velocity transform and
+  ``False`` for all other transforms. Previously, methods would return
+  timestamps only if the result of the transformation was timestamped.
+  This does not affect the xarray interface.
+
+New features
+~~~~~~~~~~~~
+* New ``plot`` module with plotting methods for static reference frames and
+  arrays of points.
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+* Fixed ``"reference_frame"`` attribute incorrectly set by
+  ``transform_vectors``.
+
+
 0.4.1 (February 18th, 2021)
 ---------------------------
 
 Bug fixes & improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Fixed ``transform_coordinates`` failing when spatial dimension is first
   axis of array.
 * Fixed ``transform_linear_velocity`` and ``transform_angular_velocity``

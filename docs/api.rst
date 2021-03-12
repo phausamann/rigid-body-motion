@@ -82,6 +82,19 @@ Utility functions
     rotate_vectors
 
 
+Plotting
+--------
+
+.. currentmodule:: rigid_body_motion.plot
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    reference_frame
+    points
+
+
 xarray Accessors
 ----------------
 

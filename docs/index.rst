@@ -26,7 +26,7 @@ xarray_ data types.
    :caption: Contents:
 
    installation
-   usage
+   reference_frames
    xarray
    api
    roadmap

@@ -106,7 +106,14 @@ example_data = {
 
 
 def transform_vectors(
-    arr, into, outof=None, dim=None, axis=None, timestamps=None, time_axis=None
+    arr,
+    into,
+    outof=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    return_timestamps=False,
 ):
     """ Transform an array of vectors between reference frames.
 
@@ -144,6 +151,9 @@ def transform_vectors(
         The axis of the array representing the timestamps of the vectors.
         Defaults to the first axis of the array.
 
+    return_timestamps: bool, default False
+        If True, also return the timestamps after the transformation.
+
     Returns
     -------
     arr_transformed: array_like
@@ -157,12 +167,27 @@ def transform_vectors(
     transform_quaternions, transform_points, ReferenceFrame
     """
     return _transform(
-        "transform_vectors", arr, into, outof, dim, axis, timestamps, time_axis
+        "transform_vectors",
+        arr,
+        into,
+        outof,
+        dim,
+        axis,
+        timestamps,
+        time_axis,
+        return_timestamps=return_timestamps,
     )
 
 
 def transform_points(
-    arr, into, outof=None, dim=None, axis=None, timestamps=None, time_axis=None
+    arr,
+    into,
+    outof=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    return_timestamps=False,
 ):
     """ Transform an array of points between reference frames.
 
@@ -200,6 +225,9 @@ def transform_points(
         The axis of the array representing the timestamps of the points.
         Defaults to the first axis of the array.
 
+    return_timestamps: bool, default False
+        If True, also return the timestamps after the transformation.
+
     Returns
     -------
     arr_transformed: array_like
@@ -213,12 +241,27 @@ def transform_points(
     transform_vectors, transform_quaternions, ReferenceFrame
     """
     return _transform(
-        "transform_points", arr, into, outof, dim, axis, timestamps, time_axis
+        "transform_points",
+        arr,
+        into,
+        outof,
+        dim,
+        axis,
+        timestamps,
+        time_axis,
+        return_timestamps=return_timestamps,
     )
 
 
 def transform_quaternions(
-    arr, into, outof=None, dim=None, axis=None, timestamps=None, time_axis=None
+    arr,
+    into,
+    outof=None,
+    dim=None,
+    axis=None,
+    timestamps=None,
+    time_axis=None,
+    return_timestamps=False,
 ):
     """ Transform an array of quaternions between reference frames.
 
@@ -256,6 +299,9 @@ def transform_quaternions(
         The axis of the array representing the timestamps of the quaternions.
         Defaults to the first axis of the array.
 
+    return_timestamps: bool, default False
+        If True, also return the timestamps after the transformation.
+
     Returns
     -------
     arr_transformed: array_like
@@ -277,6 +323,7 @@ def transform_quaternions(
         axis,
         timestamps,
         time_axis,
+        return_timestamps=return_timestamps,
     )
 
 
@@ -290,6 +337,7 @@ def transform_angular_velocity(
     timestamps=None,
     time_axis=None,
     cutoff=None,
+    return_timestamps=True,
 ):
     """ Transform an array of angular velocities between frames.
 
@@ -344,6 +392,9 @@ def transform_angular_velocity(
         velocity after the twist estimation as a fraction of the Nyquist
         frequency.
 
+    return_timestamps: bool, default True
+        If True, also return the timestamps after the transformation.
+
     Returns
     -------
     arr_transformed: array_like
@@ -368,6 +419,7 @@ def transform_angular_velocity(
         time_axis,
         what=what,
         cutoff=cutoff,
+        return_timestamps=return_timestamps,
     )
 
 
@@ -384,6 +436,7 @@ def transform_linear_velocity(
     time_axis=None,
     cutoff=None,
     outlier_thresh=None,
+    return_timestamps=True,
 ):
     """ Transform an array of linear velocities between frames.
 
@@ -456,6 +509,9 @@ def transform_linear_velocity(
         measurements from the Intel RealSense T265 tracker, set this value
         to 1e-3.
 
+    return_timestamps: bool, default True
+        If True, also return the timestamps after the transformation.
+
     Returns
     -------
     arr_transformed: array_like
@@ -483,6 +539,7 @@ def transform_linear_velocity(
         reference_frame=reference_frame,
         cutoff=cutoff,
         outlier_thresh=outlier_thresh,
+        return_timestamps=return_timestamps,
     )
 
 

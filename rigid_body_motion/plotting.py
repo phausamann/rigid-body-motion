@@ -102,7 +102,33 @@ def _set_axes_equal(ax):
 def plot_reference_frame(
     frame, world_frame=None, ax=None, figsize=(6, 6), arrow_len=1.0
 ):
-    """"""
+    """ Plot a 3D coordinate system representing a static reference frame.
+
+    Parameters
+    ----------
+    frame: str or ReferenceFrame
+        The reference frame to plot. If str, the frame will be looked up
+        in the registry under that name.
+
+    world_frame: str or ReferenceFrame, optional
+        If specified, the world reference frame that defines the origin of the
+        plot. If str, the frame will be looked up in the registry under that
+        name.
+
+    ax: matplotlib.axes.Axes instance, optional
+        If provided, plot the points onto these axes.
+
+    figsize:
+        If `ax` is not provided, create a figure of this size.
+
+    arrow_len:
+        Length of the arrows of the coordinate system.
+
+    Returns
+    -------
+    arrows: list of Arrow3D
+        A list of three arrows representing the plotted coordinate system.
+    """
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection="3d")
@@ -117,14 +143,37 @@ def plot_reference_frame(
     return arrows
 
 
-def plot_points(arr, ax=None, figsize=(6, 6)):
-    """"""
+def plot_points(arr, ax=None, figsize=(6, 6), fmt=None, **kwargs):
+    """ Plot an array of 3D points.
+
+    Parameters
+    ----------
+    arr: array_like, shape (N, 3)
+        Array of 3D points to plot.
+
+    ax: matplotlib.axes.Axes instance, optional
+        If provided, plot the points onto these axes.
+
+    figsize:
+        If `ax` is not provided, create a figure of this size.
+
+    fmt: str, optional
+        A format string, e.g. 'ro' for red circles.
+
+    kwargs:
+        Additional keyword arguments passed to ax.plot().
+
+    Returns
+    -------
+    lines: list of Line3D
+        A list of lines representing the plotted data.
+    """
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection="3d")
 
-    line = ax.plot(arr[:, 0], arr[:, 1], arr[:, 2])
+    lines = ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], fmt, **kwargs)
 
     _set_axes_equal(ax)
 
-    return line
+    return lines

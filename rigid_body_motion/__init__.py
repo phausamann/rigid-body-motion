@@ -6,7 +6,7 @@ from pathlib import Path
 
 from pkg_resources import resource_filename
 
-from . import ros  # noqa
+from . import plot, ros  # noqa
 from .coordinate_systems import (
     cartesian_to_polar,
     cartesian_to_spherical,

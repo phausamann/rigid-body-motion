@@ -509,7 +509,7 @@ class TestReferenceFrame:
             "world"
         )
 
-        npt.assert_allclose(w_head_world, -w_eyes_head, rtol=1e-2)
+        npt.assert_allclose(w_head_world, -w_eyes_head, rtol=0.1, atol=1e-10)
         assert (v_eyes_world < 1e-10).all()
         assert (w_eyes_world < 1e-10).all()
 
@@ -546,7 +546,7 @@ class TestReferenceFrame:
             moving_frame="eyes",
             timestamps=ts[1:-1],
         )
-        assert (v_eyes_world_rf < 0.06).all()
+        assert (np.abs(v_eyes_world_rf) < 1e-3).all()
 
         # transform moving frame
         v_eyes_world_mf = rbm.registry["head"].transform_linear_velocity(
@@ -556,4 +556,4 @@ class TestReferenceFrame:
             reference_frame="world",
             timestamps=ts[1:-1],
         )
-        assert (v_eyes_world_mf < 0.06).all()
+        assert (np.abs(v_eyes_world_mf) < 1e-3).all()

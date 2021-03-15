@@ -117,7 +117,7 @@ def register_rf_tree():
 @pytest.fixture()
 def compensated_tree():
     """"""
-    n_samples = 1000
+    n_samples = 10000
     stack = False
 
     rbm.register_frame("world", update=True)

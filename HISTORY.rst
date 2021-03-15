@@ -12,11 +12,16 @@ Breaking changes
   ``False`` for all other transforms. Previously, methods would return
   timestamps only if the result of the transformation was timestamped.
   This does not affect the xarray interface.
+* ``lookup_transform`` now returns the correct transformation from the base
+  frame to the target frame (instead of the other way around).
+* ``ReferenceFrame.get_transformation`` is deprecated and replaced by
+  ``ReferenceFrame.lookup_transform``.
 
 New features
 ~~~~~~~~~~~~
 * New ``plot`` module with plotting methods for static reference frames and
   arrays of points.
+* New ``lookup_pose`` method that calculates the pose of a frame wrt another.
 
 Bug fixes & improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~

@@ -72,6 +72,7 @@ __all__ = [
     "best_fit_transform",
     "iterative_closest_point",
     "lookup_transform",
+    "lookup_pose",
     "lookup_twist",
     "lookup_linear_velocity",
     "lookup_angular_velocity",
@@ -201,9 +202,9 @@ def transform_points(
         which the array will be represented after the transformation.
 
     outof: str or ReferenceFrame, optional
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        ReferenceFrame instance or name of a registered reference frame which
+        is the current reference frame of the array. Can be omitted if the
+        array is a DataArray whose ``attrs`` contain a "reference_frame" entry
         with the name of a registered frame.
 
     dim: str, optional
@@ -275,9 +276,9 @@ def transform_quaternions(
         which the array will be represented after the transformation.
 
     outof: str or ReferenceFrame, optional
-        ReferenceFrame instance or name of a registered reference frame in
-        which the array is currently represented. Can be omitted if the array
-        is a DataArray whose ``attrs`` contain a "representation_frame" entry
+        ReferenceFrame instance or name of a registered reference frame which
+        is the current reference frame of the array. Can be omitted if the
+        array is a DataArray whose ``attrs`` contain a "reference_frame" entry
         with the name of a registered frame.
 
     dim: str, optional
@@ -350,6 +351,18 @@ def transform_angular_velocity(
     the frame that is being changed and will be represented in the new
     frame after the transformation.
 
+    When transforming the reference frame R to a new frame R' while keeping
+    the moving frame M fixed, the transformed velocity is calculated
+    according to the formula:
+
+    .. math:: \omega_{M/R'} = \omega_{M/R} + \omega_{R/R'}
+
+    When transforming the moving frame M to a new frame M' while keeping
+    the reference frame R fixed, the transformed velocity is calculated
+    according to the formula:
+
+    .. math:: \omega_{M'/R} = \omega_{M/R} + \omega_{M'/M}
+
     Parameters
     ----------
     arr: array_like
@@ -407,7 +420,7 @@ def transform_angular_velocity(
     --------
     transform_linear_velocity, transform_vectors, transform_quaternions,
     transform_points, ReferenceFrame
-    """
+    """  # noqa
     return _transform(
         "transform_angular_velocity",
         arr,
@@ -448,6 +461,18 @@ def transform_linear_velocity(
     another. In either case, it is assumed that the array is represented in
     the frame that is being changed and will be represented in the new
     frame after the transformation.
+
+    When transforming the reference frame R to a new frame R' while keeping
+    the moving frame M fixed, the transformed velocity is calculated
+    according to the formula:
+
+    .. math:: v_{M/R'} = v_{M/R} + v_{R/R'} + \omega_{R/R'} \\times t_{M/R}
+
+    When transforming the moving frame M to a new frame M' while keeping
+    the reference frame R fixed, the transformed velocity is calculated
+    according to the formula:
+
+    .. math:: v_{M'/R} = v_{M/R} + v_{M'/M} + \omega_{M/R} \\times t_{M'/M}
 
     Parameters
     ----------
@@ -524,7 +549,7 @@ def transform_linear_velocity(
     --------
     transform_angular_velocity, transform_vectors, transform_quaternions,
     transform_points, ReferenceFrame
-    """
+    """  # noqa
     return _transform(
         "transform_linear_velocity",
         arr,
@@ -627,6 +652,12 @@ def transform_coordinates(
 def lookup_transform(outof, into, as_dataset=False):
     """ Look up transformation from one frame to another.
 
+    The transformation is a rotation `r` followed by a translation `t` which,
+    when applied to a point expressed wrt the base frame `B`, yields that
+    point wrt the target frame `T`:
+
+    .. math:: p_T = rot(r, p_B) + t
+
     Parameters
     ----------
     outof: str or ReferenceFrame
@@ -650,7 +681,7 @@ def lookup_transform(outof, into, as_dataset=False):
     """
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
-    translation, rotation, timestamps = into.get_transformation(outof)
+    translation, rotation, timestamps = outof.get_transformation(into)
 
     if as_dataset:
         return _make_transform_or_pose_dataset(
@@ -658,6 +689,42 @@ def lookup_transform(outof, into, as_dataset=False):
         )
     else:
         return translation, rotation, timestamps
+
+
+def lookup_pose(frame, reference, as_dataset=False):
+    """ Look up pose of one frame wrt a reference.
+
+    Parameters
+    ----------
+    frame: str or ReferenceFrame
+        Frame for which to look up the pose.
+
+    reference: str or ReferenceFrame
+        Reference frame of the pose.
+
+    as_dataset: bool, default False
+        If True, return an xarray.Dataset. Otherwise, return a tuple of
+        position, orientation and timestamps.
+
+    Returns
+    -------
+    position, orientation, timestamps: each numpy.ndarray
+        Position, orientation and timestamps of the pose between the
+        frames, if `as_dataset` is False.
+
+    ds: xarray.Dataset
+        The above arrays as an xarray.Dataset, if `as_dataset` is True.
+    """
+    reference = _resolve_rf(reference)
+    frame = _resolve_rf(frame)
+    position, orientation, timestamps = frame.get_transformation(reference)
+
+    if as_dataset:
+        return _make_transform_or_pose_dataset(
+            position, orientation, reference, timestamps, pose=True
+        )
+    else:
+        return position, orientation, timestamps
 
 
 def lookup_twist(
@@ -751,10 +818,10 @@ def lookup_linear_velocity(
     Parameters
     ----------
     moving_frame: str or ReferenceFrame
-        The reference frame whose twist is estimated.
+        The reference frame whose velocity is estimated.
 
     reference: str or ReferenceFrame, optional
-        The reference frame wrt which the twist is estimated. Defaults to
+        The reference frame wrt which the velocity is estimated. Defaults to
         the parent frame of the moving frame.
 
     represent_in: str or ReferenceFrame, optional
@@ -820,10 +887,10 @@ def lookup_angular_velocity(
     Parameters
     ----------
     moving_frame: str or ReferenceFrame
-        The reference frame whose twist is estimated.
+        The reference frame whose velocity is estimated.
 
     reference: str or ReferenceFrame, optional
-        The reference frame wrt which the twist is estimated. Defaults to
+        The reference frame wrt which the velocity is estimated. Defaults to
         the parent frame of the moving frame.
 
     represent_in: str or ReferenceFrame, optional

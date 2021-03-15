@@ -630,7 +630,7 @@ def _make_transform_or_pose_dataset(
             },
         )
 
-    ds.translation.attrs.update(
+    ds[linear_name].attrs.update(
         {
             "representation_frame": frame.name,
             "reference_frame": frame.name,
@@ -640,7 +640,7 @@ def _make_transform_or_pose_dataset(
         }
     )
 
-    ds.rotation.attrs.update(
+    ds[angular_name].attrs.update(
         {
             "representation_frame": frame.name,
             "reference_frame": frame.name,

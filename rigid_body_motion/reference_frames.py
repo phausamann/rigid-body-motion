@@ -529,12 +529,7 @@ class ReferenceFrame(NodeMixin):
         )
 
     def get_transformation(self, to_frame):
-        """ Calculate the transformation from this frame to another.
-
-        The transformation is a rotation followed by a translation which,
-        when applied to a position and/or orientation represented in this
-        reference frame, yields the representation of that
-        position/orientation in the target reference frame.
+        """ Look up the transformation from this frame to another.
 
         Parameters
         ----------
@@ -552,6 +547,10 @@ class ReferenceFrame(NodeMixin):
 
         ts: array_like, shape (n_timestamps,) or None
             The timestamps for which the transformation is defined.
+
+        See Also
+        --------
+        lookup_transform
         """
         matcher = self._get_matcher(to_frame)
 
@@ -758,15 +757,6 @@ class ReferenceFrame(NodeMixin):
     ):
         """ Transform array of angular velocities from this frame to another.
 
-        The array represents the velocity of a moving body or frame wrt a
-        reference frame, expressed in a representation frame.
-
-        The transformation changes either the reference frame, the moving
-        frame or the representation frame of the velocity from this frame to
-        another. In either case, it is assumed that the array is represented in
-        the frame that is being changed and will be represented in the new
-        frame after the transformation.
-
         Parameters
         ----------
         arr: array_like
@@ -809,6 +799,10 @@ class ReferenceFrame(NodeMixin):
 
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
+
+        See Also
+        --------
+        transform_angular_velocity
         """
         if what == "reference_frame":
             angular, angular_ts = self.lookup_angular_velocity(
@@ -831,8 +825,8 @@ class ReferenceFrame(NodeMixin):
             )
         else:
             raise ValueError(
-                f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
-                f"got {what}"
+                f"Expected 'what' to be 'reference_frame', 'moving_frame' or "
+                f"'representation_frame', got {what}"
             )
 
         arr, ts = self.transform_vectors(
@@ -869,15 +863,6 @@ class ReferenceFrame(NodeMixin):
         cutoff=None,
     ):
         """ Transform array of linear velocities from this frame to another.
-
-        The array represents the velocity of a moving body or frame wrt a
-        reference frame, expressed in a representation frame.
-
-        The transformation changes either the reference frame, the moving
-        frame or the representation frame of the velocity from this frame to
-        another. In either case, it is assumed that the array is represented in
-        the frame that is being changed and will be represented in the new
-        frame after the transformation.
 
         Parameters
         ----------
@@ -923,14 +908,9 @@ class ReferenceFrame(NodeMixin):
             frequency.
 
         outlier_thresh: float, optional
-            Some SLAM-based trackers introduce position corrections when a new
-            camera frame becomes available. This introduces outliers in the
-            linear velocity estimate. The estimation algorithm used here
-            can suppress these outliers by throwing out samples where the
+            Suppress outliers by throwing out samples where the
             norm of the second-order differences of the position is above
-            `outlier_thresh` and interpolating the missing values. For
-            measurements from the Intel RealSense T265 tracker, set this value
-            to 1e-3.
+            `outlier_thresh` and interpolating the missing values.
 
         Returns
         -------
@@ -939,6 +919,10 @@ class ReferenceFrame(NodeMixin):
 
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
+
+        See Also
+        --------
+        transform_linear_velocity
         """
         if what == "reference_frame":
             linear, angular, linear_ts = self.lookup_twist(
@@ -979,8 +963,8 @@ class ReferenceFrame(NodeMixin):
 
         else:
             raise ValueError(
-                f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
-                f"got {what}"
+                f"Expected 'what' to be 'reference_frame', 'moving_frame' or "
+                f"'representation_frame', got {what}"
             )
 
         arr, ts = self.transform_vectors(
@@ -1035,14 +1019,9 @@ class ReferenceFrame(NodeMixin):
             to the parent frame.
 
         outlier_thresh: float, optional
-            Some SLAM-based trackers introduce position corrections when a new
-            camera frame becomes available. This introduces outliers in the
-            linear velocity estimate. The estimation algorithm used here
-            can suppress these outliers by throwing out samples where the
+            Suppress outliers by throwing out samples where the
             norm of the second-order differences of the position is above
-            `outlier_thresh` and interpolating the missing values. For
-            measurements from the Intel RealSense T265 tracker, set this value
-            to 1e-3.
+            `outlier_thresh` and interpolating the missing values.
 
         cutoff: float, optional
             Frequency of a low-pass filter applied to linear and angular
@@ -1136,14 +1115,9 @@ class ReferenceFrame(NodeMixin):
             to the parent frame.
 
         outlier_thresh: float, optional
-            Some SLAM-based trackers introduce position corrections when a new
-            camera frame becomes available. This introduces outliers in the
-            linear velocity estimate. The estimation algorithm used here
-            can suppress these outliers by throwing out samples where the
+            Suppress outliers by throwing out samples where the
             norm of the second-order differences of the position is above
-            `outlier_thresh` and interpolating the missing values. For
-            measurements from the Intel RealSense T265 tracker, set this value
-            to 1e-3.
+            `outlier_thresh` and interpolating the missing values.
 
         cutoff: float, optional
             Frequency of a low-pass filter applied to linear and angular

@@ -3,6 +3,8 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
+from rigid_body_motion.core import _resolve_rf
+
 
 class Arrow3D(FancyArrowPatch):
     """ Colored arrows representing coordinate system. """
@@ -132,6 +134,8 @@ def plot_reference_frame(
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection="3d")
+
+    frame = _resolve_rf(frame)
 
     if frame.timestamps is not None:
         raise NotImplementedError("Can only plot static reference frames")

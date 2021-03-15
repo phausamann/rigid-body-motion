@@ -316,19 +316,19 @@ class TestReferenceFrame:
         npt.assert_allclose(ts_out.astype(float), ts1[:5].astype(float))
         assert ts_out.dtype == ts1.dtype
 
-    def test_get_transformation(self, rf_grid, get_rf_tree):
+    def test_lookup_transform(self, rf_grid, get_rf_tree):
         """"""
         r, rc1, rc2, t, tc1, tc2 = rf_grid
         rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
 
         # child1 to world
-        t_act, r_act, ts = rf_child1.get_transformation(rf_world)
+        t_act, r_act, ts = rf_child1.lookup_transform(rf_world)
         npt.assert_almost_equal(t_act, tc1)
         npt.assert_almost_equal(r_act, rc1)
         assert ts is None
 
         # child1 to child2
-        t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
+        t_act, r_act, ts = rf_child1.lookup_transform(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)
         assert ts is None
@@ -337,7 +337,7 @@ class TestReferenceFrame:
         rf_child1_inv = rbm.ReferenceFrame(
             parent=rf_world, translation=tc1, rotation=rc1, inverse=True
         )
-        t_act, r_act, ts = rf_world.get_transformation(rf_child1_inv)
+        t_act, r_act, ts = rf_world.lookup_transform(rf_child1_inv)
         npt.assert_almost_equal(t_act, tc1)
         npt.assert_almost_equal(r_act, rc1)
         assert ts is None
@@ -350,12 +350,12 @@ class TestReferenceFrame:
             "child4", rf_child2, timestamps=np.arange(10)
         )
 
-        t_act, r_act, ts = rf_child3.get_transformation(rf_child4)
+        t_act, r_act, ts = rf_child3.lookup_transform(rf_child4)
         npt.assert_almost_equal(t_act, np.tile(t, (5, 1)))
         npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
         npt.assert_equal(ts, np.arange(5) + 2.5)
 
-    def test_get_transformation_discrete(self):
+    def test_lookup_transform_discrete(self):
         """"""
         t1 = np.ones((10, 3))
         t2 = np.array([[1.0, 0.0, 0.0], [2.0, 0.0, 0.0]])
@@ -373,13 +373,13 @@ class TestReferenceFrame:
         )
 
         # interpolated first
-        t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
+        t_act, r_act, ts = rf_child1.lookup_transform(rf_child2)
         npt.assert_equal(t_act, [[0.0, 1.0, 1.0]] * 5 + [[-1.0, 1.0, 1.0]] * 5)
         npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (10, 1)))
         npt.assert_allclose(ts, np.arange(10))
 
         # event-based first
-        t_act, r_act, ts = rf_child2.get_transformation(rf_child1)
+        t_act, r_act, ts = rf_child2.lookup_transform(rf_child1)
         npt.assert_equal(
             t_act, [[0.0, -1.0, -1.0]] * 5 + [[1.0, -1.0, -1.0]] * 5
         )

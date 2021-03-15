@@ -196,7 +196,7 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         """
         self.frame = _resolve_rf(frame)
         self.base = _resolve_rf(base or self.frame.parent)
-        self.translation, _, _ = self.frame.get_transformation(self.base)
+        self.translation, _, _ = self.frame.lookup_transform(self.base)
 
         marker = get_marker(
             frame_id=self.base.name, scale=(scale, 0.0, 0.0), color=color

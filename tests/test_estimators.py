@@ -118,7 +118,7 @@ class TestEstimators:
         v2 = rf_world.transform_points(v1, rf_child1)
 
         r = best_fit_rotation(v1, v2)
-        _, r_exp, _ = rf_world.get_transformation(rf_child1)
+        _, r_exp, _ = rf_world.lookup_transform(rf_child1)
         npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
 
     def test_best_fit_transform(
@@ -132,7 +132,7 @@ class TestEstimators:
         v2 = rf_world.transform_points(v1, rf_child1)
 
         t, r = best_fit_transform(v1, v2)
-        t_exp, r_exp, _ = rf_world.get_transformation(rf_child1)
+        t_exp, r_exp, _ = rf_world.lookup_transform(rf_child1)
         npt.assert_allclose(t, t_exp, rtol=1.0, atol=1e-10)
         npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
 
@@ -180,7 +180,7 @@ class TestEstimators:
         )
 
         t, r = iterative_closest_point(v1, v2)
-        t_exp, r_exp, _ = rf_world.get_transformation(rf_child1)
+        t_exp, r_exp, _ = rf_world.lookup_transform(rf_child1)
         npt.assert_allclose(t, t_exp, rtol=1.0, atol=0.01)
         npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-4)
 

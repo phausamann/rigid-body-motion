@@ -681,7 +681,7 @@ def lookup_transform(outof, into, as_dataset=False):
     """
     into = _resolve_rf(into)
     outof = _resolve_rf(outof)
-    translation, rotation, timestamps = outof.get_transformation(into)
+    translation, rotation, timestamps = outof.lookup_transform(into)
 
     if as_dataset:
         return _make_transform_or_pose_dataset(
@@ -717,7 +717,7 @@ def lookup_pose(frame, reference, as_dataset=False):
     """
     reference = _resolve_rf(reference)
     frame = _resolve_rf(frame)
-    position, orientation, timestamps = frame.get_transformation(reference)
+    position, orientation, timestamps = frame.lookup_transform(reference)
 
     if as_dataset:
         return _make_transform_or_pose_dataset(

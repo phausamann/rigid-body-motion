@@ -361,7 +361,7 @@ class ReferenceFrameTransformBroadcaster:
             self.translation,
             self.rotation,
             self.timestamps,
-        ) = self.frame.get_transformation(self.base)
+        ) = self.frame.lookup_transform(self.base)
 
         if self.timestamps is None:
             self.broadcaster = tf2_ros.StaticTransformBroadcaster()

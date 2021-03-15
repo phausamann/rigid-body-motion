@@ -529,6 +529,24 @@ class ReferenceFrame(NodeMixin):
         )
 
     def get_transformation(self, to_frame):
+        """ Alias for lookup_transform.
+
+        See Also
+        --------
+        ReferenceFrame.lookup_transform
+        """
+        import warnings
+
+        warnings.warn(
+            DeprecationWarning(
+                "get_transformation is deprecated, use lookup_transform "
+                "instead."
+            )
+        )
+
+        return self.lookup_transform(to_frame)
+
+    def lookup_transform(self, to_frame):
         """ Look up the transformation from this frame to another.
 
         Parameters
@@ -935,7 +953,7 @@ class ReferenceFrame(NodeMixin):
             angular_ts = linear_ts
             translation, _, translation_ts = _resolve_rf(
                 moving_frame
-            ).get_transformation(self)
+            ).lookup_transform(self)
 
         elif what == "moving_frame":
             to_frame = _resolve_rf(to_frame)
@@ -949,7 +967,7 @@ class ReferenceFrame(NodeMixin):
             angular, angular_ts = self.lookup_angular_velocity(
                 reference_frame, to_frame, cutoff=cutoff, allow_static=True,
             )
-            translation, _, translation_ts = to_frame.get_transformation(self)
+            translation, _, translation_ts = to_frame.lookup_transform(self)
 
         elif what == "representation_frame":
             return self.transform_vectors(
@@ -1057,7 +1075,7 @@ class ReferenceFrame(NodeMixin):
         except TypeError:
             raise ValueError(f"Frame {self.name} has no parent frame")
 
-        translation, rotation, timestamps = self.get_transformation(reference)
+        translation, rotation, timestamps = self.lookup_transform(reference)
 
         if timestamps is None:
             if allow_static:
@@ -1144,7 +1162,7 @@ class ReferenceFrame(NodeMixin):
         except TypeError:
             raise ValueError(f"Frame {self.name} has no parent frame")
 
-        translation, _, timestamps = self.get_transformation(reference)
+        translation, _, timestamps = self.lookup_transform(reference)
 
         if timestamps is None:
             if allow_static:
@@ -1223,7 +1241,7 @@ class ReferenceFrame(NodeMixin):
         except TypeError:
             raise ValueError(f"Frame {self.name} has no parent frame")
 
-        _, rotation, timestamps = self.get_transformation(reference)
+        _, rotation, timestamps = self.lookup_transform(reference)
 
         if timestamps is None:
             if allow_static:

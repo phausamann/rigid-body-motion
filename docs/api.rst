@@ -102,6 +102,8 @@ Plotting
 
     reference_frame
     points
+    quaternions
+    vectors
 
 
 xarray Accessors

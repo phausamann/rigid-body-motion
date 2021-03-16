@@ -19,7 +19,7 @@ Breaking changes
 New features
 ~~~~~~~~~~~~
 * New ``plot`` module with plotting methods for static reference frames and
-  arrays of points.
+  arrays of points, quaternions and vectors.
 * New ``lookup_pose`` method that calculates the pose of a frame wrt another.
 
 Bug fixes & improvements

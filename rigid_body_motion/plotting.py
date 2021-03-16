@@ -4,6 +4,7 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
 from rigid_body_motion.core import _resolve_rf
+from rigid_body_motion.utils import rotate_vectors
 
 
 class Arrow3D(FancyArrowPatch):
@@ -152,7 +153,7 @@ def plot_points(arr, ax=None, figsize=(6, 6), fmt=None, **kwargs):
 
     Parameters
     ----------
-    arr: array_like, shape (N, 3)
+    arr: array_like, shape (3,) or (N, 3)
         Array of 3D points to plot.
 
     ax: matplotlib.axes.Axes instance, optional
@@ -176,7 +177,114 @@ def plot_points(arr, ax=None, figsize=(6, 6), fmt=None, **kwargs):
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection="3d")
 
+    arr = np.asarray(arr)
+    if arr.ndim == 1:
+        arr = arr[np.newaxis, :]
+    if arr.ndim > 2 or arr.shape[1] != 3:
+        raise ValueError("array must have shape (3,) or (N,3)")
+
     lines = ax.plot(arr[:, 0], arr[:, 1], arr[:, 2], fmt, **kwargs)
+
+    _set_axes_equal(ax)
+
+    return lines
+
+
+def plot_quaternions(arr, base=None, ax=None, figsize=(6, 6), **kwargs):
+    """ Plot an array of quaternions.
+
+    Parameters
+    ----------
+    arr: array_like, shape (4,) or (N, 4)
+        Array of quaternions to plot.
+
+    base: array_like, shape (4,) or (N, 4), optional
+        If provided, base points of the quaternions.
+
+    ax: matplotlib.axes.Axes instance, optional
+        If provided, plot the points onto these axes.
+
+    figsize:
+        If `ax` is not provided, create a figure of this size.
+
+    kwargs:
+        Additional keyword arguments passed to ax.quiver().
+
+    Returns
+    -------
+    lines: list of Line3DCollection
+        A list of lines representing the plotted data.
+    """
+    if ax is None:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111, projection="3d")
+
+    vx = rotate_vectors(arr, np.array((1, 0, 0)))
+    vy = rotate_vectors(arr, np.array((0, 1, 0)))
+    vz = rotate_vectors(arr, np.array((0, 0, 1)))
+
+    lines = [
+        plot_vectors(vx, base, ax, color="r", length=0.5, **kwargs),
+        plot_vectors(vy, base, ax, color="g", length=0.5, **kwargs),
+        plot_vectors(vz, base, ax, color="b", length=0.5, **kwargs),
+    ]
+
+    return lines
+
+
+def plot_vectors(arr, base=None, ax=None, figsize=(6, 6), **kwargs):
+    """ Plot an array of 3D vectors.
+
+    Parameters
+    ----------
+    arr: array_like, shape (3,) or (N, 3)
+        Array of 3D points to plot.
+
+    base: array_like, shape (3,) or (N, 3), optional
+        If provided, base points of the vectors.
+
+    ax: matplotlib.axes.Axes instance, optional
+        If provided, plot the points onto these axes.
+
+    figsize:
+        If `ax` is not provided, create a figure of this size.
+
+    kwargs:
+        Additional keyword arguments passed to ax.quiver().
+
+    Returns
+    -------
+    lines: Line3DCollection
+        A collection of lines representing the plotted data.
+    """
+    if ax is None:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111, projection="3d")
+
+    arr = np.asarray(arr)
+    if arr.ndim == 1:
+        arr = arr[np.newaxis, :]
+    if arr.ndim > 2 or arr.shape[1] != 3:
+        raise ValueError("array must have shape (3,) or (N,3)")
+
+    if base is not None:
+        base = np.asarray(base)
+        if base.ndim == 1:
+            base = base[np.newaxis, :]
+        if base.shape != arr.shape:
+            raise ValueError("base must have the same shape as array")
+    else:
+        base = np.zeros_like(arr)
+
+    lines = ax.quiver(
+        base[:, 0],
+        base[:, 1],
+        base[:, 2],
+        arr[:, 0],
+        arr[:, 1],
+        arr[:, 2],
+        **kwargs,
+    )
 
     _set_axes_equal(ax)
 

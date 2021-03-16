@@ -739,8 +739,10 @@ def lookup_pose(frame, reference, as_dataset=False, return_timestamps=False):
         return _make_transform_or_pose_dataset(
             position, orientation, reference, timestamps, pose=True
         )
-    else:
+    elif return_timestamps:
         return position, orientation, timestamps
+    else:
+        return position, orientation
 
 
 def lookup_twist(

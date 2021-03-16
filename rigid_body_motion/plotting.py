@@ -219,9 +219,9 @@ def plot_quaternions(arr, base=None, ax=None, figsize=(6, 6), **kwargs):
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection="3d")
 
-    vx = rotate_vectors(arr, np.array((1, 0, 0)))
-    vy = rotate_vectors(arr, np.array((0, 1, 0)))
-    vz = rotate_vectors(arr, np.array((0, 0, 1)))
+    vx = rotate_vectors(arr, np.array((1, 0, 0)), one_to_one=False)
+    vy = rotate_vectors(arr, np.array((0, 1, 0)), one_to_one=False)
+    vz = rotate_vectors(arr, np.array((0, 0, 1)), one_to_one=False)
 
     lines = [
         plot_vectors(vx, base, ax, color="r", length=0.5, **kwargs),

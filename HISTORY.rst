@@ -7,11 +7,10 @@ History
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
-* Top-level reference frame transform methods now all accept a
-  ``return_timestamps`` argument that is ``True`` for velocity transform and
-  ``False`` for all other transforms. Previously, methods would return
-  timestamps only if the result of the transformation was timestamped.
-  This does not affect the xarray interface.
+* Top-level reference frame transform and lookup methods now all accept a
+  ``return_timestamps`` argument that is ``False`` by default. Previously,
+  methods would return timestamps only if the result of the transformation was
+  timestamped. This does not affect the xarray interface.
 * ``lookup_transform`` now returns the correct transformation from the base
   frame to the target frame (instead of the other way around).
 * ``ReferenceFrame.get_transformation`` is deprecated and replaced by

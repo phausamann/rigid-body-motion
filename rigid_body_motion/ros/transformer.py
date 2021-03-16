@@ -380,7 +380,7 @@ class ReferenceFrameTransformBroadcaster:
             self.pose_publisher = None
 
         if publish_twist:
-            self.linear, self.angular, _ = self.frame.lookup_twist(
+            self.linear, self.angular = self.frame.lookup_twist(
                 reference=base,
                 represent_in=self.frame,
                 cutoff=twist_cutoff,

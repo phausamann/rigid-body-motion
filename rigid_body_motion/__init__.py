@@ -338,7 +338,7 @@ def transform_angular_velocity(
     timestamps=None,
     time_axis=None,
     cutoff=None,
-    return_timestamps=True,
+    return_timestamps=False,
 ):
     """ Transform an array of angular velocities between frames.
 
@@ -405,7 +405,7 @@ def transform_angular_velocity(
         velocity after the twist estimation as a fraction of the Nyquist
         frequency.
 
-    return_timestamps: bool, default True
+    return_timestamps: bool, default False
         If True, also return the timestamps after the transformation.
 
     Returns
@@ -449,7 +449,7 @@ def transform_linear_velocity(
     time_axis=None,
     cutoff=None,
     outlier_thresh=None,
-    return_timestamps=True,
+    return_timestamps=False,
 ):
     """ Transform an array of linear velocities between frames.
 
@@ -534,7 +534,7 @@ def transform_linear_velocity(
         measurements from the Intel RealSense T265 tracker, set this value
         to 1e-3.
 
-    return_timestamps: bool, default True
+    return_timestamps: bool, default False
         If True, also return the timestamps after the transformation.
 
     Returns
@@ -649,7 +649,7 @@ def transform_coordinates(
         return arr
 
 
-def lookup_transform(outof, into, as_dataset=False):
+def lookup_transform(outof, into, as_dataset=False, return_timestamps=False):
     """ Look up transformation from one frame to another.
 
     The transformation is a rotation `r` followed by a translation `t` which,
@@ -668,13 +668,20 @@ def lookup_transform(outof, into, as_dataset=False):
 
     as_dataset: bool, default False
         If True, return an xarray.Dataset. Otherwise, return a tuple of
-        translation, rotation and timestamps.
+        translation and rotation.
+
+    return_timestamps: bool, default False
+        If True, and `as_dataset` is False, also return the timestamps of the
+        lookup.
 
     Returns
     -------
-    translation, rotation, timestamps: each numpy.ndarray
-        Translation, rotation and timestamps of transformation between the
-        frames, if `as_dataset` is False.
+    translation, rotation: each numpy.ndarray
+        Translation and rotation of transformation between the frames,
+        if `as_dataset` is False.
+
+    timestamps: numpy.ndarray
+        Corresponding timestamps of the lookup if `return_timestamps` is True.
 
     ds: xarray.Dataset
         The above arrays as an xarray.Dataset, if `as_dataset` is True.
@@ -687,11 +694,13 @@ def lookup_transform(outof, into, as_dataset=False):
         return _make_transform_or_pose_dataset(
             translation, rotation, outof, timestamps
         )
-    else:
+    elif return_timestamps:
         return translation, rotation, timestamps
+    else:
+        return translation, rotation
 
 
-def lookup_pose(frame, reference, as_dataset=False):
+def lookup_pose(frame, reference, as_dataset=False, return_timestamps=False):
     """ Look up pose of one frame wrt a reference.
 
     Parameters
@@ -704,13 +713,20 @@ def lookup_pose(frame, reference, as_dataset=False):
 
     as_dataset: bool, default False
         If True, return an xarray.Dataset. Otherwise, return a tuple of
-        position, orientation and timestamps.
+        position and orientation.
+
+    return_timestamps: bool, default False
+        If True, and `as_dataset` is False, also return the timestamps of the
+        lookup.
 
     Returns
     -------
-    position, orientation, timestamps: each numpy.ndarray
-        Position, orientation and timestamps of the pose between the
-        frames, if `as_dataset` is False.
+    position, orientation: each numpy.ndarray
+        Position and orientation of the pose between the frames,
+        if `as_dataset` is False.
+
+    timestamps: numpy.ndarray
+        Corresponding timestamps of the lookup if `return_timestamps` is True.
 
     ds: xarray.Dataset
         The above arrays as an xarray.Dataset, if `as_dataset` is True.
@@ -728,19 +744,20 @@ def lookup_pose(frame, reference, as_dataset=False):
 
 
 def lookup_twist(
-    moving_frame,
+    frame,
     reference=None,
     represent_in=None,
     outlier_thresh=None,
     cutoff=None,
     mode="quaternion",
     as_dataset=False,
+    return_timestamps=False,
 ):
     """ Estimate linear and angular velocity of a frame wrt a reference.
 
     Parameters
     ----------
-    moving_frame: str or ReferenceFrame
+    frame: str or ReferenceFrame
         The reference frame whose twist is estimated.
 
     reference: str or ReferenceFrame, optional
@@ -773,51 +790,61 @@ def lookup_twist(
 
     as_dataset: bool, default False
         If True, return an xarray.Dataset. Otherwise, return a tuple of linear
-        and angular velocity and timestamps.
+        and angular velocity.
+
+    return_timestamps: bool, default False
+        If True, and `as_dataset` is False, also return the timestamps of the
+        lookup.
 
     Returns
     -------
-    linear, angular, timestamps: each numpy.ndarray
-        Linear and angular velocity and timestamps of moving frame wrt
-        reference frame, represented in representation frame, if `as_dataset`
-        is False.
+    linear, angular: each numpy.ndarray
+        Linear and angular velocity of moving frame wrt reference frame,
+        represented in representation frame, if `as_dataset` is False.
+
+    timestamps: numpy.ndarray
+        Corresponding timestamps of the lookup if `return_timestamps` is True.
 
     ds: xarray.Dataset
         The above arrays as an xarray.Dataset, if `as_dataset` is True.
     """
-    moving_frame = _resolve_rf(moving_frame)
-    reference = _resolve_rf(reference or moving_frame.parent)
+    frame = _resolve_rf(frame)
+    reference = _resolve_rf(reference or frame.parent)
     represent_in = _resolve_rf(represent_in or reference)
 
-    linear, angular, timestamps = moving_frame.lookup_twist(
+    linear, angular, timestamps = frame.lookup_twist(
         reference,
         represent_in,
         outlier_thresh=outlier_thresh,
         cutoff=cutoff,
         mode=mode,
+        return_timestamps=True,
     )
 
     if as_dataset:
         return _make_twist_dataset(
-            angular, linear, moving_frame, reference, represent_in, timestamps
+            angular, linear, frame, reference, represent_in, timestamps
         )
-    else:
+    elif return_timestamps:
         return linear, angular, timestamps
+    else:
+        return linear, angular
 
 
 def lookup_linear_velocity(
-    moving_frame,
+    frame,
     reference=None,
     represent_in=None,
     outlier_thresh=None,
     cutoff=None,
     as_dataarray=False,
+    return_timestamps=False,
 ):
     """ Estimate linear velocity of a frame wrt a reference.
 
     Parameters
     ----------
-    moving_frame: str or ReferenceFrame
+    frame: str or ReferenceFrame
         The reference frame whose velocity is estimated.
 
     reference: str or ReferenceFrame, optional
@@ -844,49 +871,58 @@ def lookup_linear_velocity(
         frequency.
 
     as_dataarray: bool, default False
-        If True, return an xarray.DataArray. Otherwise, return a tuple of
-        linear velocity and timestamps.
+        If True, return an xarray.DataArray.
+
+    return_timestamps: bool, default False
+        If True and `as_dataarray` is False, also return the timestamps of the
+        lookup.
 
     Returns
     -------
-    linear, timestamps: each numpy.ndarray
-        Linear velocity and timestamps of moving frame wrt
-        reference frame, represented in representation frame, if `as_dataarray`
-        is False.
+    linear: numpy.ndarray or xarray.DataArray
+        Linear velocity of moving frame wrt reference frame, represented in
+        representation frame.
 
-    da: xarray.DataArray
-        The above arrays as an xarray.DataArray, if `as_dataarray` is True.
+    timestamps: numpy.ndarray
+        Corresponding timestamps of the lookup if `return_timestamps` is True.
     """
-    moving_frame = _resolve_rf(moving_frame)
-    reference = _resolve_rf(reference or moving_frame.parent)
+    frame = _resolve_rf(frame)
+    reference = _resolve_rf(reference or frame.parent)
     represent_in = _resolve_rf(represent_in or reference)
 
-    linear, timestamps = moving_frame.lookup_linear_velocity(
-        reference, represent_in, outlier_thresh=outlier_thresh, cutoff=cutoff,
+    linear, timestamps = frame.lookup_linear_velocity(
+        reference,
+        represent_in,
+        outlier_thresh=outlier_thresh,
+        cutoff=cutoff,
+        return_timestamps=True,
     )
 
     if as_dataarray:
         return _make_velocity_dataarray(
-            linear, "linear", moving_frame, reference, represent_in, timestamps
+            linear, "linear", frame, reference, represent_in, timestamps
         )
-    else:
+    elif return_timestamps:
         return linear, timestamps
+    else:
+        return linear
 
 
 def lookup_angular_velocity(
-    moving_frame,
+    frame,
     reference=None,
     represent_in=None,
     outlier_thresh=None,
     cutoff=None,
     mode="quaternion",
     as_dataarray=False,
+    return_timestamps=False,
 ):
     """ Estimate angular velocity of a frame wrt a reference.
 
     Parameters
     ----------
-    moving_frame: str or ReferenceFrame
+    frame: str or ReferenceFrame
         The reference frame whose velocity is estimated.
 
     reference: str or ReferenceFrame, optional
@@ -912,39 +948,39 @@ def lookup_angular_velocity(
         the gradient of the axis-angle representation of the rotations.
 
     as_dataarray: bool, default False
-        If True, return an xarray.DataArray. Otherwise, return a tuple of
-        angular velocity and timestamps.
+        If True, return an xarray.DataArray.
+
+    return_timestamps: bool, default False
+        If True and `as_dataarray` is False, also return the timestamps of the
+        lookup.
 
     Returns
     -------
-    angular, timestamps: each numpy.ndarray
-        Angular velocity and timestamps of moving frame wrt
-        reference frame, represented in representation frame, if `as_dataarray`
-        is False.
+    angular: numpy.ndarray or xarray.DataArray
+        Angular velocity of moving frame wrt reference frame, represented in
+        representation frame.
 
-    da: xarray.DataArray
-        The above arrays as an xarray.DataArray, if `as_dataarray` is True.
+    timestamps: numpy.ndarray
+        Corresponding timestamps of the lookup if `return_timestamps` is True.
     """
-    moving_frame = _resolve_rf(moving_frame)
-    reference = _resolve_rf(reference or moving_frame.parent)
+    frame = _resolve_rf(frame)
+    reference = _resolve_rf(reference or frame.parent)
     represent_in = _resolve_rf(represent_in or reference)
 
-    angular, timestamps = moving_frame.lookup_angular_velocity(
+    angular, timestamps = frame.lookup_angular_velocity(
         reference,
         represent_in,
         outlier_thresh=outlier_thresh,
         cutoff=cutoff,
         mode=mode,
+        return_timestamps=True,
     )
 
     if as_dataarray:
         return _make_velocity_dataarray(
-            angular,
-            "angular",
-            moving_frame,
-            reference,
-            represent_in,
-            timestamps,
+            angular, "angular", frame, reference, represent_in, timestamps,
         )
-    else:
+    elif return_timestamps:
         return angular, timestamps
+    else:
+        return angular

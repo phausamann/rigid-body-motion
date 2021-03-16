@@ -503,11 +503,9 @@ class TestReferenceFrame:
 
     def test_lookup_twist(self, compensated_tree):
         """"""
-        _, w_head_world, ts = rbm.registry["head"].lookup_twist()
-        _, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist()
-        v_eyes_world, w_eyes_world, ts = rbm.registry["eyes"].lookup_twist(
-            "world"
-        )
+        _, w_head_world = rbm.registry["head"].lookup_twist()
+        _, w_eyes_head = rbm.registry["eyes"].lookup_twist()
+        v_eyes_world, w_eyes_world = rbm.registry["eyes"].lookup_twist("world")
 
         npt.assert_allclose(w_head_world, -w_eyes_head, rtol=0.1, atol=1e-10)
         assert (v_eyes_world < 1e-10).all()
@@ -515,9 +513,11 @@ class TestReferenceFrame:
 
     def test_transform_angular_velocity(self, compensated_tree):
         """"""
-        _, w_head_world, ts = rbm.registry["head"].lookup_twist()
+        _, w_head_world, ts = rbm.registry["head"].lookup_twist(
+            return_timestamps=True
+        )
         _, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist(
-            represent_in="eyes"
+            return_timestamps=True, represent_in="eyes"
         )
 
         # transform reference frame
@@ -535,9 +535,11 @@ class TestReferenceFrame:
     def test_transform_linear_velocity(self, compensated_tree):
         """"""
         v_head_world, _, ts = rbm.registry["head"].lookup_twist(
-            represent_in="head"
+            return_timestamps=True, represent_in="head"
         )
-        v_eyes_head, _, ts = rbm.registry["eyes"].lookup_twist()
+        v_eyes_head, _, ts = rbm.registry["eyes"].lookup_twist(
+            return_timestamps=True
+        )
 
         # transform reference frame
         v_eyes_world_rf = rbm.registry["head"].transform_linear_velocity(

@@ -824,14 +824,24 @@ class ReferenceFrame(NodeMixin):
         """
         if what == "reference_frame":
             angular, angular_ts = self.lookup_angular_velocity(
-                to_frame, to_frame, cutoff=cutoff, allow_static=True
+                to_frame,
+                to_frame,
+                cutoff=cutoff,
+                allow_static=True,
+                return_timestamps=True,
             )
+
         elif what == "moving_frame":
             angular, angular_ts = _resolve_rf(
                 to_frame
             ).lookup_angular_velocity(
-                self, to_frame, cutoff=cutoff, allow_static=True
+                self,
+                to_frame,
+                cutoff=cutoff,
+                allow_static=True,
+                return_timestamps=True,
             )
+
         elif what == "representation_frame":
             return self.transform_vectors(
                 arr,
@@ -841,6 +851,7 @@ class ReferenceFrame(NodeMixin):
                 timestamps=timestamps,
                 return_timestamps=return_timestamps,
             )
+
         else:
             raise ValueError(
                 f"Expected 'what' to be 'reference_frame', 'moving_frame' or "
@@ -949,6 +960,7 @@ class ReferenceFrame(NodeMixin):
                 cutoff=cutoff,
                 outlier_thresh=outlier_thresh,
                 allow_static=True,
+                return_timestamps=True,
             )
             angular_ts = linear_ts
             translation, _, translation_ts = _resolve_rf(
@@ -963,9 +975,14 @@ class ReferenceFrame(NodeMixin):
                 cutoff=cutoff,
                 outlier_thresh=outlier_thresh,
                 allow_static=True,
+                return_timestamps=True,
             )
             angular, angular_ts = self.lookup_angular_velocity(
-                reference_frame, to_frame, cutoff=cutoff, allow_static=True,
+                reference_frame,
+                to_frame,
+                cutoff=cutoff,
+                allow_static=True,
+                return_timestamps=True,
             )
             translation, _, translation_ts = to_frame.lookup_transform(self)
 
@@ -1023,6 +1040,7 @@ class ReferenceFrame(NodeMixin):
         cutoff=None,
         mode="quaternion",
         allow_static=False,
+        return_timestamps=False,
     ):
         """ Estimate linear and angular velocity of this frame wrt a reference.
 
@@ -1055,6 +1073,9 @@ class ReferenceFrame(NodeMixin):
             If True, return a zero velocity vector and None for timestamps if
             the transform between this frame and the reference frame is static.
             Otherwise, a `ValueError` will be raised.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps of the lookup.
 
         Returns
         -------
@@ -1110,7 +1131,10 @@ class ReferenceFrame(NodeMixin):
             [(angular, angular_ts), (linear, linear_ts)],
         )
 
-        return linear, angular, twist_ts
+        if return_timestamps:
+            return linear, angular, twist_ts
+        else:
+            return linear, angular
 
     def lookup_linear_velocity(
         self,
@@ -1119,6 +1143,7 @@ class ReferenceFrame(NodeMixin):
         outlier_thresh=None,
         cutoff=None,
         allow_static=False,
+        return_timestamps=False,
     ):
         """ Estimate linear velocity of this frame wrt a reference.
 
@@ -1146,6 +1171,9 @@ class ReferenceFrame(NodeMixin):
             If True, return a zero velocity vector and None for timestamps if
             the transform between this frame and the reference frame is static.
             Otherwise, a `ValueError` will be raised.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps of the lookup.
 
         Returns
         -------
@@ -1183,7 +1211,10 @@ class ReferenceFrame(NodeMixin):
             linear, represent_in, timestamps=timestamps, return_timestamps=True
         )
 
-        return linear, linear_ts
+        if return_timestamps:
+            return linear, linear_ts
+        else:
+            return linear
 
     def lookup_angular_velocity(
         self,
@@ -1193,6 +1224,7 @@ class ReferenceFrame(NodeMixin):
         cutoff=None,
         mode="quaternion",
         allow_static=False,
+        return_timestamps=False,
     ):
         """ Estimate angular velocity of this frame wrt a reference.
 
@@ -1225,6 +1257,9 @@ class ReferenceFrame(NodeMixin):
             If True, return a zero velocity vector and None for timestamps if
             the transform between this frame and the reference frame is static.
             Otherwise, a `ValueError` will be raised.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps of the lookup.
 
         Returns
         -------
@@ -1267,7 +1302,10 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        return angular, angular_ts
+        if return_timestamps:
+            return angular, angular_ts
+        else:
+            return angular
 
     def register(self, update=False):
         """ Register this frame in the registry.

@@ -23,11 +23,22 @@ xarray_ data types.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: Getting started
 
    installation
+
+.. toctree::
+   :maxdepth: 1
+   :caption: User guide
+
    reference_frames
+   velocities
    xarray
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Help & reference
+
    api
    roadmap
    contributing
@@ -36,7 +47,7 @@ xarray_ data types.
 
 
 Indices and tables
-==================
+------------------
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

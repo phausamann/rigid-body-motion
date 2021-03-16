@@ -31,10 +31,10 @@ Reference Frames
     :nosignatures:
     :toctree: _generated
 
+    ReferenceFrame
     register_frame
     deregister_frame
     clear_registry
-    ReferenceFrame
     render_tree
 
 Coordinate Systems
@@ -49,6 +49,19 @@ Coordinate Systems
     cartesian_to_spherical
     spherical_to_cartesian
 
+Lookups
+~~~~~~~
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    lookup_transform
+    lookup_pose
+    lookup_twist
+    lookup_linear_velocity
+    lookup_angular_velocity
+
 Estimators
 ~~~~~~~~~~
 
@@ -58,10 +71,6 @@ Estimators
 
     estimate_linear_velocity
     estimate_angular_velocity
-    lookup_transform
-    lookup_twist
-    lookup_linear_velocity
-    lookup_angular_velocity
     shortest_arc_rotation
     best_fit_rotation
     best_fit_transform
@@ -80,6 +89,21 @@ Utility functions
     qmean
     qinterp
     rotate_vectors
+
+
+Plotting
+--------
+
+.. currentmodule:: rigid_body_motion.plot
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    reference_frame
+    points
+    quaternions
+    vectors
 
 
 xarray Accessors

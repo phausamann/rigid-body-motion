@@ -529,12 +529,25 @@ class ReferenceFrame(NodeMixin):
         )
 
     def get_transformation(self, to_frame):
-        """ Calculate the transformation from this frame to another.
+        """ Alias for lookup_transform.
 
-        The transformation is a rotation followed by a translation which,
-        when applied to a position and/or orientation represented in this
-        reference frame, yields the representation of that
-        position/orientation in the target reference frame.
+        See Also
+        --------
+        ReferenceFrame.lookup_transform
+        """
+        import warnings
+
+        warnings.warn(
+            DeprecationWarning(
+                "get_transformation is deprecated, use lookup_transform "
+                "instead."
+            )
+        )
+
+        return self.lookup_transform(to_frame)
+
+    def lookup_transform(self, to_frame):
+        """ Look up the transformation from this frame to another.
 
         Parameters
         ----------
@@ -552,6 +565,10 @@ class ReferenceFrame(NodeMixin):
 
         ts: array_like, shape (n_timestamps,) or None
             The timestamps for which the transformation is defined.
+
+        See Also
+        --------
+        lookup_transform
         """
         matcher = self._get_matcher(to_frame)
 
@@ -758,15 +775,6 @@ class ReferenceFrame(NodeMixin):
     ):
         """ Transform array of angular velocities from this frame to another.
 
-        The array represents the velocity of a moving body or frame wrt a
-        reference frame, expressed in a representation frame.
-
-        The transformation changes either the reference frame, the moving
-        frame or the representation frame of the velocity from this frame to
-        another. In either case, it is assumed that the array is represented in
-        the frame that is being changed and will be represented in the new
-        frame after the transformation.
-
         Parameters
         ----------
         arr: array_like
@@ -809,17 +817,31 @@ class ReferenceFrame(NodeMixin):
 
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
+
+        See Also
+        --------
+        transform_angular_velocity
         """
         if what == "reference_frame":
             angular, angular_ts = self.lookup_angular_velocity(
-                to_frame, to_frame, cutoff=cutoff, allow_static=True
+                to_frame,
+                to_frame,
+                cutoff=cutoff,
+                allow_static=True,
+                return_timestamps=True,
             )
+
         elif what == "moving_frame":
             angular, angular_ts = _resolve_rf(
                 to_frame
             ).lookup_angular_velocity(
-                self, to_frame, cutoff=cutoff, allow_static=True
+                self,
+                to_frame,
+                cutoff=cutoff,
+                allow_static=True,
+                return_timestamps=True,
             )
+
         elif what == "representation_frame":
             return self.transform_vectors(
                 arr,
@@ -829,10 +851,11 @@ class ReferenceFrame(NodeMixin):
                 timestamps=timestamps,
                 return_timestamps=return_timestamps,
             )
+
         else:
             raise ValueError(
-                f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
-                f"got {what}"
+                f"Expected 'what' to be 'reference_frame', 'moving_frame' or "
+                f"'representation_frame', got {what}"
             )
 
         arr, ts = self.transform_vectors(
@@ -869,15 +892,6 @@ class ReferenceFrame(NodeMixin):
         cutoff=None,
     ):
         """ Transform array of linear velocities from this frame to another.
-
-        The array represents the velocity of a moving body or frame wrt a
-        reference frame, expressed in a representation frame.
-
-        The transformation changes either the reference frame, the moving
-        frame or the representation frame of the velocity from this frame to
-        another. In either case, it is assumed that the array is represented in
-        the frame that is being changed and will be represented in the new
-        frame after the transformation.
 
         Parameters
         ----------
@@ -923,14 +937,9 @@ class ReferenceFrame(NodeMixin):
             frequency.
 
         outlier_thresh: float, optional
-            Some SLAM-based trackers introduce position corrections when a new
-            camera frame becomes available. This introduces outliers in the
-            linear velocity estimate. The estimation algorithm used here
-            can suppress these outliers by throwing out samples where the
+            Suppress outliers by throwing out samples where the
             norm of the second-order differences of the position is above
-            `outlier_thresh` and interpolating the missing values. For
-            measurements from the Intel RealSense T265 tracker, set this value
-            to 1e-3.
+            `outlier_thresh` and interpolating the missing values.
 
         Returns
         -------
@@ -939,6 +948,10 @@ class ReferenceFrame(NodeMixin):
 
         ts: array_like, shape (n_timestamps,) or None
             The timestamps after the transformation.
+
+        See Also
+        --------
+        transform_linear_velocity
         """
         if what == "reference_frame":
             linear, angular, linear_ts = self.lookup_twist(
@@ -947,11 +960,12 @@ class ReferenceFrame(NodeMixin):
                 cutoff=cutoff,
                 outlier_thresh=outlier_thresh,
                 allow_static=True,
+                return_timestamps=True,
             )
             angular_ts = linear_ts
             translation, _, translation_ts = _resolve_rf(
                 moving_frame
-            ).get_transformation(self)
+            ).lookup_transform(self)
 
         elif what == "moving_frame":
             to_frame = _resolve_rf(to_frame)
@@ -961,11 +975,16 @@ class ReferenceFrame(NodeMixin):
                 cutoff=cutoff,
                 outlier_thresh=outlier_thresh,
                 allow_static=True,
+                return_timestamps=True,
             )
             angular, angular_ts = self.lookup_angular_velocity(
-                reference_frame, to_frame, cutoff=cutoff, allow_static=True,
+                reference_frame,
+                to_frame,
+                cutoff=cutoff,
+                allow_static=True,
+                return_timestamps=True,
             )
-            translation, _, translation_ts = to_frame.get_transformation(self)
+            translation, _, translation_ts = to_frame.lookup_transform(self)
 
         elif what == "representation_frame":
             return self.transform_vectors(
@@ -979,8 +998,8 @@ class ReferenceFrame(NodeMixin):
 
         else:
             raise ValueError(
-                f"Expected 'what' to be 'reference_frame' or 'moving_frame', "
-                f"got {what}"
+                f"Expected 'what' to be 'reference_frame', 'moving_frame' or "
+                f"'representation_frame', got {what}"
             )
 
         arr, ts = self.transform_vectors(
@@ -1021,6 +1040,7 @@ class ReferenceFrame(NodeMixin):
         cutoff=None,
         mode="quaternion",
         allow_static=False,
+        return_timestamps=False,
     ):
         """ Estimate linear and angular velocity of this frame wrt a reference.
 
@@ -1035,14 +1055,9 @@ class ReferenceFrame(NodeMixin):
             to the parent frame.
 
         outlier_thresh: float, optional
-            Some SLAM-based trackers introduce position corrections when a new
-            camera frame becomes available. This introduces outliers in the
-            linear velocity estimate. The estimation algorithm used here
-            can suppress these outliers by throwing out samples where the
+            Suppress outliers by throwing out samples where the
             norm of the second-order differences of the position is above
-            `outlier_thresh` and interpolating the missing values. For
-            measurements from the Intel RealSense T265 tracker, set this value
-            to 1e-3.
+            `outlier_thresh` and interpolating the missing values.
 
         cutoff: float, optional
             Frequency of a low-pass filter applied to linear and angular
@@ -1058,6 +1073,9 @@ class ReferenceFrame(NodeMixin):
             If True, return a zero velocity vector and None for timestamps if
             the transform between this frame and the reference frame is static.
             Otherwise, a `ValueError` will be raised.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps of the lookup.
 
         Returns
         -------
@@ -1078,7 +1096,7 @@ class ReferenceFrame(NodeMixin):
         except TypeError:
             raise ValueError(f"Frame {self.name} has no parent frame")
 
-        translation, rotation, timestamps = self.get_transformation(reference)
+        translation, rotation, timestamps = self.lookup_transform(reference)
 
         if timestamps is None:
             if allow_static:
@@ -1113,7 +1131,10 @@ class ReferenceFrame(NodeMixin):
             [(angular, angular_ts), (linear, linear_ts)],
         )
 
-        return linear, angular, twist_ts
+        if return_timestamps:
+            return linear, angular, twist_ts
+        else:
+            return linear, angular
 
     def lookup_linear_velocity(
         self,
@@ -1122,6 +1143,7 @@ class ReferenceFrame(NodeMixin):
         outlier_thresh=None,
         cutoff=None,
         allow_static=False,
+        return_timestamps=False,
     ):
         """ Estimate linear velocity of this frame wrt a reference.
 
@@ -1136,14 +1158,9 @@ class ReferenceFrame(NodeMixin):
             to the parent frame.
 
         outlier_thresh: float, optional
-            Some SLAM-based trackers introduce position corrections when a new
-            camera frame becomes available. This introduces outliers in the
-            linear velocity estimate. The estimation algorithm used here
-            can suppress these outliers by throwing out samples where the
+            Suppress outliers by throwing out samples where the
             norm of the second-order differences of the position is above
-            `outlier_thresh` and interpolating the missing values. For
-            measurements from the Intel RealSense T265 tracker, set this value
-            to 1e-3.
+            `outlier_thresh` and interpolating the missing values.
 
         cutoff: float, optional
             Frequency of a low-pass filter applied to linear and angular
@@ -1154,6 +1171,9 @@ class ReferenceFrame(NodeMixin):
             If True, return a zero velocity vector and None for timestamps if
             the transform between this frame and the reference frame is static.
             Otherwise, a `ValueError` will be raised.
+
+        return_timestamps: bool, default False
+            If True, also return the timestamps of the lookup.
 
         Returns
         -------
@@ -1170,7 +1190,7 @@ class ReferenceFrame(NodeMixin):
         except TypeError:
             raise ValueError(f"Frame {self.name} has no parent frame")
 
-        translation, _, timestamps = self.get_transformation(reference)
+        translation, _, timestamps = self.lookup_transform(reference)
 
         if timestamps is None:
             if allow_static:
@@ -1191,7 +1211,10 @@ class ReferenceFrame(NodeMixin):
             linear, represent_in, timestamps=timestamps, return_timestamps=True
         )
 
-        return linear, linear_ts
+        if return_timestamps:
+            return linear, linear_ts
+        else:
+            return linear
 
     def lookup_angular_velocity(
         self,
@@ -1201,6 +1224,7 @@ class ReferenceFrame(NodeMixin):
         cutoff=None,
         mode="quaternion",
         allow_static=False,
+        return_timestamps=False,
     ):
         """ Estimate angular velocity of this frame wrt a reference.
 
@@ -1234,6 +1258,9 @@ class ReferenceFrame(NodeMixin):
             the transform between this frame and the reference frame is static.
             Otherwise, a `ValueError` will be raised.
 
+        return_timestamps: bool, default False
+            If True, also return the timestamps of the lookup.
+
         Returns
         -------
         angular: numpy.ndarray, shape (N, 3)
@@ -1249,7 +1276,7 @@ class ReferenceFrame(NodeMixin):
         except TypeError:
             raise ValueError(f"Frame {self.name} has no parent frame")
 
-        _, rotation, timestamps = self.get_transformation(reference)
+        _, rotation, timestamps = self.lookup_transform(reference)
 
         if timestamps is None:
             if allow_static:
@@ -1275,7 +1302,10 @@ class ReferenceFrame(NodeMixin):
             return_timestamps=True,
         )
 
-        return angular, angular_ts
+        if return_timestamps:
+            return angular, angular_ts
+        else:
+            return angular
 
     def register(self, update=False):
         """ Register this frame in the registry.

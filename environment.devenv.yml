@@ -1,5 +1,6 @@
 name: rbm
 channels:
+  - defaults
   - conda-forge
   - robostack
 dependencies:
@@ -15,15 +16,16 @@ dependencies:
   - anytree=2.8
   - pytest=6.2.2
   - pytest-cov=2.7.1
+  - coverage=4.5.3
   - sphinx=2.4.4
   - sphinx_rtd_theme=0.4.3
+  - nbsphinx=0.8.1
+  - sphinx-autosummary-accessors=0.1.2
   - numpydoc=0.9.1
-  - coverage=4.5.3
-  - pip:
-      - git+https://github.com/keewis/sphinx-autosummary-accessors
-      - --editable "{{ root }}"
+  - matplotlib=3.3.2
   # additional dev tools
   {% if "RBM_DEV_TOOLS" in os.environ %}
+  - watchdog=2.0.2
   - tox=3.5.2
   - bump2version=1.0.0
   - flake8=3.7.9
@@ -33,16 +35,22 @@ dependencies:
   {% endif %}
   # ROS dependencies
   {% if "RBM_ROS" in os.environ %}
-  - ros-melodic-rospy=1.14.5
-  - ros-melodic-tf=1.12.1
-  - ros-melodic-tf2-ros=0.6.5
-  - ros-melodic-geometry-msgs=1.12.7
-  - ros-melodic-tf2-geometry-msgs=0.6.5
-  - ros-melodic-visualization-msgs=1.12.7
-  - ros-melodic-python-orocos-kdl=1.4.0
-  - bqplot=0.12.13
-  - ipywidgets=7.5.1
-  - pyyaml=5.3.1
+  - ros-melodic-rospy
+  - ros-melodic-tf
+  - ros-melodic-tf2-ros
+  - ros-melodic-geometry-msgs
+  - ros-melodic-tf2-geometry-msgs
+  - ros-melodic-visualization-msgs
+  - ros-melodic-python-orocos-kdl
+  - ipywidgets
+  - pyyaml
+  - bqplot
+  - qt=5.9.7
+  - sip=4.19.25
   - pip:
       - jupyros==0.3.0
+      - --editable "{{ root }}"
+  {% else %}
+  - pip:
+      - --editable "{{ root }}"
   {% endif %}

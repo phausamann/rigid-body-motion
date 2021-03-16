@@ -316,19 +316,19 @@ class TestReferenceFrame:
         npt.assert_allclose(ts_out.astype(float), ts1[:5].astype(float))
         assert ts_out.dtype == ts1.dtype
 
-    def test_get_transformation(self, rf_grid, get_rf_tree):
+    def test_lookup_transform(self, rf_grid, get_rf_tree):
         """"""
         r, rc1, rc2, t, tc1, tc2 = rf_grid
         rf_world, rf_child1, rf_child2 = get_rf_tree(tc1, rc1, tc2, rc2)
 
         # child1 to world
-        t_act, r_act, ts = rf_child1.get_transformation(rf_world)
+        t_act, r_act, ts = rf_child1.lookup_transform(rf_world)
         npt.assert_almost_equal(t_act, tc1)
         npt.assert_almost_equal(r_act, rc1)
         assert ts is None
 
         # child1 to child2
-        t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
+        t_act, r_act, ts = rf_child1.lookup_transform(rf_child2)
         npt.assert_almost_equal(t_act, t)
         npt.assert_almost_equal(r_act, r)
         assert ts is None
@@ -337,7 +337,7 @@ class TestReferenceFrame:
         rf_child1_inv = rbm.ReferenceFrame(
             parent=rf_world, translation=tc1, rotation=rc1, inverse=True
         )
-        t_act, r_act, ts = rf_world.get_transformation(rf_child1_inv)
+        t_act, r_act, ts = rf_world.lookup_transform(rf_child1_inv)
         npt.assert_almost_equal(t_act, tc1)
         npt.assert_almost_equal(r_act, rc1)
         assert ts is None
@@ -350,12 +350,12 @@ class TestReferenceFrame:
             "child4", rf_child2, timestamps=np.arange(10)
         )
 
-        t_act, r_act, ts = rf_child3.get_transformation(rf_child4)
+        t_act, r_act, ts = rf_child3.lookup_transform(rf_child4)
         npt.assert_almost_equal(t_act, np.tile(t, (5, 1)))
         npt.assert_almost_equal(r_act, np.tile(r, (5, 1)))
         npt.assert_equal(ts, np.arange(5) + 2.5)
 
-    def test_get_transformation_discrete(self):
+    def test_lookup_transform_discrete(self):
         """"""
         t1 = np.ones((10, 3))
         t2 = np.array([[1.0, 0.0, 0.0], [2.0, 0.0, 0.0]])
@@ -373,13 +373,13 @@ class TestReferenceFrame:
         )
 
         # interpolated first
-        t_act, r_act, ts = rf_child1.get_transformation(rf_child2)
+        t_act, r_act, ts = rf_child1.lookup_transform(rf_child2)
         npt.assert_equal(t_act, [[0.0, 1.0, 1.0]] * 5 + [[-1.0, 1.0, 1.0]] * 5)
         npt.assert_equal(r_act, np.tile([[1.0, 0.0, 0.0, 0.0]], (10, 1)))
         npt.assert_allclose(ts, np.arange(10))
 
         # event-based first
-        t_act, r_act, ts = rf_child2.get_transformation(rf_child1)
+        t_act, r_act, ts = rf_child2.lookup_transform(rf_child1)
         npt.assert_equal(
             t_act, [[0.0, -1.0, -1.0]] * 5 + [[1.0, -1.0, -1.0]] * 5
         )
@@ -503,21 +503,21 @@ class TestReferenceFrame:
 
     def test_lookup_twist(self, compensated_tree):
         """"""
-        _, w_head_world, ts = rbm.registry["head"].lookup_twist()
-        _, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist()
-        v_eyes_world, w_eyes_world, ts = rbm.registry["eyes"].lookup_twist(
-            "world"
-        )
+        _, w_head_world = rbm.registry["head"].lookup_twist()
+        _, w_eyes_head = rbm.registry["eyes"].lookup_twist()
+        v_eyes_world, w_eyes_world = rbm.registry["eyes"].lookup_twist("world")
 
-        npt.assert_allclose(w_head_world, -w_eyes_head, rtol=1e-2)
+        npt.assert_allclose(w_head_world, -w_eyes_head, rtol=0.1, atol=1e-10)
         assert (v_eyes_world < 1e-10).all()
         assert (w_eyes_world < 1e-10).all()
 
     def test_transform_angular_velocity(self, compensated_tree):
         """"""
-        _, w_head_world, ts = rbm.registry["head"].lookup_twist()
+        _, w_head_world, ts = rbm.registry["head"].lookup_twist(
+            return_timestamps=True
+        )
         _, w_eyes_head, ts = rbm.registry["eyes"].lookup_twist(
-            represent_in="eyes"
+            return_timestamps=True, represent_in="eyes"
         )
 
         # transform reference frame
@@ -535,9 +535,11 @@ class TestReferenceFrame:
     def test_transform_linear_velocity(self, compensated_tree):
         """"""
         v_head_world, _, ts = rbm.registry["head"].lookup_twist(
-            represent_in="head"
+            return_timestamps=True, represent_in="head"
         )
-        v_eyes_head, _, ts = rbm.registry["eyes"].lookup_twist()
+        v_eyes_head, _, ts = rbm.registry["eyes"].lookup_twist(
+            return_timestamps=True
+        )
 
         # transform reference frame
         v_eyes_world_rf = rbm.registry["head"].transform_linear_velocity(
@@ -546,7 +548,7 @@ class TestReferenceFrame:
             moving_frame="eyes",
             timestamps=ts[1:-1],
         )
-        assert (v_eyes_world_rf < 0.06).all()
+        assert (np.abs(v_eyes_world_rf) < 1e-3).all()
 
         # transform moving frame
         v_eyes_world_mf = rbm.registry["head"].transform_linear_velocity(
@@ -556,4 +558,4 @@ class TestReferenceFrame:
             reference_frame="world",
             timestamps=ts[1:-1],
         )
-        assert (v_eyes_world_mf < 0.06).all()
+        assert (np.abs(v_eyes_world_mf) < 1e-3).all()

@@ -2,11 +2,38 @@
 History
 =======
 
-0.4.1 (unreleased)
-------------------
+0.5.0 (March 16th, 2021)
+------------------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+* Top-level reference frame transform and lookup methods now all accept a
+  ``return_timestamps`` argument that is ``False`` by default. Previously,
+  methods would return timestamps only if the result of the transformation was
+  timestamped. This does not affect the xarray interface.
+* ``lookup_transform`` now returns the correct transformation from the base
+  frame to the target frame (instead of the other way around).
+* ``ReferenceFrame.get_transformation`` is deprecated and replaced by
+  ``ReferenceFrame.lookup_transform``.
+
+New features
+~~~~~~~~~~~~
+* New ``plot`` module with plotting methods for static reference frames and
+  arrays of points, quaternions and vectors.
+* New ``lookup_pose`` method that calculates the pose of a frame wrt another.
 
 Bug fixes & improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~
+* Fixed ``"reference_frame"`` attribute incorrectly set by
+  ``transform_vectors``.
+
+
+0.4.1 (February 18th, 2021)
+---------------------------
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Fixed ``transform_coordinates`` failing when spatial dimension is first
   axis of array.
 * Fixed ``transform_linear_velocity`` and ``transform_angular_velocity``

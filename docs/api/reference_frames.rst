@@ -25,10 +25,24 @@ Transforms
     :nosignatures:
     :toctree: _generated
 
-    ReferenceFrame.get_transformation
     ReferenceFrame.transform_points
     ReferenceFrame.transform_quaternions
     ReferenceFrame.transform_vectors
+    ReferenceFrame.transform_angular_velocity
+    ReferenceFrame.transform_linear_velocity
+
+Lookups
+~~~~~~~
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    ReferenceFrame.lookup_transform
+    ReferenceFrame.lookup_angular_velocity
+    ReferenceFrame.lookup_linear_velocity
+    ReferenceFrame.lookup_twist
+
 
 Registry
 ~~~~~~~~

@@ -8,4 +8,7 @@ anytree==2.8.0
 sphinx==2.4.4
 sphinx_rtd_theme==0.4.3
 numpydoc==0.9.1
-git+https://github.com/keewis/sphinx-autosummary-accessors
+sphinx-autosummary-accessors==0.1.2
+nbsphinx==0.8.1
+matplotlib==3.3.2
+ipykernel==5.5.0

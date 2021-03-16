@@ -361,7 +361,7 @@ class ReferenceFrameTransformBroadcaster:
             self.translation,
             self.rotation,
             self.timestamps,
-        ) = self.frame.get_transformation(self.base)
+        ) = self.frame.lookup_transform(self.base)
 
         if self.timestamps is None:
             self.broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -380,7 +380,7 @@ class ReferenceFrameTransformBroadcaster:
             self.pose_publisher = None
 
         if publish_twist:
-            self.linear, self.angular, _ = self.frame.lookup_twist(
+            self.linear, self.angular = self.frame.lookup_twist(
                 reference=base,
                 represent_in=self.frame,
                 cutoff=twist_cutoff,

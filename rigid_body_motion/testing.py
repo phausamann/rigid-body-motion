@@ -9,7 +9,7 @@ def make_test_motion(
     n_samples,
     freq=1,
     max_angle=np.pi / 2,
-    fs=100,
+    fs=1000,
     stack=True,
     inverse=False,
     offset=None,

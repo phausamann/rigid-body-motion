@@ -503,7 +503,8 @@ def _transform(
     axis,
     timestamps,
     time_axis,
-    what="reference_frame",
+    what=None,
+    return_timestamps=False,
     **kwargs,
 ):
     """ Base transform method. """
@@ -538,6 +539,12 @@ def _transform(
                 f"whose ``attrs`` contain a 'motion_type' entry "
                 f"containing any of {method_lookup.keys()}"
             )
+
+    if what is None:
+        if method == "transform_vectors":
+            what = "representation_frame"
+        else:
+            what = "reference_frame"
 
     if outof is None:
         if attrs is not None and what in attrs:
@@ -580,9 +587,7 @@ def _transform(
         return _make_dataarray(
             arr, coords, dims, name, attrs, time_dim, ts_out
         )
-    elif ts_out is not None:
-        # TODO not so pretty. Maybe also introduce return_timestamps
-        #  parameter and do this when return_timestamps=None
+    elif return_timestamps or return_timestamps is None and ts_out is not None:
         return arr, ts_out
     else:
         return arr
@@ -625,7 +630,7 @@ def _make_transform_or_pose_dataset(
             },
         )
 
-    ds.translation.attrs.update(
+    ds[linear_name].attrs.update(
         {
             "representation_frame": frame.name,
             "reference_frame": frame.name,
@@ -635,7 +640,7 @@ def _make_transform_or_pose_dataset(
         }
     )
 
-    ds.rotation.attrs.update(
+    ds[angular_name].attrs.update(
         {
             "representation_frame": frame.name,
             "reference_frame": frame.name,

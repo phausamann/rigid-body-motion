@@ -47,10 +47,18 @@ extensions = [
 ]
 
 autosummary_generate = True
+
 # numpydoc_class_members_toctree = True
 numpydoc_show_class_members = False
+
 nbsphinx_kernel_name = "python3"
 nbsphinx_execute = "always"
+nbsphinx_prolog = """
+.. nbinfo::
+
+    You can :download:`download <{{ env.docname }}.ipynb>` this guide as a
+    Jupyter notebook.
+"""
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

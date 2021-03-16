@@ -1,0 +1,12 @@
+name: rbm-examples
+channels:
+- conda-forge
+- phausamann
+dependencies:
+- python=3.6
+- rigid-body-motion>=0.5
+- numba
+- xarray
+- netcdf4
+- matplotlib
+- ipykernel

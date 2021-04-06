@@ -148,7 +148,7 @@ def plot_reference_frame(
     return arrows
 
 
-def plot_points(arr, ax=None, figsize=(6, 6), fmt=None, **kwargs):
+def plot_points(arr, ax=None, figsize=(6, 6), fmt="", **kwargs):
     """ Plot an array of 3D points.
 
     Parameters

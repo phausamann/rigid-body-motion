@@ -5,6 +5,7 @@ import pandas as pd
 import rosbag
 
 from rigid_body_motion.ros.msg import (
+    make_transform_msg,
     unpack_point_msg,
     unpack_quaternion_msg,
     unpack_vector_msg,
@@ -71,6 +72,9 @@ class RosbagReader:
     def load_messages(self, topic):
         """ Load messages from topic as dict.
 
+        Only nav_msgs/Odometry and geometry_msgs/TransformStamped topics are
+        supported so far.
+
         Parameters
         ----------
         topic: str
@@ -134,6 +138,9 @@ class RosbagReader:
 
     def load_dataset(self, topic, cache=False):
         """ Load messages from topic as xarray.Dataset.
+
+        Only nav_msgs/Odometry and geometry_msgs/TransformStamped topics are
+        supported so far.
 
         Parameters
         ----------
@@ -212,3 +219,127 @@ class RosbagReader:
         """
         ds = self.load_dataset(topic, cache=False)
         self._write_netcdf(ds, self._get_filename(output_file, "nc"))
+
+
+class RosbagWriter:
+    """ Writer for motion topics to rosbag files. """
+
+    def __init__(self, bag_file):
+        """ Constructor.
+
+        Parameters
+        ----------
+        bag_file: str
+            Path to rosbag file.
+        """
+        self.bag_file = Path(bag_file)
+
+        self._bag = None
+
+    def __enter__(self):
+        self._bag = rosbag.Bag(self.bag_file, "w")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._bag.close()
+        self._bag = None
+
+    def write_transform_stamped(
+        self, timestamps, translation, rotation, topic, frame, child_frame
+    ):
+        """ Write multiple geometry_msgs/TransformStamped messages.
+
+        Parameters
+        ----------
+        timestamps: array_like, shape (n_timestamps,)
+            Array of timestamps.
+
+        translation: array_like, shape (n_timestamps, 3)
+            Array of translations.
+
+        rotation: array_like, shape (n_timestamps, 4)
+            Array of rotations.
+
+        topic: str
+            Topic of the messages.
+
+        frame: str
+            Parent frame of the transform.
+
+        child_frame: str
+            Child frame of the transform.
+        """
+        # check timestamps
+        timestamps = np.asarray(timestamps)
+        if timestamps.ndim != 1:
+            raise ValueError("timestamps must be one-dimensional")
+
+        # check translation
+        translation = np.asarray(translation)
+        if translation.shape != (len(timestamps), 3):
+            raise ValueError(
+                f"Translation must have shape ({len(timestamps)}, 3), "
+                f"got {translation.shape}"
+            )
+
+        # check rotation
+        rotation = np.asarray(rotation)
+        if rotation.shape != (len(timestamps), 4):
+            raise ValueError(
+                f"Rotation must have shape ({len(timestamps)}, 4), "
+                f"got {rotation.shape}"
+            )
+
+        # write messages to bag
+        for ts, t, r in zip(timestamps, translation, rotation):
+            msg = make_transform_msg(t, r, frame, child_frame, ts)
+            self._bag.write(topic, msg)
+
+    def write_transform_stamped_dataset(
+        self,
+        ds,
+        topic,
+        frame,
+        child_frame,
+        timestamps="time",
+        translation="position",
+        rotation="orientation",
+    ):
+        """ Write a dataset as geometry_msgs/TransformStamped messages.
+
+        Parameters
+        ----------
+        ds: xarray.Dataset
+            Dataset containing timestamps, translation and rotation
+
+        topic: str
+            Topic of the messages.
+
+        frame: str
+            Parent frame of the transform.
+
+        child_frame: str
+            Child frame of the transform.
+
+        timestamps: str, default 'time'
+            Name of the dimension containing the timestamps.
+
+        translation: str, default 'position'
+            Name of the variable containing the translation.
+
+        rotation: str, default 'orientation'
+            Name of the variable containing the rotation.
+        """
+        if np.issubdtype(ds[timestamps].dtype, np.datetime64):
+            timestamps = ds[timestamps].astype(float) / 1e9
+        else:
+            timestamps = ds[timestamps]
+
+        self.write_transform_stamped(
+            timestamps,
+            ds[translation],
+            ds[rotation],
+            topic,
+            frame,
+            child_frame,
+        )

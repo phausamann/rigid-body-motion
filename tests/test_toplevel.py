@@ -27,7 +27,7 @@ class TestTopLevel:
         xr.load_dataset(rbm.example_data["left_eye"])
         xr.load_dataset(rbm.example_data["right_eye"])
 
-        assert rbm.example_data["head_rosbag"].exists()
+        assert rbm.example_data["rosbag"].exists()
 
     def test_transform_points(self, rf_tree):
         """"""

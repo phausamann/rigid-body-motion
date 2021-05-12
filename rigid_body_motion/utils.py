@@ -325,9 +325,9 @@ class ExampleDataStore:
             "right_eye.nc",
             "b038c4cb2f6932e4334f135cdf7e24ff9c3b5789977b2ae0206ba80acf54c647",
         ),
-        "head_rosbag": (
-            "head.bag",
-            "2b894d6e9ed2de9daf104280d5d86346f99efb73e70e4976cefddc5dd88c73e8",
+        "rosbag": (
+            "example.bag",
+            "8d27f5e554f5a0e02e0bec59b60424e582f6104380f96c3f226b4d85c107f2bc",
         ),
     }
 

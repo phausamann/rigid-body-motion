@@ -34,7 +34,7 @@ from .msg import (
 )
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, cache_time=None):
         """ Constructor.
 

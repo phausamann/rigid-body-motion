@@ -146,6 +146,7 @@ def head_dataset():
     """"""
     xr = pytest.importorskip("xarray")
     pytest.importorskip("netCDF4")
+    pytest.importorskip("pooch")
 
     return xr.load_dataset(rbm.example_data["head"])
 
@@ -155,6 +156,7 @@ def left_eye_dataset():
     """"""
     xr = pytest.importorskip("xarray")
     pytest.importorskip("netCDF4")
+    pytest.importorskip("pooch")
 
     return xr.load_dataset(rbm.example_data["left_eye"])
 

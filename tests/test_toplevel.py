@@ -21,10 +21,13 @@ class TestTopLevel:
         """"""
         xr = pytest.importorskip("xarray")
         pytest.importorskip("netCDF4")
+        pytest.importorskip("pooch")
 
         xr.load_dataset(rbm.example_data["head"])
         xr.load_dataset(rbm.example_data["left_eye"])
         xr.load_dataset(rbm.example_data["right_eye"])
+
+        assert rbm.example_data["head_rosbag"].exists()
 
     def test_transform_points(self, rf_tree):
         """"""

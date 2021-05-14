@@ -37,22 +37,15 @@ dependencies:
   {% endif %}
   # ROS dependencies
   {% if "RBM_ROS" in os.environ %}
-  - ros-melodic-rospy
-  - ros-melodic-tf
-  - ros-melodic-tf2-ros
-  - ros-melodic-geometry-msgs
-  - ros-melodic-tf2-geometry-msgs
-  - ros-melodic-visualization-msgs
-  - ros-melodic-python-orocos-kdl
+  - ros-noetic-rospy
+  - ros-noetic-tf
+  - ros-noetic-tf2-ros
+  - ros-noetic-tf2-geometry-msgs
+  - ros-noetic-geometry-msgs
+  - ros-noetic-visualization-msgs
+  - python-orocos-kdl
+  - boost=1.74
   - ipywidgets
-  - pyyaml
-  - bqplot
-  - qt=5.9.7
-  - sip=4.19.25
-  - pip:
-      - jupyros==0.3.0
-      - --editable "{{ root }}"
-  {% else %}
-  - pip:
-      - --editable "{{ root }}"
   {% endif %}
+  - pip:
+      - --editable "{{ root }}"

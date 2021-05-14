@@ -225,6 +225,19 @@ class TestRosbagReader:
             == "geometry_msgs/TransformStamped"
         )
 
+    def test_get_topics_and_types(self, RosbagReader, rosbag_path):
+        """"""
+        with RosbagReader(rosbag_path) as reader:
+            info = reader.get_topics_and_types()
+
+        assert info == {
+            "/camera/accel/sample": "sensor_msgs/Imu",
+            "/camera/gyro/sample": "sensor_msgs/Imu",
+            "/camera/odom/sample": "nav_msgs/Odometry",
+            "/vicon/t265_tracker/t265_tracker": "geometry_msgs/"
+            "TransformStamped",
+        }
+
     def test_load_msgs(self, RosbagReader, rosbag_path):
         """"""
         # odometry

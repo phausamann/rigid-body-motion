@@ -69,6 +69,25 @@ class RosbagReader:
 
         ds.to_netcdf(filename, encoding=encoding)
 
+    def get_topics_and_types(self):
+        """ Get topics and corresponding message types included in rosbag.
+
+        Returns
+        -------
+        topics: dict
+            Names of topics and corresponding message types included in the
+            rosbag.
+        """
+        if self._bag is None:
+            raise RuntimeError(
+                "get_topics must be called from within the RosbagReader "
+                "context manager"
+            )
+
+        info = self._bag.get_type_and_topic_info()
+
+        return {k: v[0] for k, v in info[1].items()}
+
     def load_messages(self, topic):
         """ Load messages from topic as dict.
 

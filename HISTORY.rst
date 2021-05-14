@@ -2,6 +2,16 @@
 History
 =======
 
+0.6.0 (unreleased)
+------------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+* Example data is now fetched via the ``pooch`` library and no longer a part
+  of the package itself.
+
+
 0.5.0 (March 16th, 2021)
 ------------------------
 

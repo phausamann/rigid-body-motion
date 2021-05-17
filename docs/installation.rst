@@ -51,8 +51,6 @@ Plotting functions require matplotlib:
 
     $ pip install matplotlib
 
-.. _ros-install:
-
 ROS integration
 ---------------
 

@@ -146,6 +146,7 @@ def head_dataset():
     """"""
     xr = pytest.importorskip("xarray")
     pytest.importorskip("netCDF4")
+    pytest.importorskip("pooch")
 
     return xr.load_dataset(rbm.example_data["head"])
 
@@ -155,6 +156,7 @@ def left_eye_dataset():
     """"""
     xr = pytest.importorskip("xarray")
     pytest.importorskip("netCDF4")
+    pytest.importorskip("pooch")
 
     return xr.load_dataset(rbm.example_data["left_eye"])
 
@@ -172,6 +174,13 @@ def head_rf_tree(head_dataset):
 def rosbag_path():
     """"""
     yield test_data_dir / "test.bag"
+    shutil.rmtree(test_data_dir / "cache", ignore_errors=True)
+
+
+@pytest.fixture()
+def optitrack_path():
+    """"""
+    yield test_data_dir / "optitrack.csv"
     shutil.rmtree(test_data_dir / "cache", ignore_errors=True)
 
 

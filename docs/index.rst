@@ -34,6 +34,7 @@ xarray_ data types.
    reference_frames
    velocities
    xarray
+   ros
 
 .. toctree::
    :maxdepth: 1

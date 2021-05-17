@@ -1,12 +1,9 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.5.0"
-from pathlib import Path
+__version__ = "0.6.0"
 
-from pkg_resources import resource_filename
-
-from . import plot, ros  # noqa
+from . import io, plot, ros  # noqa
 from .coordinate_systems import (
     cartesian_to_polar,
     cartesian_to_spherical,
@@ -39,7 +36,7 @@ from .reference_frames import (
     register_frame,
     render_tree,
 )
-from .utils import qinterp, qinv, qmean, qmul, rotate_vectors
+from .utils import ExampleDataStore, qinterp, qinv, qmean, qmul, rotate_vectors
 
 try:
     import rigid_body_motion.accessors  # noqa
@@ -95,15 +92,7 @@ _cs_funcs = {
 }
 
 
-example_data = {
-    "head": Path(resource_filename("rigid_body_motion", "data/head.nc")),
-    "left_eye": Path(
-        resource_filename("rigid_body_motion", "data/left_eye.nc")
-    ),
-    "right_eye": Path(
-        resource_filename("rigid_body_motion", "data/right_eye.nc")
-    ),
-}
+example_data = ExampleDataStore()
 
 
 def transform_vectors(

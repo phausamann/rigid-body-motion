@@ -48,7 +48,7 @@ def Transformer():
     return tf.Transformer
 
 
-class TestTransformer(object):
+class TestTransformer:
     def test_moving_reference_frame(self, Transformer, head_dataset):
         """"""
         rbm.register_frame("world")
@@ -202,6 +202,13 @@ def RosbagReader():
     return io.RosbagReader
 
 
+@pytest.fixture()
+def RosbagWriter():
+    """"""
+    io = pytest.importorskip("rigid_body_motion.ros.io")
+    return io.RosbagWriter
+
+
 class TestRosbagReader:
     def test_get_msg_type(self, RosbagReader, rosbag_path):
         """"""
@@ -217,6 +224,19 @@ class TestRosbagReader:
             RosbagReader._get_msg_type(bag, "/vicon/t265_tracker/t265_tracker")
             == "geometry_msgs/TransformStamped"
         )
+
+    def test_get_topics_and_types(self, RosbagReader, rosbag_path):
+        """"""
+        with RosbagReader(rosbag_path) as reader:
+            info = reader.get_topics_and_types()
+
+        assert info == {
+            "/camera/accel/sample": "sensor_msgs/Imu",
+            "/camera/gyro/sample": "sensor_msgs/Imu",
+            "/camera/odom/sample": "nav_msgs/Odometry",
+            "/vicon/t265_tracker/t265_tracker": "geometry_msgs/"
+            "TransformStamped",
+        }
 
     def test_load_msgs(self, RosbagReader, rosbag_path):
         """"""
@@ -289,6 +309,37 @@ class TestRosbagReader:
             reader.export("/camera/odom/sample", output_file)
 
         assert output_file.exists()
+
+
+class TestRosbagWriter:
+    def test_write_transform_stamped(self, RosbagWriter, tmpdir):
+        """"""
+        rosbag_path = tmpdir / "test.bag"
+
+        with RosbagWriter(rosbag_path) as writer:
+            writer.write_transform_stamped(
+                np.arange(10),
+                np.zeros((10, 3)),
+                np.zeros((10, 4)),
+                "/test",
+                "world",
+                "body",
+            )
+
+        assert rosbag_path.exists()
+
+    def test_write_transform_stamped_dataset(
+        self, RosbagWriter, head_dataset, tmpdir
+    ):
+        """"""
+        rosbag_path = tmpdir / "test.bag"
+
+        with RosbagWriter(rosbag_path) as writer:
+            writer.write_transform_stamped_dataset(
+                head_dataset.isel(time=range(100)), "/test", "world", "body",
+            )
+
+        assert rosbag_path.exists()
 
 
 # -- utils module -- #

@@ -6,3 +6,4 @@ numpy-quaternion
 numba
 anytree
 pytest
+pooch

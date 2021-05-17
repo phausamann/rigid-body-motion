@@ -91,6 +91,18 @@ Utility functions
     rotate_vectors
 
 
+I/O functions
+-------------
+
+.. currentmodule:: rigid_body_motion.io
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    load_optitrack
+
+
 Plotting
 --------
 
@@ -112,7 +124,6 @@ xarray Accessors
 .. currentmodule:: xarray
 
 .. autosummary::
-    :nosignatures:
     :toctree: _generated
     :template: autosummary/accessor_method.rst
 

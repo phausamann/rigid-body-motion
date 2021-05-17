@@ -1,6 +1,7 @@
 """"""
 import operator
 from functools import reduce
+from pathlib import Path
 
 import numpy as np
 from quaternion import as_float_array, as_quat_array, quaternion
@@ -304,3 +305,45 @@ def is_dataset(obj, require_attrs=None):
     ]
 
     return all([hasattr(obj, name) for name in require_attrs])
+
+
+class ExampleDataStore:
+    """ Storage interface for example data. """
+
+    base_url = "https://github.com/phausamann/rbm-data/raw/main/"
+
+    registry = {
+        "head": (
+            "head.nc",
+            "874eddaa51bf775c7311f0046613c6f969adef6e34fe4aea2e1248a75ed3fee3",
+        ),
+        "left_eye": (
+            "left_eye.nc",
+            "56d5488fb8d3ff08450663ed0136ac659c1d51eb5340a7e3ed52f5ecf019139c",
+        ),
+        "right_eye": (
+            "right_eye.nc",
+            "b038c4cb2f6932e4334f135cdf7e24ff9c3b5789977b2ae0206ba80acf54c647",
+        ),
+        "rosbag": (
+            "example.bag",
+            "8d27f5e554f5a0e02e0bec59b60424e582f6104380f96c3f226b4d85c107f2bc",
+        ),
+    }
+
+    def __getitem__(self, item):
+        try:
+            import pooch
+        except ImportError:
+            raise ModuleNotFoundError(
+                "pooch must be installed to load example data"
+            )
+
+        try:
+            dataset, known_hash = self.registry[item]
+        except KeyError:
+            raise KeyError(f"'{item}' is not a valid example dataset")
+
+        return Path(
+            pooch.retrieve(url=self.base_url + dataset, known_hash=known_hash)
+        )

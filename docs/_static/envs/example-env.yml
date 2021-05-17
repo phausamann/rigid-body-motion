@@ -4,9 +4,10 @@ channels:
 - phausamann
 dependencies:
 - python=3.6
-- rigid-body-motion>=0.5
+- rigid-body-motion>=0.6
 - numba
 - xarray
 - netcdf4
 - matplotlib
 - ipykernel
+- pooch

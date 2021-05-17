@@ -14,15 +14,17 @@ dependencies:
   - quaternion=2020.9.5.14.42.2
   - numba=0.48
   - anytree=2.8
+  - pooch=1.3.0
   - pytest=6.2.2
   - pytest-cov=2.7.1
   - coverage=4.5.3
-  - sphinx=2.4.4
+  - sphinx=3.5.4
   - sphinx_rtd_theme=0.4.3
   - nbsphinx=0.8.1
-  - sphinx-autosummary-accessors=0.1.2
+  - sphinx-autosummary-accessors=0.2.0
   - numpydoc=0.9.1
   - matplotlib=3.3.2
+  - jinja2=2.11.3
   # additional dev tools
   {% if "RBM_DEV_TOOLS" in os.environ %}
   - watchdog=2.0.2
@@ -35,22 +37,15 @@ dependencies:
   {% endif %}
   # ROS dependencies
   {% if "RBM_ROS" in os.environ %}
-  - ros-melodic-rospy
-  - ros-melodic-tf
-  - ros-melodic-tf2-ros
-  - ros-melodic-geometry-msgs
-  - ros-melodic-tf2-geometry-msgs
-  - ros-melodic-visualization-msgs
-  - ros-melodic-python-orocos-kdl
+  - ros-noetic-rospy
+  - ros-noetic-tf
+  - ros-noetic-tf2-ros
+  - ros-noetic-tf2-geometry-msgs
+  - ros-noetic-geometry-msgs
+  - ros-noetic-visualization-msgs
+  - python-orocos-kdl
+  - boost=1.74
   - ipywidgets
-  - pyyaml
-  - bqplot
-  - qt=5.9.7
-  - sip=4.19.25
-  - pip:
-      - jupyros==0.3.0
-      - --editable "{{ root }}"
-  {% else %}
-  - pip:
-      - --editable "{{ root }}"
   {% endif %}
+  - pip:
+      - --editable "{{ root }}"

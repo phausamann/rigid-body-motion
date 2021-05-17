@@ -34,7 +34,7 @@ from .msg import (
 )
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, cache_time=None):
         """ Constructor.
 
@@ -481,12 +481,22 @@ class ReferenceFrameTransformBroadcaster:
             while not rospy.is_shutdown() and not self.stopped:
                 self.publish()
                 self.idx = (self.idx + 1) % len(self.timestamps)
-                dt = (
-                    self.timestamps.values[self.idx].astype(float) / 1e9
-                    - self.timestamps.values[self.idx - 1].astype(float) / 1e9
-                    if self.idx > 0
-                    else 0.0
-                )
+                if isinstance(self.timestamps, pd.DatetimeIndex):
+                    dt = (
+                        self.timestamps.values[self.idx].astype(float) / 1e9
+                        - self.timestamps.values[self.idx - 1].astype(float)
+                        / 1e9
+                        if self.idx > 0
+                        else 0.0
+                    )
+                else:
+                    dt = float(
+                        self.timestamps.values[self.idx]
+                        - self.timestamps.values[self.idx - 1]
+                        if self.idx > 0
+                        else 0.0
+                    )
+
                 rospy.sleep(dt)
         else:
             rospy.spin()

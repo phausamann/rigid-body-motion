@@ -11,6 +11,11 @@ Breaking changes
 * Example data is now fetched via the ``pooch`` library and no longer a part
   of the package itself.
 
+New features
+~~~~~~~~~~~~
+* New ``io`` module for import/export methods.
+* New ``ros.RosbagWriter`` class for writing rosbag files.
+
 
 0.5.0 (March 16th, 2021)
 ------------------------

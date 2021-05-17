@@ -91,6 +91,18 @@ Utility functions
     rotate_vectors
 
 
+I/O functions
+-------------
+
+.. currentmodule:: rigid_body_motion.io
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    load_optitrack
+
+
 Plotting
 --------
 

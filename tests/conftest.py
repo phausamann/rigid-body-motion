@@ -178,6 +178,13 @@ def rosbag_path():
 
 
 @pytest.fixture()
+def optitrack_path():
+    """"""
+    yield test_data_dir / "optitrack.csv"
+    shutil.rmtree(test_data_dir / "cache", ignore_errors=True)
+
+
+@pytest.fixture()
 def export_folder():
     """"""
     export_folder = test_data_dir / "exports"

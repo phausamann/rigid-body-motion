@@ -3,7 +3,7 @@ __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
 __version__ = "0.5.0"
 
-from . import plot, ros  # noqa
+from . import io, plot, ros  # noqa
 from .coordinate_systems import (
     cartesian_to_polar,
     cartesian_to_spherical,

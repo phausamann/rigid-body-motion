@@ -99,11 +99,15 @@ def load_optitrack(filepath, import_format="numpy"):
 
         for name in data_dict:
             position = xr.DataArray(
-                data_dict[name]["position"], name="position"
-            ).rename(axis="cartesian_axis")
+                data_dict[name]["position"],
+                name="position",
+                dims=("time", "cartesian_axis"),
+            )
             orientation = xr.DataArray(
-                data_dict[name].orientation, name="orientation"
-            ).rename(axis="quaternion_axis")
+                data_dict[name].orientation,
+                name="orientation",
+                dims=("time", "quaternion_axis"),
+            )
             data_dict[name] = xr.merge((position, orientation))
 
         return data_dict

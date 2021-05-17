@@ -124,7 +124,6 @@ xarray Accessors
 .. currentmodule:: xarray
 
 .. autosummary::
-    :nosignatures:
     :toctree: _generated
     :template: autosummary/accessor_method.rst
 

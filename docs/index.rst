@@ -33,6 +33,7 @@ xarray_ data types.
 
    reference_frames
    velocities
+   estimators
    xarray
    ros
 

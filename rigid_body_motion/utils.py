@@ -221,6 +221,9 @@ def rotate_vectors(q, v, axis=-1, qaxis=-1, one_to_one=True):
         Otherwise, this array has shape `q.shape` + `v.shape`.
     """
     # TODO proper broadcasting if v is DataArray
+    q = np.asarray(q)
+    v = np.asarray(v)
+
     if q.dtype != quaternion:
         q = as_quat_array(np.swapaxes(q, qaxis, -1))
 

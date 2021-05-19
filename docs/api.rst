@@ -84,6 +84,7 @@ Utility functions
     :nosignatures:
     :toctree: _generated
 
+    from_euler_angles
     qinv
     qmul
     qmean

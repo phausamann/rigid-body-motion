@@ -95,6 +95,32 @@ and, from a second terminal, launch RViz:
     $ conda activate ros
     $ rviz
 
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+In order to make sure all ROS dependencies have been set up correctly, run:
+
+.. code-block:: console
+
+    $ python -m rigid_body_motion.ros.check_install
+
+If this is not successful, you need to fix some of your dependencies. The
+following outlines solutions for common issues:
+
+1. Problem: boost version
+
+   .. code-block:: console
+
+       ImportError: libboost_thread.so.1.74.0: cannot open shared object file:
+       No such file or directory
+
+   Solution: install correct boost version
+
+   .. code-block:: console
+
+       $ conda install -c conda-forge boost=1.74
+
+   Replace ``1.74`` with whatever version the traceback tells you is missing.
 
 Example environments
 --------------------

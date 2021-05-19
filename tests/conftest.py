@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from quaternion import as_float_array, from_euler_angles
 
 import rigid_body_motion as rbm
 from rigid_body_motion.testing import make_test_motion
@@ -36,15 +35,6 @@ def rf_grid(request):
 def transform_grid(request):
     """"""
     return request.param
-
-
-@pytest.fixture()
-def mock_quaternion():
-    def _mock_quaternion(*angles):
-        """"""
-        return as_float_array(from_euler_angles(*angles))
-
-    return _mock_quaternion
 
 
 @pytest.fixture()

@@ -1,21 +1,23 @@
 import numpy as np
 import pytest
 from numpy import testing as npt
-from quaternion import (
-    as_float_array,
-    as_quat_array,
-    from_euler_angles,
-    quaternion,
-)
+from quaternion import as_float_array, as_quat_array, quaternion
 
 from rigid_body_motion.testing import make_test_motion
-from rigid_body_motion.utils import qinterp, qinv, qmean, qmul, rotate_vectors
+from rigid_body_motion.utils import (
+    from_euler_angles,
+    qinterp,
+    qinv,
+    qmean,
+    qmul,
+    rotate_vectors,
+)
 
 
 class TestUtils(object):
     def test_qinv(self):
         """"""
-        q = from_euler_angles(0.0, 0.0, np.pi / 4)
+        q = from_euler_angles(roll=np.pi / 4, return_quaternion=True)
 
         assert qinv(q) == 1 / q
         npt.assert_equal(qinv(as_float_array(q)), as_float_array(1 / q))
@@ -25,8 +27,8 @@ class TestUtils(object):
 
     def test_qmul(self):
         """"""
-        q1 = from_euler_angles(0.0, 0.0, np.pi / 4)
-        q2 = from_euler_angles(0.0, 0.0, np.pi / 4)
+        q1 = from_euler_angles(roll=np.pi / 4, return_quaternion=True)
+        q2 = from_euler_angles(roll=np.pi / 4, return_quaternion=True)
 
         assert qmul(q1, q1) == q1 * q2
         npt.assert_equal(
@@ -52,10 +54,10 @@ class TestUtils(object):
         """"""
         q = np.hstack(
             (
-                from_euler_angles(0.0, 0.0, np.pi / 4),
-                from_euler_angles(0.0, 0.0, -np.pi / 4),
-                from_euler_angles(0.0, np.pi / 4, 0.0),
-                from_euler_angles(0.0, -np.pi / 4, 0.0),
+                from_euler_angles(roll=np.pi / 4, return_quaternion=True),
+                from_euler_angles(roll=-np.pi / 4, return_quaternion=True),
+                from_euler_angles(pitch=np.pi / 4, return_quaternion=True),
+                from_euler_angles(pitch=-np.pi / 4, return_quaternion=True),
                 quaternion(1.0, 0.0, 0.0, 0.0),
             )
         )
@@ -99,7 +101,9 @@ class TestUtils(object):
     def test_rotate_vectors(self):
         """"""
         v = np.ones((10, 3))
-        q = np.tile(from_euler_angles(0.0, 0.0, np.pi / 4), 10)
+        q = np.tile(
+            from_euler_angles(yaw=np.pi / 4, return_quaternion=True), 10
+        )
         vr = np.vstack((np.zeros(10), np.sqrt(2) * np.ones(10), np.ones(10))).T
 
         # single quaternion, single vector
@@ -135,3 +139,48 @@ class TestUtils(object):
 
         with pytest.raises(ValueError):
             rotate_vectors(q, np.ones((10, 4)))
+
+    def test_from_euler_angles(self):
+        """"""
+        rpy_r = (np.pi / 2, 0, 0)
+        q_r = (np.sqrt(2) / 2, np.sqrt(2) / 2, 0, 0)
+        q_rp = (0.5, 0.5, 0.5, 0.5)
+        q_ypr = (np.sqrt(2) / 2, 0, np.sqrt(2) / 2, 0)
+
+        # single rpy
+        q = from_euler_angles(rpy_r)
+        np.testing.assert_almost_equal(q, q_r)
+
+        # rpy array
+        q = from_euler_angles(np.tile(rpy_r, (10, 1)))
+        np.testing.assert_almost_equal(q, np.tile(q_r, (10, 1)))
+
+        # different axis
+        q = from_euler_angles(np.tile(rpy_r, (10, 1)).T, axis=0)
+        np.testing.assert_almost_equal(q, np.tile(q_r, (10, 1)).T)
+
+        # single roll
+        q = from_euler_angles(roll=np.pi / 2)
+        np.testing.assert_almost_equal(q, q_r)
+
+        # single roll, pitch & yaw
+        q = from_euler_angles(roll=np.pi / 2, pitch=np.pi / 2)
+        np.testing.assert_almost_equal(q, q_rp)
+
+        # single roll, pitch, yaw + different order
+        q = from_euler_angles(
+            roll=np.pi / 2, pitch=np.pi / 2, yaw=np.pi / 2, order="ypr"
+        )
+        np.testing.assert_almost_equal(q, q_ypr)
+
+        # no input
+        with pytest.raises(ValueError):
+            from_euler_angles()
+
+        # rpy and roll together
+        with pytest.raises(ValueError):
+            from_euler_angles(rpy_r, roll=np.pi / 2)
+
+        # inconsistent shapes
+        with pytest.raises(ValueError):
+            from_euler_angles(roll=np.ones(10), pitch=1)

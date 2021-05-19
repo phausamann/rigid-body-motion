@@ -1,7 +1,7 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 from . import io, plot, ros  # noqa
 from .coordinate_systems import (
@@ -36,7 +36,15 @@ from .reference_frames import (
     register_frame,
     render_tree,
 )
-from .utils import ExampleDataStore, qinterp, qinv, qmean, qmul, rotate_vectors
+from .utils import (
+    ExampleDataStore,
+    from_euler_angles,
+    qinterp,
+    qinv,
+    qmean,
+    qmul,
+    rotate_vectors,
+)
 
 try:
     import rigid_body_motion.accessors  # noqa
@@ -74,6 +82,7 @@ __all__ = [
     "lookup_linear_velocity",
     "lookup_angular_velocity",
     # utils
+    "from_euler_angles",
     "example_data",
     "qinterp",
     "qinv",

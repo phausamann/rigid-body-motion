@@ -37,8 +37,8 @@ from .reference_frames import (
     render_tree,
 )
 from .utils import (
-    from_euler_angles,
     ExampleDataStore,
+    from_euler_angles,
     qinterp,
     qinv,
     qmean,

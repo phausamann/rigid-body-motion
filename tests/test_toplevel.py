@@ -3,18 +3,19 @@ import pytest
 from numpy import testing as npt
 
 import rigid_body_motion as rbm
+from rigid_body_motion.utils import from_euler_angles
 
 
 class TestTopLevel:
     """"""
 
     @pytest.fixture()
-    def rf_tree(self, register_rf_tree, mock_quaternion):
+    def rf_tree(self, register_rf_tree):
         """"""
         register_rf_tree(
             tc1=(1.0, 0.0, 0.0),
             tc2=(-1.0, 0.0, 0.0),
-            rc2=mock_quaternion(np.pi, 0.0, 0.0),
+            rc2=from_euler_angles(yaw=np.pi),
         )
 
     def test_example_data(self):
@@ -78,10 +79,10 @@ class TestTopLevel:
         assert da_child1.attrs["representation_frame"] == "child1"
         npt.assert_almost_equal(da_child1[0, 0], arr_exp)
 
-    def test_transform_quaternions(self, rf_tree, mock_quaternion):
+    def test_transform_quaternions(self, rf_tree):
         """"""
         arr_child2 = (1.0, 0.0, 0.0, 0.0)
-        arr_exp = mock_quaternion(np.pi, 0.0, 0.0)
+        arr_exp = from_euler_angles(yaw=np.pi)
 
         # tuple
         arr_child1 = rbm.transform_quaternions(
@@ -89,12 +90,12 @@ class TestTopLevel:
         )
         npt.assert_almost_equal(arr_child1, arr_exp)
 
-    def test_transform_quaternions_xr(self, rf_tree, mock_quaternion):
+    def test_transform_quaternions_xr(self, rf_tree):
         """"""
         xr = pytest.importorskip("xarray")
 
         arr_child2 = (1.0, 0.0, 0.0, 0.0)
-        arr_exp = mock_quaternion(np.pi, 0.0, 0.0)
+        arr_exp = from_euler_angles(yaw=np.pi)
 
         da_child2 = xr.DataArray(
             np.tile(arr_child2, (10, 1)),

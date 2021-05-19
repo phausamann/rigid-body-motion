@@ -1,5 +1,6 @@
 import numpy as np
-from quaternion import as_float_array, from_rotation_vector
+
+from rigid_body_motion.utils import from_euler_angles
 
 
 def load_optitrack(filepath, import_format="numpy"):
@@ -60,20 +61,14 @@ def load_optitrack(filepath, import_format="numpy"):
 
     # convert orientation to quaternions
     for name in data_dict:
-        r = np.deg2rad(data_dict[name]["Rotation"].values)
-        qx = from_rotation_vector(
-            r[:, 0][:, np.newaxis] * np.array([1, 0, 0])[np.newaxis, :]
+        rpy = np.deg2rad(data_dict[name]["Rotation"].values)
+        order = (
+            meta.get("Rotation Type", "XYZ")
+            .replace("X", "r")
+            .replace("Y", "p")
+            .replace("Z", "y")
         )
-        qy = from_rotation_vector(
-            r[:, 1][:, np.newaxis] * np.array([0, 1, 0])[np.newaxis, :]
-        )
-        qz = from_rotation_vector(
-            r[:, 2][:, np.newaxis] * np.array([0, 0, 1])[np.newaxis, :]
-        )
-        if meta.get("Rotation Type", "XYZ") == "XYZ":
-            q = as_float_array(qx * qy * qz)
-        else:
-            raise ValueError("Unsupported rotation type")
+        q = from_euler_angles(rpy, order=order)
 
         position = data_dict[name]["Position"]
         position.columns = position.columns.str.lower()

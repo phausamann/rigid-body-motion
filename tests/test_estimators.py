@@ -12,6 +12,7 @@ from rigid_body_motion.estimators import (
     iterative_closest_point,
     shortest_arc_rotation,
 )
+from rigid_body_motion.utils import from_euler_angles
 
 
 class TestEstimators:
@@ -109,10 +110,10 @@ class TestEstimators:
 
         xr.testing.assert_allclose(actual, expected)
 
-    def test_best_fit_rotation(self, get_rf_tree, mock_quaternion):
+    def test_best_fit_rotation(self, get_rf_tree):
         """"""
         rf_world, rf_child1, _ = get_rf_tree(
-            (0.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
+            (0.0, 0.0, 0.0), from_euler_angles(roll=np.pi / 2)
         )
         v1 = np.random.randn(10, 3)
         v2 = rf_world.transform_points(v1, rf_child1)
@@ -121,12 +122,10 @@ class TestEstimators:
         _, r_exp, _ = rf_world.lookup_transform(rf_child1)
         npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-10)
 
-    def test_best_fit_transform(
-        self, get_rf_tree, mock_quaternion, icp_test_data
-    ):
+    def test_best_fit_transform(self, get_rf_tree, icp_test_data):
         """"""
         rf_world, rf_child1, _ = get_rf_tree(
-            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
+            (1.0, 0.0, 0.0), from_euler_angles(roll=np.pi / 2)
         )
         v1 = np.random.randn(10, 3)
         v2 = rf_world.transform_points(v1, rf_child1)
@@ -146,12 +145,12 @@ class TestEstimators:
             [-6.87968663e-01, 4.73801246e-04, 9.12595868e-03, 7.25682859e-01],
         )
 
-    def test_best_fit_transform_xr(self, get_rf_tree, mock_quaternion):
+    def test_best_fit_transform_xr(self, get_rf_tree):
         """"""
         xr = pytest.importorskip("xarray")
 
         rf_world, rf_child1, _ = get_rf_tree(
-            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
+            (1.0, 0.0, 0.0), from_euler_angles(roll=np.pi / 2)
         )
         v1 = np.random.randn(10, 3)
         v2 = rf_world.transform_points(v1, rf_child1)
@@ -164,12 +163,12 @@ class TestEstimators:
         assert t.dims == ("cartesian_axis",)
         assert r.dims == ("quaternion_axis",)
 
-    def test_iterative_closest_point(self, get_rf_tree, mock_quaternion):
+    def test_iterative_closest_point(self, get_rf_tree):
         """"""
         np.random.seed(42)
 
         rf_world, rf_child1, _ = get_rf_tree(
-            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 6, 0.0, 0.0)
+            (1.0, 0.0, 0.0), from_euler_angles(yaw=np.pi / 6)
         )
         x, y = np.meshgrid(np.arange(10), np.arange(20))
         v1 = np.column_stack(
@@ -184,12 +183,12 @@ class TestEstimators:
         npt.assert_allclose(t, t_exp, rtol=1.0, atol=0.01)
         npt.assert_allclose(np.abs(r), np.abs(r_exp), rtol=1.0, atol=1e-4)
 
-    def test_iterative_closest_point_xr(self, get_rf_tree, mock_quaternion):
+    def test_iterative_closest_point_xr(self, get_rf_tree):
         """"""
         xr = pytest.importorskip("xarray")
 
         rf_world, rf_child1, _ = get_rf_tree(
-            (1.0, 0.0, 0.0), mock_quaternion(np.pi / 2, 0.0, 0.0)
+            (1.0, 0.0, 0.0), from_euler_angles(roll=np.pi / 2)
         )
         v1 = np.random.randn(10, 3)
         v2 = rf_world.transform_points(v1, rf_child1)

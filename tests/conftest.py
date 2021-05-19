@@ -39,15 +39,6 @@ def transform_grid(request):
 
 
 @pytest.fixture()
-def mock_quaternion():
-    def _mock_quaternion(*angles):
-        """"""
-        return as_float_array(from_euler_angles(*angles))
-
-    return _mock_quaternion
-
-
-@pytest.fixture()
 def mock_frame():
     rbm.register_frame("world")
 

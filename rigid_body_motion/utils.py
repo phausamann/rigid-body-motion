@@ -4,7 +4,12 @@ from functools import reduce
 from pathlib import Path
 
 import numpy as np
-from quaternion import as_float_array, as_quat_array, quaternion
+from quaternion import (
+    as_float_array,
+    as_quat_array,
+    from_rotation_vector,
+    quaternion,
+)
 from quaternion import rotate_vectors as quat_rv
 from quaternion import squad
 
@@ -255,6 +260,125 @@ def rotate_vectors(q, v, axis=-1, qaxis=-1, one_to_one=True):
     vr = v + 2 * np.cross(r, s * v + rxv, axisb=axis, axisc=axis) / m
 
     return vr
+
+
+def from_euler_angles(
+    rpy=None,
+    roll=None,
+    pitch=None,
+    yaw=None,
+    axis=-1,
+    order="rpy",
+    return_quaternion=False,
+):
+    """ Construct quaternions from Euler angles.
+
+    This method differs from the method found in the quaternion package in
+    that it is actually useful for converting commonly found Euler angle
+    representations to quaternions.
+
+    Parameters
+    ----------
+    rpy: array-like, shape (..., 3, ...), optional
+        Array with roll, pitch and yaw values. Mutually exclusive with `roll`,
+        `pitch` and `yaw` arguments.
+
+    roll: array-like, optional
+        Array with roll values. Mutually exclusive with `rpy` argument.
+
+    pitch: array-like, optional
+        Array with pitch values. Mutually exclusive with `rpy` argument.
+
+    yaw: array-like, optional
+        Array with yaw values. Mutually exclusive with `rpy` argument.
+
+    axis: int, default -1
+        Array axis representing RPY values of `rpy` argument.
+
+    order: str, default "rpy"
+        Order of consecutively applied rotations. Defaults to
+        roll -> pitch -> yaw.
+
+    return_quaternion: bool, default False
+        If True, return result as quaternion dtype.
+
+    Returns
+    -------
+    q: array-like
+        Array with quaternions
+    """
+    if rpy is not None:
+        if roll is not None or pitch is not None or yaw is not None:
+            raise ValueError(
+                "Cannot specify roll, pitch or yaw when rpy is provided"
+            )
+        rpy = np.swapaxes(np.asarray(rpy), axis, -1)
+        roll = rpy[..., 0]
+        pitch = rpy[..., 1]
+        yaw = rpy[..., 2]
+        shape = rpy.shape[:-1]
+    else:
+        shape = None
+
+    if roll is not None:
+        roll = np.asarray(roll)
+        shape = roll.shape
+        roll = from_rotation_vector(
+            np.stack((roll, np.zeros(shape), np.zeros(shape)), axis=-1)
+        )
+
+    if pitch is not None:
+        pitch = np.asarray(pitch)
+        if shape is None:
+            shape = np.shape(pitch)
+        elif shape != pitch.shape:
+            raise ValueError(
+                f"Inconsistent shape for pitch argument: expected {shape}, "
+                f"got {pitch.shape}"
+            )
+        pitch = from_rotation_vector(
+            np.stack((np.zeros(shape), pitch, np.zeros(shape)), axis=-1)
+        )
+
+    if yaw is not None:
+        yaw = np.asarray(yaw)
+        if shape is None:
+            shape = np.shape(yaw)
+        elif shape != yaw.shape:
+            raise ValueError(
+                f"Inconsistent shape for yaw argument: expected {shape}, "
+                f"got {yaw.shape}"
+            )
+        yaw = from_rotation_vector(
+            np.stack((np.zeros(shape), np.zeros(shape), yaw), axis=-1)
+        )
+
+    if shape is None:
+        raise ValueError(
+            "Must specify at least one of rpy, roll, pitch or yaw"
+        )
+
+    # rearrange rotors according to order
+    rotors = [None] * 3
+    try:
+        rotors[order.index("r")] = roll
+        rotors[order.index("p")] = pitch
+        rotors[order.index("y")] = yaw
+    except (ValueError, IndexError):
+        raise ValueError(
+            f"order must be a permutation of 'r', 'p' and 'y', got {order}"
+        )
+
+    # chain rotors
+    q = quaternion(1, 0, 0, 0)
+    for r in rotors:
+        if r is not None:
+            q = q * r
+
+    if return_quaternion:
+        return q
+    else:
+        return np.swapaxes(as_float_array(q), -1, axis)
 
 
 def is_dataarray(obj, require_attrs=None):

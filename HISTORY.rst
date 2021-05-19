@@ -2,11 +2,18 @@
 History
 =======
 
-0.6.1 (unreleased)
+0.7.0 (unreleased)
 ------------------
+
+New features
+~~~~~~~~~~~~
+
+* New ``from_euler_angles`` utility method.
+
 
 Bug fixes & improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Importing ROS interface classes will not fail silently anymore and instead
   show the traceback of the import error.
 
@@ -22,6 +29,7 @@ Breaking changes
 
 New features
 ~~~~~~~~~~~~
+
 * New ``io`` module for import/export methods.
 * New ``ros.RosbagWriter`` class for writing rosbag files.
 
@@ -31,6 +39,7 @@ New features
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
+
 * Top-level reference frame transform and lookup methods now all accept a
   ``return_timestamps`` argument that is ``False`` by default. Previously,
   methods would return timestamps only if the result of the transformation was
@@ -42,12 +51,14 @@ Breaking changes
 
 New features
 ~~~~~~~~~~~~
+
 * New ``plot`` module with plotting methods for static reference frames and
   arrays of points, quaternions and vectors.
 * New ``lookup_pose`` method that calculates the pose of a frame wrt another.
 
 Bug fixes & improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Fixed ``"reference_frame"`` attribute incorrectly set by
   ``transform_vectors``.
 

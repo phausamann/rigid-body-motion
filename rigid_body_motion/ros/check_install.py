@@ -9,10 +9,10 @@ if __name__ == "__main__":
         import visualization_msgs.msg  # noqa
 
         try:
-            import rospkg
-            import tf2_geometry_msgs
-            import tf2_ros
-            from tf.msg import tfMessage
+            import rospkg  # noqa
+            import tf2_geometry_msgs  # noqa
+            import tf2_ros  # noqa
+            from tf.msg import tfMessage  # noqa
         except rospkg.ResourceNotFound:
             raise ImportError(
                 "The rospkg module was found but tf2_ros failed to import, "

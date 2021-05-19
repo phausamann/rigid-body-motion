@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from quaternion import as_float_array, from_euler_angles
 
 import rigid_body_motion as rbm
 from rigid_body_motion.testing import make_test_motion

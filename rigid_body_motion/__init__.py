@@ -1,7 +1,7 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 from . import io, plot, ros  # noqa
 from .coordinate_systems import (

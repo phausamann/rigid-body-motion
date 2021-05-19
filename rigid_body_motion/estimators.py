@@ -235,6 +235,10 @@ def estimate_angular_velocity(
 def shortest_arc_rotation(v1, v2, dim=None, axis=None):
     """ Estimate the shortest-arc rotation between two arrays of vectors.
 
+    This method computes the rotation `r` that satisfies:
+
+    .. math:: v_2 / ||v_2|| = rot(r, v_1) / ||v_1||
+
     Parameters
     ----------
     v1: array_like, shape (..., 3, ...)

@@ -2,6 +2,15 @@
 History
 =======
 
+0.6.1 (unreleased)
+------------------
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+* Importing ROS interface classes will not fail silently anymore and instead
+  show the traceback of the import error.
+
+
 0.6.0 (May 17th, 2021)
 ----------------------
 

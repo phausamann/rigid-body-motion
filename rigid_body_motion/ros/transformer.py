@@ -35,6 +35,11 @@ from .msg import (
 
 
 class Transformer:
+    """ Wrapper class for tf2_ros.Buffer.
+
+    Can be constructed from a ReferenceFrame instance.
+    """
+
     def __init__(self, cache_time=None):
         """ Constructor.
 
@@ -67,6 +72,7 @@ class Transformer:
         root = reference_frame.root
 
         # get the first and last timestamps for all moving reference frames
+        # TODO float timestamps
         t_start_end = list(
             zip(
                 *[

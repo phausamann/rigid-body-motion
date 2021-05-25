@@ -21,6 +21,18 @@ jobs:
         - conda mambabuild ci/conda_recipe
       after_success:
         - chmod +x ci/conda_recipe/conda_upload.sh
+    - env: RBM_ROS_DEBUG=true
+      install:
+        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - source "$HOME/miniconda/etc/profile.d/conda.sh"
+        - hash -r
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update -q conda
+        - conda install -c conda-forge mamba
+        - mamba env create
+      script:
+        - make -C docs html
     - python: 3.6
       env: TOXENV=py36
     - python: 3.7
@@ -29,11 +41,6 @@ jobs:
       env: TOXENV=minimal
     - python: 3.7
       env: TOXENV=latest
-    - python: 3.6
-      env: TOXENV=docs
-      install:
-        - sudo apt-get install pandoc
-        - pip install -U tox-travis
     - python: 3.6
       env: TOXENV=lint
 

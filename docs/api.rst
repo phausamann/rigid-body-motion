@@ -119,6 +119,24 @@ Plotting
     vectors
 
 
+ROS interface
+-------------
+
+.. currentmodule:: rigid_body_motion.ros
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    init_node
+    RosbagReader
+    RosbagWriter
+    ReferenceFrameTransformBroadcaster
+    ReferenceFrameMarkerPublisher
+    Transformer
+    play_publisher
+
+
 xarray Accessors
 ----------------
 

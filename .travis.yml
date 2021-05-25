@@ -32,6 +32,7 @@ jobs:
         - conda install -c conda-forge mamba
         - mamba env create
       script:
+        - conda activate rbm
         - make -C docs html
     - python: 3.6
       env: TOXENV=py36

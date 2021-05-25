@@ -1,5 +1,58 @@
 """"""
+import atexit
+import warnings
+
 import numpy as np
+
+
+def init_node(name, start_master=False):
+    """ Register a client node with the master.
+
+    Parameters
+    ----------
+    name: str
+        Name of the node.
+
+    start_master: bool, default False
+        If True, start a ROS master if one isn't already running.
+
+    Returns
+    -------
+    master: ROSLaunchParent or ROSMasterStub instance
+        If a ROS master was started by this method, returns a
+        ``ROSLaunchParent`` instance that can be used to shut down the master
+        with its ``shutdown()`` method. Otherwise, a ``ROSMasterStub`` is
+        returned that shows a warning when its ``shutdown()`` method is called.
+    """
+    import roslaunch
+    import rospy
+
+    class ROSMasterStub:
+        @staticmethod
+        def shutdown():
+            warnings.warn(
+                "ROS master was started somewhere else and cannot be shut "
+                "down."
+            )
+
+    try:
+        rospy.get_master().getPid()
+    except ConnectionRefusedError:
+        if start_master:
+            master = roslaunch.parent.ROSLaunchParent(
+                "master", [], is_core=True
+            )
+            master.start()
+            # make sure master is shut down on exit
+            atexit.register(master.shutdown)
+        else:
+            raise RuntimeError("ROS master is not running.")
+    else:
+        master = ROSMasterStub()
+
+    rospy.init_node(name)
+
+    return master
 
 
 def play_publisher(publisher, step=1, speed=1.0, skip=None, timestamps=None):

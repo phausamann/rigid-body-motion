@@ -58,4 +58,4 @@ except ImportError:
             msg = traceback.format_exc()
 
 
-from .utils import play_publisher  # noqa
+from .utils import init_node, play_publisher  # noqa

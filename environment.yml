@@ -25,18 +25,7 @@ dependencies:
   - numpydoc=0.9.1
   - matplotlib=3.3.2
   - jinja2=2.11.3
-  # additional dev tools
-  {% if "RBM_DEV_TOOLS" in os.environ %}
-  - watchdog=2.0.2
-  - tox=3.5.2
-  - bump2version=1.0.0
-  - flake8=3.7.9
-  - pre-commit=2.5.1
-  - black=19.10b0
-  - isort=5.0.4
-  {% endif %}
   # ROS dependencies
-  {% if "RBM_ROS" in os.environ %}
   - ros-noetic-rospy
   - ros-noetic-tf
   - ros-noetic-tf2-ros
@@ -46,6 +35,5 @@ dependencies:
   - python-orocos-kdl
   - boost=1.74
   - ipywidgets
-  {% endif %}
   - pip:
-      - --editable "{{ root }}"
+      - --editable .

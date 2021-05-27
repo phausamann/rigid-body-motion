@@ -93,7 +93,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@4.1.3
         with:
-          branch: gh-pages
+          branch: docs
           folder: docs/_build/html
 
   lint:

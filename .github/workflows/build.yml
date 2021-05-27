@@ -23,8 +23,37 @@ jobs:
       - name: Install package
         run: python setup.py install
       - name: Test with pytest
-        run: |
-          pytest
+        run: pytest
+
+  minimal:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+      - name: Install dependencies
+        run: pip install pandas pytest
+      - name: Install package
+        run: python setup.py install
+      - name: Test with pytest
+        run: pytest
+
+  latest:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: pip install -r ci/requirements_latest.txt
+      - name: Install package
+        run: python setup.py install
+      - name: Test with pytest
+        run: pytest
 
   conda-build:
     runs-on: ubuntu-18.04
@@ -42,9 +71,7 @@ jobs:
         run: conda mambabuild ci/conda_recipe -c conda-forge -c robostack
       - name: Upload to channel on tags
         if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload /usr/share/miniconda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
-
+        run: anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload /usr/share/miniconda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
 
   docs:
     runs-on: ubuntu-18.04
@@ -63,7 +90,7 @@ jobs:
           make -C docs/ doctest
           touch docs/_build/html/.nojekyll
       - name: Deploy docs on master
-#        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@4.1.3
         with:
           branch: gh-pages
@@ -87,5 +114,5 @@ jobs:
         run: isort -c .
       - name: Run twine
         run: |
-          python setup.py install sdist
+          python setup.py sdist
           twine check dist/*

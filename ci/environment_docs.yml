@@ -2,7 +2,6 @@ name: rbm-docs
 channels:
   - defaults
   - conda-forge
-  - robostack
 dependencies:
   - python=3.6
   - pip=19.1
@@ -22,10 +21,3 @@ dependencies:
   - numpydoc=0.9.1
   - matplotlib=3.3.2
   - jinja2=2.11.3
-  # ROS dependencies
-  - ros-noetic-rospy=1.15.9
-  - ros-noetic-tf=1.13.2
-  - ros-noetic-tf2-ros=0.7.5
-  - ros-noetic-geometry-msgs=1.13.0
-  - ros-noetic-visualization-msgs=1.13.0
-  - ipywidgets=7.6.0

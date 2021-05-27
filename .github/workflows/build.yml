@@ -66,8 +66,6 @@ jobs:
           conda install -y -c conda-forge boa anaconda-client
           conda config --set anaconda_upload no
       - name: Run conda build
-        env:
-          RBM_ROS_DEBUG: true
         run: conda mambabuild ci/conda_recipe -c conda-forge -c robostack
       - name: Upload to channel on tags
         if: startsWith(github.ref, 'refs/tags/')
@@ -84,6 +82,8 @@ jobs:
           conda install -y -c conda-forge mamba
           mamba env create
       - name: Build Sphinx docs and run doctests
+        env:
+          NBSPHINX_EXEC: always
         run: |
           source activate rbm
           make -C docs/ html

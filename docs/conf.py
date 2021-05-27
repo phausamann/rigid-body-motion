@@ -52,7 +52,7 @@ autosummary_generate = True
 numpydoc_show_class_members = False
 
 nbsphinx_kernel_name = "python3"
-nbsphinx_execute = "auto"
+nbsphinx_execute = os.environ.get("NBSPHINX_EXEC", "auto")
 nbsphinx_prolog = """
 .. nbinfo::
 

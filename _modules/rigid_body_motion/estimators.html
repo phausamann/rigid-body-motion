@@ -1,0 +1,736 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion.estimators &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../rigid_body_motion.html">rigid_body_motion</a> &raquo;</li>
+        
+      <li>rigid_body_motion.estimators</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rigid_body_motion.estimators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">quaternion</span> <span class="kn">import</span> <span class="n">as_float_array</span><span class="p">,</span> <span class="n">from_rotation_matrix</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">cKDTree</span>
+
+<span class="kn">from</span> <span class="nn">rigid_body_motion.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_estimate_angular_velocity</span><span class="p">,</span>
+    <span class="n">_estimate_linear_velocity</span><span class="p">,</span>
+    <span class="n">_make_dataarray</span><span class="p">,</span>
+    <span class="n">_maybe_unpack_dataarray</span><span class="p">,</span>
+    <span class="n">_replace_dim</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rigid_body_motion.utils</span> <span class="kn">import</span> <span class="n">rotate_vectors</span>
+
+
+<span class="k">def</span> <span class="nf">_reshape_vectors</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">same_shape</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Reshape input vectors to two dimensions. &quot;&quot;&quot;</span>
+    <span class="c1"># TODO v2 as DataArray with possibly different dimension order</span>
+    <span class="n">v1</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">_maybe_unpack_dataarray</span><span class="p">(</span>
+        <span class="n">v1</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">v2</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">_maybe_unpack_dataarray</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Shape of v1 and v2 along axis </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2"> must be 3, got &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="si">}</span><span class="s2"> for v1 and </span><span class="si">{</span><span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="si">}</span><span class="s2"> for v2&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;v1 must have at least two dimensions&quot;</span><span class="p">)</span>
+
+    <span class="c1"># flatten everything except spatial dimension</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">same_shape</span> <span class="ow">and</span> <span class="n">v1</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">v2</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;v1 and v2 must have the same shape&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_make_transform_dataarrays</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Make translation and rotation DataArrays. &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+    <span class="n">translation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">translation</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;cartesian_axis&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]},</span>
+        <span class="s2">&quot;cartesian_axis&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;translation&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">rotation</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;quaternion_axis&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]},</span>
+        <span class="s2">&quot;quaternion_axis&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;rotation&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span>
+
+
+<div class="viewcode-block" id="estimate_linear_velocity"><a class="viewcode-back" href="../../_generated/rigid_body_motion.estimate_linear_velocity.html#rigid_body_motion.estimate_linear_velocity">[docs]</a><span class="k">def</span> <span class="nf">estimate_linear_velocity</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate linear velocity from a time series of translation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        Array of translations.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the points.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        points. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the points, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the points.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to the linear velocity after</span>
+<span class="sd">        the estimation as a fraction of the Nyquist frequency.</span>
+
+<span class="sd">    outlier_thresh: float, optional</span>
+<span class="sd">        Some SLAM-based trackers introduce position corrections when a new</span>
+<span class="sd">        camera frame becomes available. This introduces outliers in the</span>
+<span class="sd">        linear velocity estimate. The estimation algorithm used here</span>
+<span class="sd">        can suppress these outliers by throwing out samples where the</span>
+<span class="sd">        norm of the second-order differences of the position is above</span>
+<span class="sd">        `outlier_thresh` and interpolating the missing values. For</span>
+<span class="sd">        measurements from the Intel RealSense T265 tracker, set this value</span>
+<span class="sd">        to 1e-3.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    linear: array_like</span>
+<span class="sd">        Array of linear velocities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">time_dim</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">,</span>
+        <span class="n">dims</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">_maybe_unpack_dataarray</span><span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span>
+    <span class="p">)</span>
+
+    <span class="n">linear</span> <span class="o">=</span> <span class="n">_estimate_linear_velocity</span><span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_make_dataarray</span><span class="p">(</span>
+            <span class="n">linear</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">time_dim</span><span class="p">,</span> <span class="n">timestamps</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">linear</span></div>
+
+
+<div class="viewcode-block" id="estimate_angular_velocity"><a class="viewcode-back" href="../../_generated/rigid_body_motion.estimate_angular_velocity.html#rigid_body_motion.estimate_angular_velocity">[docs]</a><span class="k">def</span> <span class="nf">estimate_angular_velocity</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;quaternion&quot;</span><span class="p">,</span>
+    <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate angular velocity from a time series of rotations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        Array of rotations, expressed in quaternions.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the quaternions.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        quaternions. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the quaternions, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the quaternions.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    mode: str, default &quot;quaternion&quot;</span>
+<span class="sd">        If &quot;quaternion&quot;, compute the angular velocity from the quaternion</span>
+<span class="sd">        derivative. If &quot;rotation_vector&quot;, compute the angular velocity from</span>
+<span class="sd">        the gradient of the axis-angle representation of the rotations.</span>
+
+<span class="sd">    outlier_thresh: float, optional</span>
+<span class="sd">        Suppress samples where the norm of the second-order differences of the</span>
+<span class="sd">        rotation is above `outlier_thresh` and interpolate the missing values.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to the angular velocity after</span>
+<span class="sd">        the estimation as a fraction of the Nyquist frequency.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    angular: array_like</span>
+<span class="sd">        Array of angular velocities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">time_dim</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">,</span>
+        <span class="n">dims</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">_maybe_unpack_dataarray</span><span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span>
+    <span class="p">)</span>
+
+    <span class="n">angular</span> <span class="o">=</span> <span class="n">_estimate_angular_velocity</span><span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_replace_dim</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="s2">&quot;cartesian&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_dataarray</span><span class="p">(</span>
+            <span class="n">angular</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">time_dim</span><span class="p">,</span> <span class="n">timestamps</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">angular</span></div>
+
+
+<div class="viewcode-block" id="shortest_arc_rotation"><a class="viewcode-back" href="../../_generated/rigid_body_motion.shortest_arc_rotation.html#rigid_body_motion.shortest_arc_rotation">[docs]</a><span class="k">def</span> <span class="nf">shortest_arc_rotation</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate the shortest-arc rotation between two arrays of vectors.</span>
+
+<span class="sd">    This method computes the rotation `r` that satisfies:</span>
+
+<span class="sd">    .. math:: v_2 / ||v_2|| = rot(r, v_1) / ||v_1||</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v1: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The first array of vectors.</span>
+
+<span class="sd">    v2: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The second array of vectors.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the first array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the vectors.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the arrays representing the spatial coordinates of the</span>
+<span class="sd">        vectors. Defaults to the last axis of the arrays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rotation: array_like, shape (..., 4, ...)</span>
+<span class="sd">        The quaternion representation of the shortest-arc rotation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">v1</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span> <span class="o">=</span> <span class="n">_maybe_unpack_dataarray</span><span class="p">(</span>
+        <span class="n">v1</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+    <span class="n">sn1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v1</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sn2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">d12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v1</span> <span class="o">*</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">c12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sn1</span> <span class="o">*</span> <span class="n">sn2</span><span class="p">)</span> <span class="o">+</span> <span class="n">d12</span><span class="p">,</span> <span class="n">c12</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">rotation</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_replace_dim</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="s2">&quot;quaternion&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_dataarray</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotation</span></div>
+
+
+<div class="viewcode-block" id="best_fit_rotation"><a class="viewcode-back" href="../../_generated/rigid_body_motion.best_fit_rotation.html#rigid_body_motion.best_fit_rotation">[docs]</a><span class="k">def</span> <span class="nf">best_fit_rotation</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Least-squares best-fit rotation between two arrays of vectors.</span>
+
+<span class="sd">    Finds the rotation `r` that minimizes:</span>
+
+<span class="sd">    .. math:: || v_2 - rot(r, v_1) ||</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v1: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The first array of vectors.</span>
+
+<span class="sd">    v2: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The second array of vectors.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the first array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the vectors.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the arrays representing the spatial coordinates of the</span>
+<span class="sd">        vectors. Defaults to the last axis of the arrays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rotation: array_like, shape (4,)</span>
+<span class="sd">        Rotation of transform.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Adapted from https://github.com/ClayFlannigan/icp</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    iterative_closest_point, best_fit_transform</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">was_dataarray</span> <span class="o">=</span> <span class="n">_reshape_vectors</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+
+    <span class="c1"># rotation matrix</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Vt</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># rotation as quaternion</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span><span class="n">from_rotation_matrix</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">was_dataarray</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">rotation</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;quaternion_axis&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]},</span>
+            <span class="s2">&quot;quaternion_axis&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;rotation&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rotation</span></div>
+
+
+<div class="viewcode-block" id="best_fit_transform"><a class="viewcode-back" href="../../_generated/rigid_body_motion.best_fit_transform.html#rigid_body_motion.best_fit_transform">[docs]</a><span class="k">def</span> <span class="nf">best_fit_transform</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Least-squares best-fit transform between two arrays of vectors.</span>
+
+<span class="sd">    Finds the rotation `r` and the translation `t` that minimize:</span>
+
+<span class="sd">    .. math:: || v_2 - (rot(r, v_1) + t) ||</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v1: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The first array of vectors.</span>
+
+<span class="sd">    v2: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The second array of vectors.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the first array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the vectors.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the arrays representing the spatial coordinates of the</span>
+<span class="sd">        vectors. Defaults to the last axis of the arrays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    translation: array_like, shape (3,)</span>
+<span class="sd">        Translation of transform.</span>
+
+<span class="sd">    rotation: array_like, shape (4,)</span>
+<span class="sd">        Rotation of transform.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Adapted from https://github.com/ClayFlannigan/icp</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    iterative_closest_point, best_fit_rotation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">was_dataarray</span> <span class="o">=</span> <span class="n">_reshape_vectors</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+
+    <span class="c1"># translate points to their centroids</span>
+    <span class="n">mean_v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mean_v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">v1_centered</span> <span class="o">=</span> <span class="n">v1</span> <span class="o">-</span> <span class="n">mean_v1</span>
+    <span class="n">v2_centered</span> <span class="o">=</span> <span class="n">v2</span> <span class="o">-</span> <span class="n">mean_v2</span>
+
+    <span class="c1"># rotation matrix</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1_centered</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">v2_centered</span><span class="p">)</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Vt</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># special reflection case</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">Vt</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Vt</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># rotation as quaternion</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span><span class="n">from_rotation_matrix</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+    <span class="c1"># translation</span>
+    <span class="n">translation</span> <span class="o">=</span> <span class="n">mean_v2</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">mean_v1</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">was_dataarray</span><span class="p">:</span>
+        <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">=</span> <span class="n">_make_transform_dataarrays</span><span class="p">(</span>
+            <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span></div>
+
+
+<span class="k">def</span> <span class="nf">_nearest_neighbor</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Find the nearest neighbor in v2 for each point in v1. &quot;&quot;&quot;</span>
+    <span class="n">kd_tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+    <span class="n">distances</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">kd_tree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">idx</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">distances</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="iterative_closest_point"><a class="viewcode-back" href="../../_generated/rigid_body_motion.iterative_closest_point.html#rigid_body_motion.iterative_closest_point">[docs]</a><span class="k">def</span> <span class="nf">iterative_closest_point</span><span class="p">(</span>
+    <span class="n">v1</span><span class="p">,</span>
+    <span class="n">v2</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">init_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iterations</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Iterative closest point algorithm matching two arrays of vectors.</span>
+
+<span class="sd">    Finds the rotation `r` and the translation `t` such that:</span>
+
+<span class="sd">    .. math:: v_2 \simeq rot(r, v_1) + t</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v1: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The first array of vectors.</span>
+
+<span class="sd">    v2: array_like, shape (..., 3, ...)</span>
+<span class="sd">        The second array of vectors.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the first array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the vectors.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the arrays representing the spatial coordinates of the</span>
+<span class="sd">        vectors. Defaults to the last axis of the arrays.</span>
+
+<span class="sd">    init_transform: tuple, optional</span>
+<span class="sd">        Initial guess as (translation, rotation) tuple.</span>
+
+<span class="sd">    max_iterations: int, default 20</span>
+<span class="sd">        Maximum number of iterations.</span>
+
+<span class="sd">    tolerance: float, default 1e-3</span>
+<span class="sd">        Abort if the mean distance error between the transformed arrays does</span>
+<span class="sd">        not improve by more than this threshold between iterations.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    translation: array_like, shape (3,)</span>
+<span class="sd">        Translation of transform.</span>
+
+<span class="sd">    rotation: array_like, shape (4,)</span>
+<span class="sd">        Rotation of transform.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Adapted from https://github.com/ClayFlannigan/icp</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For points with known correspondences (e.g. timeseries of positions), it is</span>
+<span class="sd">    recommended to interpolate the points to a common sampling base and use the</span>
+<span class="sd">    `best_fit_transform` method.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    best_fit_transform, best_fit_rotation</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">was_dataarray</span> <span class="o">=</span> <span class="n">_reshape_vectors</span><span class="p">(</span>
+        <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">same_shape</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+
+    <span class="n">v1_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+
+    <span class="c1"># apply the initial pose estimation</span>
+    <span class="k">if</span> <span class="n">init_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">init_transform</span>
+        <span class="n">v1_new</span> <span class="o">=</span> <span class="n">rotate_vectors</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">v1_new</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+    <span class="n">prev_error</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
+        <span class="c1"># find the nearest neighbors between the current source and destination</span>
+        <span class="c1"># points</span>
+        <span class="n">idx</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="n">_nearest_neighbor</span><span class="p">(</span><span class="n">v1_new</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+
+        <span class="c1"># compute the transformation between the current source and nearest</span>
+        <span class="c1"># destination points</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">best_fit_transform</span><span class="p">(</span><span class="n">v1_new</span><span class="p">,</span> <span class="n">v2</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="c1"># update the current source</span>
+        <span class="n">v1_new</span> <span class="o">=</span> <span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v1_new</span><span class="p">)</span> <span class="o">+</span> <span class="n">t</span>
+
+        <span class="c1"># check error</span>
+        <span class="n">mean_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">prev_error</span> <span class="o">-</span> <span class="n">mean_error</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">prev_error</span> <span class="o">=</span> <span class="n">mean_error</span>
+
+    <span class="c1"># calculate final transformation</span>
+    <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">=</span> <span class="n">best_fit_transform</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v1_new</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">was_dataarray</span><span class="p">:</span>
+        <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">=</span> <span class="n">_make_transform_dataarrays</span><span class="p">(</span>
+            <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion.ros.visualization &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../rigid_body_motion.html">rigid_body_motion</a> &raquo;</li>
+        
+      <li>rigid_body_motion.ros.visualization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rigid_body_motion.ros.visualization</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+
+<span class="kn">from</span> <span class="nn">rigid_body_motion.core</span> <span class="kn">import</span> <span class="n">_resolve_rf</span>
+
+
+<span class="k">def</span> <span class="nf">hex_to_rgba</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert hex color string to ColorRGBA message.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    h : str</span>
+<span class="sd">        Hex color string in the format #RRGGBBAA.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    c : ColorRGBA</span>
+<span class="sd">        ColorRGBA message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">std_msgs.msg</span> <span class="kn">import</span> <span class="n">ColorRGBA</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ColorRGBA</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">get_marker</span><span class="p">(</span>
+    <span class="n">marker_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">frame_id</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#ffffffff&quot;</span><span class="p">,</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+    <span class="n">orientation</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a Marker visualization message.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    marker_type : int, default Marker.LINE_STRIP</span>
+<span class="sd">        Type of the marker.</span>
+
+<span class="sd">    frame_id : str, default &quot;world&quot;</span>
+<span class="sd">        Name of the reference frame of the marker.</span>
+
+<span class="sd">    scale : float or iterable of float, len 3, default 1.0</span>
+<span class="sd">        Scale of the marker.</span>
+
+<span class="sd">    color : str, default &quot;#ffffffff&quot;</span>
+<span class="sd">        Color of the marker.</span>
+
+<span class="sd">    position : iterable, len 3, default (0.0, 0.0, 0.0)</span>
+<span class="sd">        Position of the marker wrt its reference frame.</span>
+
+<span class="sd">    orientation : iterable, len 4, default (0.0, 0.0, 0.0, 1.0)</span>
+<span class="sd">        Orientation of the marker wrt its reference frame.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    marker: Marker</span>
+<span class="sd">        Marker message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Quaternion</span><span class="p">,</span> <span class="n">Vector3</span>
+    <span class="kn">from</span> <span class="nn">visualization_msgs.msg</span> <span class="kn">import</span> <span class="n">Marker</span>
+
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">Marker</span><span class="p">()</span>
+
+    <span class="n">marker</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">marker_type</span> <span class="ow">or</span> <span class="n">Marker</span><span class="o">.</span><span class="n">LINE_STRIP</span>
+    <span class="n">marker</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="n">frame_id</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">marker</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">marker</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">Vector3</span><span class="p">(</span><span class="o">*</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">hex_to_rgba</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">marker</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">Quaternion</span><span class="p">(</span><span class="o">*</span><span class="n">orientation</span><span class="p">)</span>
+    <span class="n">marker</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="c1"># TOD0: make configurable via vector</span>
+    <span class="n">marker</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">return</span> <span class="n">marker</span>
+
+
+<span class="k">class</span> <span class="nc">BaseMarkerPublisher</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Base class for Marker publishers. &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">publish_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        marker : Marker</span>
+<span class="sd">            Marker message to publish.</span>
+
+<span class="sd">        topic : str</span>
+<span class="sd">            Name of the topic on which to publish.</span>
+
+<span class="sd">        publish_interval : float, default 0.0</span>
+<span class="sd">            Time in seconds between publishing when calling ``spin``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">rospy</span>
+        <span class="kn">from</span> <span class="nn">visualization_msgs.msg</span> <span class="kn">import</span> <span class="n">Marker</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">marker</span> <span class="o">=</span> <span class="n">marker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topic</span> <span class="o">=</span> <span class="n">topic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publish_interval</span> <span class="o">=</span> <span class="n">publish_interval</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Publisher</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span> <span class="n">Marker</span><span class="p">,</span> <span class="n">queue_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">latch</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;Created marker publisher&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Publish a marker message. &quot;&quot;&quot;</span>
+        <span class="n">current_message</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">current_message</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">current_message</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_message</span><span class="o">.</span><span class="n">getvalue</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">current_message</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">marker</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_spin_blocking</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Continuously publish messages. &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">rospy</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">publish_interval</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">spin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Continuously publish messages.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        block: bool, default False</span>
+<span class="sd">            If True, this method will block until the publisher is stopped,</span>
+<span class="sd">            e.g. by calling stop(). Otherwise, the main loop is</span>
+<span class="sd">            dispatched to a separate thread which is returned by this</span>
+<span class="sd">            function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        thread: threading.Thread</span>
+<span class="sd">            If `block=True`, the Thread instance that runs the loop.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">block</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spin_blocking</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_spin_blocking</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Stop publishing. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="ReferenceFrameMarkerPublisher"><a class="viewcode-back" href="../../../_generated/rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html#rigid_body_motion.ros.ReferenceFrameMarkerPublisher">[docs]</a><span class="k">class</span> <span class="nc">ReferenceFrameMarkerPublisher</span><span class="p">(</span><span class="n">BaseMarkerPublisher</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Publisher for the translation of a reference frame wrt another. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ReferenceFrameMarkerPublisher.__init__"><a class="viewcode-back" href="../../../_generated/rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html#rigid_body_motion.ros.ReferenceFrameMarkerPublisher.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frame</span><span class="p">,</span>
+        <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">topic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_points</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">publish_interval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#ffffffff&quot;</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame : str or ReferenceFrame</span>
+<span class="sd">            Reference frame for which to publish the translation.</span>
+
+<span class="sd">        base : str or ReferenceFrame, optional</span>
+<span class="sd">            Base reference wrt to which the translation is published. Defaults</span>
+<span class="sd">            to the parent reference frame.</span>
+
+<span class="sd">        topic : str, optional</span>
+<span class="sd">            Name of the topic on which to publish. Defaults to &quot;/&lt;frame&gt;/path&quot;.</span>
+
+<span class="sd">        max_points : int, default 1000</span>
+<span class="sd">            Maximum number of points to add to the marker. Actual translation</span>
+<span class="sd">            array will be sub-sampled to this number of points.</span>
+
+<span class="sd">        publish_interval : float, default 0.0</span>
+<span class="sd">            Time in seconds between publishing when calling ``spin``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Point</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">base</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">translation</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+
+        <span class="n">marker</span> <span class="o">=</span> <span class="n">get_marker</span><span class="p">(</span>
+            <span class="n">frame_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span>
+        <span class="p">)</span>
+        <span class="n">show_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">max_points</span>
+        <span class="n">marker</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">translation</span><span class="p">[::</span><span class="n">show_every</span><span class="p">]]</span>
+
+        <span class="n">topic</span> <span class="o">=</span> <span class="n">topic</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/path&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">marker</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">publish_interval</span><span class="o">=</span><span class="n">publish_interval</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReferenceFrameMarkerPublisher.get_ros3d_widget"><a class="viewcode-back" href="../../../_generated/rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html#rigid_body_motion.ros.ReferenceFrameMarkerPublisher.get_ros3d_widget">[docs]</a>    <span class="k">def</span> <span class="nf">get_ros3d_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ros</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tf_client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a ros3d.Marker widget to display in a ros3d.Viewer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ros : jupyros.ros3d.ROSConnection, optional</span>
+<span class="sd">            ros3d ROS connection instance.</span>
+
+<span class="sd">        tf_client : jupyros.ros3d.TFClient, optional</span>
+<span class="sd">            ros3d TF client instance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        jupyros.ros3d.Marker</span>
+<span class="sd">            ros3d marker widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">jupyros</span> <span class="kn">import</span> <span class="n">ros3d</span>
+
+        <span class="n">ros</span> <span class="o">=</span> <span class="n">ros</span> <span class="ow">or</span> <span class="n">ros3d</span><span class="o">.</span><span class="n">ROSConnection</span><span class="p">()</span>
+        <span class="n">tf_client</span> <span class="o">=</span> <span class="n">tf_client</span> <span class="ow">or</span> <span class="n">ros3d</span><span class="o">.</span><span class="n">TFClient</span><span class="p">(</span>
+            <span class="n">ros</span><span class="o">=</span><span class="n">ros</span><span class="p">,</span> <span class="n">fixed_frame</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ros3d</span><span class="o">.</span><span class="n">Marker</span><span class="p">(</span>
+            <span class="n">ros</span><span class="o">=</span><span class="n">ros</span><span class="p">,</span> <span class="n">tf_client</span><span class="o">=</span><span class="n">tf_client</span><span class="p">,</span> <span class="n">topic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

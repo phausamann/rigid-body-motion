@@ -1,0 +1,214 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Working with xarray\n",
+    "\n",
+    "rigid_body_motion provides first class support for xarray data types. xarray has several features that make working with motion data convenient:\n",
+    "\n",
+    "1. xarray is designed to combine physical data with metadata such as timestamps.\n",
+    "2. xarray's `Dataset` class can be used as a container for timestamped transformations.\n",
+    "3. Arbitrary metadata can be attached to arrays to keep track of e.g. reference frames.\n",
+    "\n",
+    "We recommend you to familiarize yourself with xarray before working through this tutorial. Their [documentation](http://xarray.pydata.org/en/stable/index.html) is an excellent resource for that."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-info\">\n",
+    "Note\n",
+    "    \n",
+    "The following examples require the `matplotlib`, `xarray` and `netcdf4` libraries.\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import rigid_body_motion as rbm\n",
+    "import xarray as xr\n",
+    "import matplotlib.pyplot as plt\n",
+    "\n",
+    "plt.rcParams[\"figure.figsize\"] = (10, 5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Loading example data\n",
+    "\n",
+    "rigid_body_motion includes a recording of head and eye tracking data (using the Intel RealSense T265 as the head tracker and the Pupil Core eye tracker). This data can be loaded with `xr.open_dataset`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "head = xr.open_dataset(rbm.example_data[\"head\"])\n",
+    "head"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The dataset includes position and orientation as well as angular and linear velocity of the tracker. Additionally, it includes the physical dimensions `time`, `cartesian_axis` (for position and velocities) and `quaternion_axis` (for orientation). Let's have a look at the position data:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "head.position"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As you can see, this is a two-dimensional array (called `DataArray` in xarray) with timestamps and explicit names for the physical axes in cartesian coordinates. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "xarray also provides a straightforward way of plotting:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "head.linear_velocity.plot.line(x=\"time\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The example recording is from a test subject wearing the combined head/eye tracker while walking twice around a building. The head tracking data is represented in a world-fixed reference frame whose origin is at the head tracker's location at the start of the recording."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In the next step, we will leverage rigid_body_motion's powerful reference frame mechanism to transform the linear velocity from world to tracker coordinates."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Reference frame interface\n",
+    "\n",
+    "As in the previous tutorial, we begin by registering the world frame as root of the reference frame tree:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rbm.register_frame(\"world\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Timestamped reference frames can be easily constructed from `Dataset` instances with the [ReferenceFrame.from_dataset()](api/_generated/rigid_body_motion.ReferenceFrame.from_dataset.rst) method. We need to specify the variables representing translation and rotation of the reference frame as well as the name of the coordinate containing timestamps and the parent frame:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rf_head = rbm.ReferenceFrame.from_dataset(\n",
+    "    head, \"position\", \"orientation\", \"time\", parent=\"world\", name=\"head\"\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's register this reference frame so that we can use it easily for transformations:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rf_head.register()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can use [transform_linear_velocity()](_generated/rigid_body_motion.transform_linear_velocity.rst) to transform the linear velocity to be represented in tracker coordinates:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "v_head = rbm.transform_linear_velocity(\n",
+    "    head.linear_velocity, outof=\"world\", into=\"head\", what=\"representation_frame\"\n",
+    ")\n",
+    "v_head.plot.line(x=\"time\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We now see a mean linear velocity of ~1.4 m/s in the negative z direction. This is due to the coordinate system defined by the RealSense T265 where the positive z direction is defined [towards the back of the device](https://github.com/IntelRealSense/librealsense/blob/master/doc/t265.md)."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python [conda env:rbm]",
+   "language": "python",
+   "name": "conda-env-rbm-py"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

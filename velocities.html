@@ -1,0 +1,939 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Linear and angular velocity &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Estimating transforms from data" href="estimators.html" />
+    <link rel="prev" title="Reference frames" href="reference_frames.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Linear and angular velocity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Setting-up">Setting up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Linear-velocity">Linear velocity</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Transforming-the-reference-frame">Transforming the reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Transforming-the-moving-frame">Transforming the moving frame</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Angular-velocity">Angular velocity</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Transforming the reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Transforming the moving frame</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Linear and angular velocity</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/velocities.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="admonition note">
+<p>You can <a class="reference download internal" download="" href="_downloads/bfe7a6ee00b7bc44a9fdc5481f8fad3a/velocities.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">download</span></code></a> this guide as a
+Jupyter notebook.</p>
+</div>
+<div class="section" id="Linear-and-angular-velocity">
+<h1>Linear and angular velocity<a class="headerlink" href="#Linear-and-angular-velocity" title="Permalink to this headline">¶</a></h1>
+<p>We have seen how to look up and transform positions and orientations across reference frames in the previous section. Working with velocities adds some complexity that will be explained in this section.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle">Note</p>
+<p>The following examples require the <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> library.</p>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">rigid_body_motion</span> <span class="k">as</span> <span class="nn">rbm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Setting-up">
+<h2>Setting up<a class="headerlink" href="#Setting-up" title="Permalink to this headline">¶</a></h2>
+<p>Like in the previous section, we first set up the world frame:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>For simplicity, all reference frames will share the same timestamps:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">n_timestamps</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">n_timestamps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We define a body moving 5 meters in the x direction:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p_body_world</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_timestamps</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">p_body_world</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">n_timestamps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In addition, this body will rotate 90° around the z axis. We use helper functions from the <code class="docutils literal notranslate"><span class="pre">quaternion</span></code> package for this:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">quaternion</span> <span class="kn">import</span> <span class="n">as_float_array</span><span class="p">,</span> <span class="n">from_euler_angles</span>
+
+<span class="n">o_body_world</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span>
+    <span class="n">from_euler_angles</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">n_timestamps</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can attach a reference frame to this body:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span>
+    <span class="s2">&quot;body&quot;</span><span class="p">,</span>
+    <span class="n">translation</span><span class="o">=</span><span class="n">p_body_world</span><span class="p">,</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="n">o_body_world</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+    <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We now define a second moving body whose motion we describe wrt the frame of the first body. It is located at 1 meter in the y direction and moves 1 meter in the negative x direction.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p_body2_body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_timestamps</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">p_body2_body</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_timestamps</span><span class="p">)</span>
+<span class="n">p_body2_body</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<p>This body also rotates, but this time around the y axis:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">o_body2_body</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span>
+    <span class="n">from_euler_angles</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">n_timestamps</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can register a frame attached to the second body as a child frame of the first body frame:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span>
+    <span class="s2">&quot;body2&quot;</span><span class="p">,</span>
+    <span class="n">translation</span><span class="o">=</span><span class="n">p_body2_body</span><span class="p">,</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="n">o_body2_body</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+    <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s plot the position and orientation of both bodies wrt the world frame. We use the <a class="reference internal" href="_generated/rigid_body_motion.lookup_pose.html"><span class="doc">lookup_pose()</span></a> method to obtain the position of the second body in the world frame:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p_body2_world</span><span class="p">,</span> <span class="n">o_body2_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_pose</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">p_body_world</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;yo-&quot;</span><span class="p">)</span>
+<span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">quaternions</span><span class="p">(</span><span class="n">o_body_world</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">p_body_world</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">sharez</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">p_body2_world</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;co-&quot;</span><span class="p">)</span>
+<span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">quaternions</span><span class="p">(</span><span class="n">o_body2_world</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">p_body2_world</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/velocities_20_0.png" src="_images/velocities_20_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Linear-velocity">
+<h2>Linear velocity<a class="headerlink" href="#Linear-velocity" title="Permalink to this headline">¶</a></h2>
+<p>The linear velocity of a frame wrt another frame can be calculated with the <a class="reference internal" href="_generated/rigid_body_motion.lookup_linear_velocity.html"><span class="doc">lookup_linear_velocity()</span></a> method:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v_body2_body</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_linear_velocity</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span>
+<span class="n">v_body2_body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([-0.2,  0. ,  0. ])
+</pre></div></div>
+</div>
+<p>As expected, the velocity of the second body wrt the first body <span class="math notranslate nohighlight">\(v_{B2/B}\)</span> is 0.2 m/s in the negative x direction. Next, we will see how we can obtain the velocity of the second body wrt the world frame <span class="math notranslate nohighlight">\(W\)</span>.</p>
+<div class="section" id="Transforming-the-reference-frame">
+<h3>Transforming the reference frame<a class="headerlink" href="#Transforming-the-reference-frame" title="Permalink to this headline">¶</a></h3>
+<p>When transforming linear velocities across frames, we need to use the so-called “three term velocity formula”. In this case, we have the velocity of the <em>moving frame</em> <span class="math notranslate nohighlight">\(B2\)</span> wrt the <em>reference frame</em> <span class="math notranslate nohighlight">\(B\)</span>. We can transform the current reference frame <span class="math notranslate nohighlight">\(B\)</span> to the new frame <span class="math notranslate nohighlight">\(W\)</span> as follows:</p>
+<div class="math notranslate nohighlight">
+\[v_{B2/W} = \underbrace{v_{B2/B}}_{\text{Input}} + \underbrace{v_{B/W} + \omega_{B/W} \times t_{B2/B}}_{\text{Lookup}}\]</div>
+<p>In addition to the velocities between the reference frames <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(W\)</span>, this formula also requires the translation between the moving frame <span class="math notranslate nohighlight">\(B2\)</span> and the original reference frame <span class="math notranslate nohighlight">\(B\)</span>. This is why we also need to specify the <code class="docutils literal notranslate"><span class="pre">moving_frame</span></code> argument when using <a class="reference internal" href="_generated/rigid_body_motion.transform_linear_velocity.html"><span class="doc">transform_linear_velocity()</span></a>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v_body2_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">transform_linear_velocity</span><span class="p">(</span>
+    <span class="n">v_body2_body</span><span class="p">,</span> <span class="n">outof</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">moving_frame</span><span class="o">=</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Alternatively, we can also use <a class="reference internal" href="_generated/rigid_body_motion.lookup_linear_velocity.html"><span class="doc">lookup_linear_velocity()</span></a> to lookup the position of <span class="math notranslate nohighlight">\(B2\)</span> wrt <span class="math notranslate nohighlight">\(W\)</span> and differentiate:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v_body2_world_lookup</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_linear_velocity</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The following short helper function can be used to compare the two methods:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">compare_velocities</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">lookup</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compare velocities from transform and lookup. &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mode</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> velocity (</span><span class="si">{</span><span class="s1">&#39;rad/s&#39;</span> <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;angular&#39;</span> <span class="k">else</span> <span class="s1">&#39;m/s&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Transform&quot;</span><span class="p">)</span>
+
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">lookup</span><span class="p">)</span>
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Lookup&quot;</span><span class="p">)</span>
+    <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">compare_velocities</span><span class="p">(</span><span class="n">v_body2_world</span><span class="p">,</span> <span class="n">v_body2_world_lookup</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/velocities_30_0.png" src="_images/velocities_30_0.png" />
+</div>
+</div>
+<p>We see a slight discrepancy due to numerical inconsistencies in the derivative calculation. However, these errors are reduced at higher sampling rates.</p>
+</div>
+<div class="section" id="Transforming-the-moving-frame">
+<h3>Transforming the moving frame<a class="headerlink" href="#Transforming-the-moving-frame" title="Permalink to this headline">¶</a></h3>
+<p>In a different scenario, we might be given the velocity of the first body wrt the world frame and want to transform the <em>moving frame</em> from <span class="math notranslate nohighlight">\(B\)</span> to <span class="math notranslate nohighlight">\(B2\)</span> to compute the velocity of the second body wrt <span class="math notranslate nohighlight">\(W\)</span>. The same formula applies, although this time the input is <span class="math notranslate nohighlight">\(v_{B/W}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v_{B2/W} = \underbrace{v_{B/W}}_{\text{Input}} + \underbrace{v_{B2/B} + \omega_{B/W} \times t_{B2/B}}_{\text{Lookup}}\]</div>
+<p>When using <a class="reference internal" href="_generated/rigid_body_motion.transform_linear_velocity.html"><span class="doc">transform_linear_velocity()</span></a> we need to be careful that the velocity is represented in the coordinates of the frame we want to transform. Therefore, <span class="math notranslate nohighlight">\(v_{B/W}\)</span> has to be represented in <span class="math notranslate nohighlight">\(B\)</span>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v_body_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_linear_velocity</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">represent_in</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can use <a class="reference internal" href="_generated/rigid_body_motion.transform_linear_velocity.html"><span class="doc">transform_linear_velocity()</span></a> with <code class="docutils literal notranslate"><span class="pre">what=&quot;moving_frame&quot;</span></code> to transform from <span class="math notranslate nohighlight">\(B\)</span> to <span class="math notranslate nohighlight">\(B2\)</span>. Since the method needs to look up <span class="math notranslate nohighlight">\(\omega_{B/W}\)</span>, this time we need to provide the <code class="docutils literal notranslate"><span class="pre">reference_frame</span></code> of the velocity:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v_body2_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">transform_linear_velocity</span><span class="p">(</span>
+    <span class="n">v_body_world</span><span class="p">,</span>
+    <span class="n">outof</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">,</span>
+    <span class="n">into</span><span class="o">=</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span>
+    <span class="n">reference_frame</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+    <span class="n">what</span><span class="o">=</span><span class="s2">&quot;moving_frame&quot;</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s compare this result against the lookup method again. Note that the transformation also changes the representation frame to the new frame, which is why the resulting velocity is different compared to the first case:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v_body2_world_lookup</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_linear_velocity</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">represent_in</span><span class="o">=</span><span class="s2">&quot;body2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">compare_velocities</span><span class="p">(</span><span class="n">v_body2_world</span><span class="p">,</span> <span class="n">v_body2_world_lookup</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/velocities_38_0.png" src="_images/velocities_38_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Angular-velocity">
+<h2>Angular velocity<a class="headerlink" href="#Angular-velocity" title="Permalink to this headline">¶</a></h2>
+<p>Angular velocities can be looked up with <a class="reference internal" href="_generated/rigid_body_motion.lookup_angular_velocity.html"><span class="doc">lookup_angular_velocity()</span></a>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w_body2_body</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span>
+<span class="n">w_body2_body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([0.        , 0.15708158, 0.        ])
+</pre></div></div>
+</div>
+<div class="section" id="id1">
+<h3>Transforming the reference frame<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Transforming the reference frame of angular velocity is similar to the case of linear velocity, although the formula is a lot simpler:</p>
+<div class="math notranslate nohighlight">
+\[\omega_{B2/W} = \underbrace{\omega_{B2/B}}_{\text{Input}} + \underbrace{\omega_{B/W}}_{\text{Lookup}}\]</div>
+<p>Because of this, <a class="reference internal" href="_generated/rigid_body_motion.transform_angular_velocity.html"><span class="doc">transform_angular_velocity()</span></a> also has a simpler interface:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w_body2_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">transform_angular_velocity</span><span class="p">(</span>
+    <span class="n">w_body2_body</span><span class="p">,</span> <span class="n">outof</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Comparing the transform to the lookup shows no differences in the result:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w_body2_world_lookup</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">compare_velocities</span><span class="p">(</span><span class="n">w_body2_world</span><span class="p">,</span> <span class="n">w_body2_world_lookup</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;angular&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/velocities_47_0.png" src="_images/velocities_47_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>Transforming the moving frame<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>As before, we can also transform the moving frame:</p>
+<div class="math notranslate nohighlight">
+\[\omega_{B2/W} = \underbrace{\omega_{B/W}}_{\text{Input}} + \underbrace{\omega_{B2/B}}_{\text{Lookup}}\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w_body_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">represent_in</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w_body2_world</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">transform_angular_velocity</span><span class="p">(</span>
+    <span class="n">w_body_world</span><span class="p">,</span> <span class="n">outof</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="n">what</span><span class="o">=</span><span class="s2">&quot;moving_frame&quot;</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w_body2_world_lookup</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span><span class="s2">&quot;body2&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">represent_in</span><span class="o">=</span><span class="s2">&quot;body2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">compare_velocities</span><span class="p">(</span><span class="n">w_body2_world</span><span class="p">,</span> <span class="n">w_body2_world_lookup</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;angular&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/velocities_52_0.png" src="_images/velocities_52_0.png" />
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="estimators.html" class="btn btn-neutral float-right" title="Estimating transforms from data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="reference_frames.html" class="btn btn-neutral float-left" title="Reference frames" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

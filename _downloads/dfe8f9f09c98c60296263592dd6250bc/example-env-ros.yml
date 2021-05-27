@@ -1,0 +1,22 @@
+name: rbm-examples-ros
+channels:
+- conda-forge
+- robostack
+- phausamann
+dependencies:
+- python=3.6
+- rigid-body-motion
+- numba
+- xarray
+- netcdf4
+- matplotlib
+- ipykernel
+- ipywidgets
+- ros-noetic-rospy
+- ros-noetic-tf
+- ros-noetic-tf2-ros
+- ros-noetic-tf2-geometry-msgs
+- ros-noetic-geometry-msgs
+- ros-noetic-visualization-msgs
+- python-orocos-kdl
+- boost=1.74

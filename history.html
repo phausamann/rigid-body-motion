@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>History &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Credits" href="authors.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#may-27th-2021">0.8.0 (May 27th, 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new-features">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bug-fixes-improvements">Bug fixes &amp; improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#may-19th-2021">0.7.0 (May 19th, 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Bug fixes &amp; improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#may-17th-2021">0.6.0 (May 17th, 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#breaking-changes">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">New features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#march-16th-2021">0.5.0 (March 16th, 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Bug fixes &amp; improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#february-18th-2021">0.4.1 (February 18th, 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Bug fixes &amp; improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#february-11th-2021">0.4.0 (February 11th, 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Bug fixes &amp; improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#december-8th-2020">0.3.0 (December 8th, 2020)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">Bug fixes &amp; improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#october-22nd-2020">0.2.0 (October 22nd, 2020)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">New features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#october-7th-2020">0.1.2 (October 7th, 2020)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#improvements">Improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#september-17th-2020">0.1.1 (September 17th, 2020)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id13">0.1.0 (September 17th, 2020)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>History</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/history.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="history">
+<h1>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="may-27th-2021">
+<h2>0.8.0 (May 27th, 2021)<a class="headerlink" href="#may-27th-2021" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new-features">
+<h3>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">ros.init_node</span></code> method to initialize a ROS node and optionally start
+a ROS master.</p></li>
+</ul>
+</div>
+<div class="section" id="bug-fixes-improvements">
+<h3>Bug fixes &amp; improvements<a class="headerlink" href="#bug-fixes-improvements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>All ROS dependencies are now lazily imported.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="may-19th-2021">
+<h2>0.7.0 (May 19th, 2021)<a class="headerlink" href="#may-19th-2021" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>New features<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">from_euler_angles</span></code> utility method.</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Bug fixes &amp; improvements<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Importing ROS interface classes will not fail silently anymore and instead
+show the traceback of the import error.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="may-17th-2021">
+<h2>0.6.0 (May 17th, 2021)<a class="headerlink" href="#may-17th-2021" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="breaking-changes">
+<h3>Breaking changes<a class="headerlink" href="#breaking-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Example data is now fetched via the <code class="docutils literal notranslate"><span class="pre">pooch</span></code> library and no longer a part
+of the package itself.</p></li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>New features<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">io</span></code> module for import/export methods.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">ros.RosbagWriter</span></code> class for writing rosbag files.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="march-16th-2021">
+<h2>0.5.0 (March 16th, 2021)<a class="headerlink" href="#march-16th-2021" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>Breaking changes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Top-level reference frame transform and lookup methods now all accept a
+<code class="docutils literal notranslate"><span class="pre">return_timestamps</span></code> argument that is <code class="docutils literal notranslate"><span class="pre">False</span></code> by default. Previously,
+methods would return timestamps only if the result of the transformation was
+timestamped. This does not affect the xarray interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lookup_transform</span></code> now returns the correct transformation from the base
+frame to the target frame (instead of the other way around).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ReferenceFrame.get_transformation</span></code> is deprecated and replaced by
+<code class="docutils literal notranslate"><span class="pre">ReferenceFrame.lookup_transform</span></code>.</p></li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h3>New features<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">plot</span></code> module with plotting methods for static reference frames and
+arrays of points, quaternions and vectors.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">lookup_pose</span></code> method that calculates the pose of a frame wrt another.</p></li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h3>Bug fixes &amp; improvements<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">&quot;reference_frame&quot;</span></code> attribute incorrectly set by
+<code class="docutils literal notranslate"><span class="pre">transform_vectors</span></code>.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="february-18th-2021">
+<h2>0.4.1 (February 18th, 2021)<a class="headerlink" href="#february-18th-2021" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h3>Bug fixes &amp; improvements<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">transform_coordinates</span></code> failing when spatial dimension is first
+axis of array.</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">transform_linear_velocity</span></code> and <code class="docutils literal notranslate"><span class="pre">transform_angular_velocity</span></code>
+failing when reference frame or moving frame is transformed across only
+static transforms.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">allow_static</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">lookup_twist</span></code>,
+<code class="docutils literal notranslate"><span class="pre">lookup_angular_velocity</span></code> and <code class="docutils literal notranslate"><span class="pre">lookup_linear_velocity</span></code> to return zero
+velocity and no timestamps across only static transforms.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="february-11th-2021">
+<h2>0.4.0 (February 11th, 2021)<a class="headerlink" href="#february-11th-2021" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h3>New features<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">lookup_linear_velocity</span></code> and <code class="docutils literal notranslate"><span class="pre">lookup_angular_velocity</span></code> top-level
+methods.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">render_tree</span></code> top-level method for printing out a graphical
+representation of a reference frame tree.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lookup_twist</span></code> now accepts a <code class="docutils literal notranslate"><span class="pre">mode</span></code> parameter to specify the mode for
+angular velocity calculation.</p></li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h3>Bug fixes &amp; improvements<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed a bug where estimated angular velocity was all NaN when orientation
+contained NaNs.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="december-8th-2020">
+<h2>0.3.0 (December 8th, 2020)<a class="headerlink" href="#december-8th-2020" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3>New features<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Reference frames with timestamps now accept the <code class="docutils literal notranslate"><span class="pre">discrete</span></code> parameter,
+allowing for transformations to be fixed from their timestamp into the
+future.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rbm</span></code> accessor for DataArrays implementing <code class="docutils literal notranslate"><span class="pre">qinterp</span></code> and <code class="docutils literal notranslate"><span class="pre">qinv</span></code>
+methods.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">best_fit_rotation</span></code> and <code class="docutils literal notranslate"><span class="pre">qinterp</span></code> top-level methods.</p></li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h3>Bug fixes &amp; improvements<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Refactor of internal timestamp matching mechanism defining a clear priority
+for target timestamps. This can result in slight changes of timestamps
+and arrays returned by transformations but will generally produce more
+accurate results.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">mode</span></code> and <code class="docutils literal notranslate"><span class="pre">outlier_thresh</span></code> arguments to
+<code class="docutils literal notranslate"><span class="pre">estimate_angular_velocity</span></code>.</p></li>
+<li><p>Fixed issues with <code class="docutils literal notranslate"><span class="pre">iterative_closest_point</span></code>.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="october-22nd-2020">
+<h2>0.2.0 (October 22nd, 2020)<a class="headerlink" href="#october-22nd-2020" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h3>New features<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">estimate_linear_velocity</span></code> and <code class="docutils literal notranslate"><span class="pre">estimate_angular_velocity</span></code> top-level
+methods.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">qmul</span></code> top-level method for multiplying quaternions.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="october-7th-2020">
+<h2>0.1.2 (October 7th, 2020)<a class="headerlink" href="#october-7th-2020" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Use SQUAD instead of linear interpolation for quaternions.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="september-17th-2020">
+<h2>0.1.1 (September 17th, 2020)<a class="headerlink" href="#september-17th-2020" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bug-fixes">
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fix transformations failing for DataArrays with non-numeric coords.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id13">
+<h2>0.1.0 (September 17th, 2020)<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>First release</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="authors.html" class="btn btn-neutral float-left" title="Credits" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

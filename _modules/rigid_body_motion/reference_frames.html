@@ -1,0 +1,1536 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion.reference_frames &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../rigid_body_motion.html">rigid_body_motion</a> &raquo;</li>
+        
+      <li>rigid_body_motion.reference_frames</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rigid_body_motion.reference_frames</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">anytree</span> <span class="kn">import</span> <span class="n">NodeMixin</span><span class="p">,</span> <span class="n">RenderTree</span><span class="p">,</span> <span class="n">Walker</span>
+<span class="kn">from</span> <span class="nn">quaternion</span> <span class="kn">import</span> <span class="n">as_float_array</span><span class="p">,</span> <span class="n">as_quat_array</span><span class="p">,</span> <span class="n">from_rotation_matrix</span>
+
+<span class="kn">from</span> <span class="nn">rigid_body_motion.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TransformMatcher</span><span class="p">,</span>
+    <span class="n">_estimate_angular_velocity</span><span class="p">,</span>
+    <span class="n">_estimate_linear_velocity</span><span class="p">,</span>
+    <span class="n">_resolve_rf</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rigid_body_motion.utils</span> <span class="kn">import</span> <span class="n">qinv</span><span class="p">,</span> <span class="n">rotate_vectors</span>
+
+<span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="k">def</span> <span class="nf">_register</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Register a reference frame. &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rf</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Reference frame name cannot be None.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rf</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+            <span class="c1"># TODO keep children?</span>
+            <span class="n">_registry</span><span class="p">[</span><span class="n">rf</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Reference frame with name </span><span class="si">{</span><span class="n">rf</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is already registered. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Specify update=True to overwrite.&quot;</span>
+            <span class="p">)</span>
+    <span class="c1"># TODO check if name is a cs transform?</span>
+    <span class="n">_registry</span><span class="p">[</span><span class="n">rf</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">rf</span>
+
+
+<span class="k">def</span> <span class="nf">_deregister</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Deregister a reference frame. &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Reference frame with name &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; not found in registry&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">_registry</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="render_tree"><a class="viewcode-back" href="../../_generated/rigid_body_motion.render_tree.html#rigid_body_motion.render_tree">[docs]</a><span class="k">def</span> <span class="nf">render_tree</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Render a reference frame tree.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    root: str or ReferenceFrame</span>
+<span class="sd">        The root of the rendered tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">pre</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">RenderTree</span><span class="p">(</span><span class="n">_resolve_rf</span><span class="p">(</span><span class="n">root</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pre</span><span class="si">}{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="register_frame"><a class="viewcode-back" href="../../_generated/rigid_body_motion.register_frame.html#rigid_body_motion.register_frame">[docs]</a><span class="k">def</span> <span class="nf">register_frame</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">translation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Register a new reference frame in the registry.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        The name of the reference frame.</span>
+
+<span class="sd">    parent: str or ReferenceFrame, optional</span>
+<span class="sd">        The parent reference frame. If str, the frame will be looked up</span>
+<span class="sd">        in the registry under that name. If not specified, this frame</span>
+<span class="sd">        will be a root node of a new reference frame tree.</span>
+
+<span class="sd">    translation: array_like, optional</span>
+<span class="sd">        The translation of this frame wrt the parent frame. Not</span>
+<span class="sd">        applicable if there is no parent frame.</span>
+
+<span class="sd">    rotation: array_like, optional</span>
+<span class="sd">        The rotation of this frame wrt the parent frame. Not</span>
+<span class="sd">        applicable if there is no parent frame.</span>
+
+<span class="sd">    timestamps: array_like, optional</span>
+<span class="sd">        The timestamps for translation and rotation of this frame. Not</span>
+<span class="sd">        applicable if this is a static reference frame.</span>
+
+<span class="sd">    inverse: bool, default False</span>
+<span class="sd">        If True, invert the transform wrt the parent frame, i.e. the</span>
+<span class="sd">        translation and rotation are specified for the parent frame wrt this</span>
+<span class="sd">        frame.</span>
+
+<span class="sd">    discrete: bool, default False</span>
+<span class="sd">        If True, transformations with timestamps are assumed to be events.</span>
+<span class="sd">        Instead of interpolating between timestamps, transformations are</span>
+<span class="sd">        fixed between their timestamp and the next one.</span>
+
+<span class="sd">    update: bool, default False</span>
+<span class="sd">        If True, overwrite if there is a frame with the same name in the</span>
+<span class="sd">        registry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO make this a class with __call__, from_dataset etc. methods?</span>
+    <span class="n">rf</span> <span class="o">=</span> <span class="n">ReferenceFrame</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span>
+        <span class="n">translation</span><span class="o">=</span><span class="n">translation</span><span class="p">,</span>
+        <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+        <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">_register</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="deregister_frame"><a class="viewcode-back" href="../../_generated/rigid_body_motion.deregister_frame.html#rigid_body_motion.deregister_frame">[docs]</a><span class="k">def</span> <span class="nf">deregister_frame</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Remove a reference frame from the registry.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        The name of the reference frame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_deregister</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="clear_registry"><a class="viewcode-back" href="../../_generated/rigid_body_motion.clear_registry.html#rigid_body_motion.clear_registry">[docs]</a><span class="k">def</span> <span class="nf">clear_registry</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Clear the reference frame registry. &quot;&quot;&quot;</span>
+    <span class="n">_registry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ReferenceFrame"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.html#rigid_body_motion.ReferenceFrame">[docs]</a><span class="k">class</span> <span class="nc">ReferenceFrame</span><span class="p">(</span><span class="n">NodeMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A three-dimensional reference frame. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ReferenceFrame.__init__"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.html#rigid_body_motion.ReferenceFrame.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">translation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str, optional</span>
+<span class="sd">            The name of this reference frame.</span>
+
+<span class="sd">        parent: str or ReferenceFrame, optional</span>
+<span class="sd">            The parent reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name. If not specified, this frame</span>
+<span class="sd">            will be a root node of a new reference frame tree.</span>
+
+<span class="sd">        translation: array_like, optional</span>
+<span class="sd">            The translation of this frame wrt the parent frame. Not</span>
+<span class="sd">            applicable if there is no parent frame.</span>
+
+<span class="sd">        rotation: array_like, optional</span>
+<span class="sd">            The rotation of this frame wrt the parent frame. Not</span>
+<span class="sd">            applicable if there is no parent frame.</span>
+
+<span class="sd">        timestamps: array_like, optional</span>
+<span class="sd">            The timestamps for translation and rotation of this frame. Not</span>
+<span class="sd">            applicable if this is a static reference frame.</span>
+
+<span class="sd">        inverse: bool, default False</span>
+<span class="sd">            If True, invert the transform wrt the parent frame, i.e. the</span>
+<span class="sd">            translation and rotation are specified for the parent frame wrt</span>
+<span class="sd">            this frame.</span>
+
+<span class="sd">        discrete: bool, default False</span>
+<span class="sd">            If True, transformations with timestamps are assumed to be events.</span>
+<span class="sd">            Instead of interpolating between timestamps, transformations are</span>
+<span class="sd">            fixed between their timestamp and the next one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ReferenceFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># TODO check name requirement</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">translation</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_arrays</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">inverse</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_verify_root</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">translation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">discrete</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamps must be provided when discrete=True&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">discrete</span> <span class="o">=</span> <span class="n">discrete</span></div>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Destructor. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">_registry</span> <span class="ow">and</span> <span class="n">_registry</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">_deregister</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; String representation. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ReferenceFrame &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&gt;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; String representation. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_init_arrays</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">inverse</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize translation, rotation and timestamp arrays. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">timestamps</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamps must be one-dimensional.&quot;</span><span class="p">)</span>
+            <span class="n">t_shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">r_shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+            <span class="n">r_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,)</span>
+
+        <span class="k">if</span> <span class="n">translation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">translation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">translation</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">translation</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">t_shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected translation to be of shape </span><span class="si">{</span><span class="n">t_shape</span><span class="si">}</span><span class="s2">, got &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">translation</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">translation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">t_shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rotation</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">r_shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected rotation to be of shape </span><span class="si">{</span><span class="n">r_shape</span><span class="si">}</span><span class="s2">, got &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rotation</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">r_shape</span><span class="p">)</span>
+            <span class="n">rotation</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="n">qinv</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span>
+            <span class="n">translation</span> <span class="o">=</span> <span class="o">-</span><span class="n">rotate_vectors</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">translation</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_verify_root</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Verify arguments for root node. &quot;&quot;&quot;</span>
+        <span class="c1"># TODO test</span>
+        <span class="k">if</span> <span class="n">translation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;translation specified without parent frame.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rotation specified without parent frame.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamps specified without parent frame.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_validate_input</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">n_axis</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Validate shape of array and timestamps. &quot;&quot;&quot;</span>
+        <span class="c1"># TODO process DataArray (dim=str, timestamps=str)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_axis</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected array to have length </span><span class="si">{</span><span class="n">n_axis</span><span class="si">}</span><span class="s2"> along axis </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">timestamps</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timestamps must be one-dimensional&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">time_axis</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Axis </span><span class="si">{</span><span class="n">time_axis</span><span class="si">}</span><span class="s2"> of the array must have the same length &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;as the timestamps&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># TODO this should be done somewhere else</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">timestamps</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_expand_singleton_axes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">t_or_r</span><span class="p">,</span> <span class="n">ndim</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Expand singleton axes for correct broadcasting with array. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">t_or_r</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">t_or_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">t_or_r</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">t_or_r</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_match_arrays</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">arrays</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Match multiple arrays with timestamps. &quot;&quot;&quot;</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="n">TransformMatcher</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">:</span>
+            <span class="n">matcher</span><span class="o">.</span><span class="n">add_array</span><span class="p">(</span><span class="o">*</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_arrays</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_rf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Walk from this frame to a target frame along the tree. &quot;&quot;&quot;</span>
+        <span class="n">to_rf</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">to_rf</span><span class="p">)</span>
+        <span class="n">walker</span> <span class="o">=</span> <span class="n">Walker</span><span class="p">()</span>
+        <span class="n">up</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">down</span> <span class="o">=</span> <span class="n">walker</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_rf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">up</span><span class="p">,</span> <span class="n">down</span>
+
+    <span class="k">def</span> <span class="nf">_get_matcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_frame</span><span class="p">,</span> <span class="n">arrays</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a TransformMatcher from this frame to another. &quot;&quot;&quot;</span>
+        <span class="n">up</span><span class="p">,</span> <span class="n">down</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walk</span><span class="p">(</span><span class="n">to_frame</span><span class="p">)</span>
+
+        <span class="n">matcher</span> <span class="o">=</span> <span class="n">TransformMatcher</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">rf</span> <span class="ow">in</span> <span class="n">up</span><span class="p">:</span>
+            <span class="n">matcher</span><span class="o">.</span><span class="n">add_reference_frame</span><span class="p">(</span><span class="n">rf</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">rf</span> <span class="ow">in</span> <span class="n">down</span><span class="p">:</span>
+            <span class="n">matcher</span><span class="o">.</span><span class="n">add_reference_frame</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">arrays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">:</span>
+                <span class="n">matcher</span><span class="o">.</span><span class="n">add_array</span><span class="p">(</span><span class="o">*</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matcher</span>
+
+<div class="viewcode-block" id="ReferenceFrame.from_dataset"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_dataset.html#rigid_body_motion.ReferenceFrame.from_dataset">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">ds</span><span class="p">,</span>
+        <span class="n">translation</span><span class="p">,</span>
+        <span class="n">rotation</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Construct a reference frame from a Dataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ds: xarray Dataset</span>
+<span class="sd">            The dataset from which to construct the reference frame.</span>
+
+<span class="sd">        translation: str</span>
+<span class="sd">            The name of the variable representing the translation</span>
+<span class="sd">            wrt the parent frame.</span>
+
+<span class="sd">        rotation: str</span>
+<span class="sd">            The name of the variable representing the rotation</span>
+<span class="sd">            wrt the parent frame.</span>
+
+<span class="sd">        timestamps: str</span>
+<span class="sd">            The name of the variable or coordinate representing the</span>
+<span class="sd">            timestamps.</span>
+
+<span class="sd">        parent: str or ReferenceFrame</span>
+<span class="sd">            The parent reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        name: str, default None</span>
+<span class="sd">            The name of the reference frame.</span>
+
+<span class="sd">        inverse: bool, default False</span>
+<span class="sd">            If True, invert the transform wrt the parent frame, i.e. the</span>
+<span class="sd">            translation and rotation are specified for the parent frame wrt</span>
+<span class="sd">            this frame.</span>
+
+<span class="sd">        discrete: bool, default False</span>
+<span class="sd">            If True, transformations with timestamps are assumed to be events.</span>
+<span class="sd">            Instead of interpolating between timestamps, transformations are</span>
+<span class="sd">            fixed between their timestamp and the next one.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rf: ReferenceFrame</span>
+<span class="sd">            The constructed reference frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO raise errors here if dimensions etc. don&#39;t match</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="p">,</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">translation</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">rotation</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">timestamps</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+            <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.from_translation_dataarray"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_translation_dataarray.html#rigid_body_motion.ReferenceFrame.from_translation_dataarray">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_translation_dataarray</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Construct a reference frame from a translation DataArray.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        da: xarray DataArray</span>
+<span class="sd">            The array that describes the translation of this frame</span>
+<span class="sd">            wrt the parent frame.</span>
+
+<span class="sd">        timestamps: str</span>
+<span class="sd">            The name of the variable or coordinate representing the</span>
+<span class="sd">            timestamps.</span>
+
+<span class="sd">        parent: str or ReferenceFrame</span>
+<span class="sd">            The parent reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        name: str, default None</span>
+<span class="sd">            The name of the reference frame.</span>
+
+<span class="sd">        inverse: bool, default False</span>
+<span class="sd">            If True, invert the transform wrt the parent frame, i.e. the</span>
+<span class="sd">            translation is specified for the parent frame wrt this frame.</span>
+
+<span class="sd">        discrete: bool, default False</span>
+<span class="sd">            If True, transformations with timestamps are assumed to be events.</span>
+<span class="sd">            Instead of interpolating between timestamps, transformations are</span>
+<span class="sd">            fixed between their timestamp and the next one.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rf: ReferenceFrame</span>
+<span class="sd">            The constructed reference frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO raise errors here if dimensions etc. don&#39;t match</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="p">,</span>
+            <span class="n">translation</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">timestamps</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+            <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.from_rotation_dataarray"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_rotation_dataarray.html#rigid_body_motion.ReferenceFrame.from_rotation_dataarray">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_rotation_dataarray</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Construct a reference frame from a rotation DataArray.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        da: xarray DataArray</span>
+<span class="sd">            The array that describes the rotation of this frame</span>
+<span class="sd">            wrt the parent frame.</span>
+
+<span class="sd">        timestamps: str</span>
+<span class="sd">            The name of the variable or coordinate representing the</span>
+<span class="sd">            timestamps.</span>
+
+<span class="sd">        parent: str or ReferenceFrame</span>
+<span class="sd">            The parent reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        name: str, default None</span>
+<span class="sd">            The name of the reference frame.</span>
+
+<span class="sd">        inverse: bool, default False</span>
+<span class="sd">            If True, invert the transform wrt the parent frame, i.e. the</span>
+<span class="sd">            rotation is specified for the parent frame wrt this frame.</span>
+
+<span class="sd">        discrete: bool, default False</span>
+<span class="sd">            If True, transformations with timestamps are assumed to be events.</span>
+<span class="sd">            Instead of interpolating between timestamps, transformations are</span>
+<span class="sd">            fixed between their timestamp and the next one.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rf: ReferenceFrame</span>
+<span class="sd">            The constructed reference frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO raise errors here if dimensions etc. don&#39;t match</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">timestamps</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+            <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.from_rotation_matrix"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_rotation_matrix.html#rigid_body_motion.ReferenceFrame.from_rotation_matrix">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_rotation_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Construct a static reference frame from a rotation matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mat: array_like, shape (3, 3)</span>
+<span class="sd">            The rotation matrix that describes the rotation of this frame</span>
+<span class="sd">            wrt the parent frame.</span>
+
+<span class="sd">        parent: str or ReferenceFrame</span>
+<span class="sd">            The parent reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        name: str, default None</span>
+<span class="sd">            The name of the reference frame.</span>
+
+<span class="sd">        inverse: bool, default False</span>
+<span class="sd">            If True, invert the transform wrt the parent frame, i.e. the</span>
+<span class="sd">            rotation is specified for the parent frame wrt this frame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rf: ReferenceFrame</span>
+<span class="sd">            The constructed reference frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO support moving reference frame</span>
+        <span class="k">if</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected mat to have shape (3, 3), got </span><span class="si">{</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="n">as_float_array</span><span class="p">(</span><span class="n">from_rotation_matrix</span><span class="p">(</span><span class="n">mat</span><span class="p">)),</span>
+            <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">get_transformation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Alias for lookup_transform.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        ReferenceFrame.lookup_transform</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">warnings</span>
+
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="ne">DeprecationWarning</span><span class="p">(</span>
+                <span class="s2">&quot;get_transformation is deprecated, use lookup_transform &quot;</span>
+                <span class="s2">&quot;instead.&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">to_frame</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReferenceFrame.lookup_transform"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_transform.html#rigid_body_motion.ReferenceFrame.lookup_transform">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Look up the transformation from this frame to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        to_frame: str or ReferenceFrame</span>
+<span class="sd">            The target reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t: array_like, shape (3,) or (n_timestamps, 3)</span>
+<span class="sd">            The translation from this frame to the target frame.</span>
+
+<span class="sd">        r: array_like, shape (4,) or (n_timestamps, 4)</span>
+<span class="sd">            The rotation from this frame to the target frame.</span>
+
+<span class="sd">        ts: array_like, shape (n_timestamps,) or None</span>
+<span class="sd">            The timestamps for which the transformation is defined.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        lookup_transform</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_matcher</span><span class="p">(</span><span class="n">to_frame</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_transformation</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.transform_vectors"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_vectors.html#rigid_body_motion.ReferenceFrame.transform_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">transform_vectors</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">to_frame</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform array of vectors from this frame to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr: array_like</span>
+<span class="sd">            The array to transform.</span>
+
+<span class="sd">        to_frame: str or ReferenceFrame</span>
+<span class="sd">            The target reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        axis: int, default -1</span>
+<span class="sd">            The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">            vectors.</span>
+
+<span class="sd">        time_axis: int, default 0</span>
+<span class="sd">            The axis of the array representing the timestamps of the vectors.</span>
+
+<span class="sd">        timestamps: array_like, optional</span>
+<span class="sd">            The timestamps of the vectors, corresponding to the `time_axis`</span>
+<span class="sd">            of the array. If not None, the axis defined by `time_axis` will be</span>
+<span class="sd">            re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">            defined.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        arr_transformed: array_like</span>
+<span class="sd">            The transformed array.</span>
+
+<span class="sd">        ts: array_like, shape (n_timestamps,) or None</span>
+<span class="sd">            The timestamps after the transformation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">arr_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_matcher</span><span class="p">(</span><span class="n">to_frame</span><span class="p">,</span> <span class="n">arrays</span><span class="o">=</span><span class="p">[(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr_ts</span><span class="p">)])</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_transformation</span><span class="p">()</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_arrays</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_singleton_axes</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+        <span class="c1"># undo time axis swap</span>
+        <span class="k">if</span> <span class="n">time_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.transform_points"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_points.html#rigid_body_motion.ReferenceFrame.transform_points">[docs]</a>    <span class="k">def</span> <span class="nf">transform_points</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">to_frame</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform array of points from this frame to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr: array_like</span>
+<span class="sd">            The array to transform.</span>
+
+<span class="sd">        to_frame: str or ReferenceFrame</span>
+<span class="sd">            The target reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        axis: int, default -1</span>
+<span class="sd">            The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">            points.</span>
+
+<span class="sd">        time_axis: int, default 0</span>
+<span class="sd">            The axis of the array representing the timestamps of the points.</span>
+
+<span class="sd">        timestamps: array_like, optional</span>
+<span class="sd">            The timestamps of the vectors, corresponding to the `time_axis`</span>
+<span class="sd">            of the array. If not None, the axis defined by `time_axis` will be</span>
+<span class="sd">            re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">            defined.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        arr_transformed: array_like</span>
+<span class="sd">            The transformed array.</span>
+
+<span class="sd">        ts: array_like, shape (n_timestamps,) or None</span>
+<span class="sd">            The timestamps after the transformation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">arr_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_matcher</span><span class="p">(</span><span class="n">to_frame</span><span class="p">,</span> <span class="n">arrays</span><span class="o">=</span><span class="p">[(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr_ts</span><span class="p">)])</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_transformation</span><span class="p">()</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_arrays</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_singleton_axes</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_singleton_axes</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+        <span class="c1"># undo time axis swap</span>
+        <span class="k">if</span> <span class="n">time_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.transform_quaternions"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_quaternions.html#rigid_body_motion.ReferenceFrame.transform_quaternions">[docs]</a>    <span class="k">def</span> <span class="nf">transform_quaternions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">to_frame</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform array of quaternions from this frame to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr: array_like</span>
+<span class="sd">            The array to transform.</span>
+
+<span class="sd">        to_frame: str or ReferenceFrame</span>
+<span class="sd">            The target reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        axis: int, default -1</span>
+<span class="sd">            The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">            quaternions.</span>
+
+<span class="sd">        time_axis: int, default 0</span>
+<span class="sd">            The axis of the array representing the timestamps of the</span>
+<span class="sd">            quaternions.</span>
+
+<span class="sd">        timestamps: array_like, optional</span>
+<span class="sd">            The timestamps of the quaternions, corresponding to the `time_axis`</span>
+<span class="sd">            of the array. If not None, the axis defined by `time_axis` will be</span>
+<span class="sd">            re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">            defined.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        arr_transformed: array_like</span>
+<span class="sd">            The transformed array.</span>
+
+<span class="sd">        ts: array_like, shape (n_timestamps,) or None</span>
+<span class="sd">            The timestamps after the transformation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">arr_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+        <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_matcher</span><span class="p">(</span><span class="n">to_frame</span><span class="p">,</span> <span class="n">arrays</span><span class="o">=</span><span class="p">[(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr_ts</span><span class="p">)])</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_transformation</span><span class="p">()</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_arrays</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_singleton_axes</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">as_quat_array</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="n">as_quat_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">as_float_array</span><span class="p">(</span><span class="n">arr</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+
+        <span class="c1"># undo time axis swap</span>
+        <span class="k">if</span> <span class="n">time_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">time_axis</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.transform_angular_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_angular_velocity.html#rigid_body_motion.ReferenceFrame.transform_angular_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">transform_angular_velocity</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">to_frame</span><span class="p">,</span>
+        <span class="n">what</span><span class="o">=</span><span class="s2">&quot;reference_frame&quot;</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform array of angular velocities from this frame to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr: array_like</span>
+<span class="sd">            The array to transform.</span>
+
+<span class="sd">        to_frame: str or ReferenceFrame</span>
+<span class="sd">            The target reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        what: str, default &quot;reference_frame&quot;</span>
+<span class="sd">            What frame of the velocity to transform. Can be &quot;reference_frame&quot;,</span>
+<span class="sd">            &quot;moving_frame&quot; or &quot;representation_frame&quot;.</span>
+
+<span class="sd">        axis: int, default -1</span>
+<span class="sd">            The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">            velocities.</span>
+
+<span class="sd">        time_axis: int, default 0</span>
+<span class="sd">            The axis of the array representing the timestamps of the</span>
+<span class="sd">            velocities.</span>
+
+<span class="sd">        timestamps: array_like, optional</span>
+<span class="sd">            The timestamps of the velocities, corresponding to the `time_axis`</span>
+<span class="sd">            of the array. If not None, the axis defined by `time_axis` will be</span>
+<span class="sd">            re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">            defined.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">        cutoff: float, optional</span>
+<span class="sd">            Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">            velocity after the twist estimation as a fraction of the Nyquist</span>
+<span class="sd">            frequency.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        arr_transformed: array_like</span>
+<span class="sd">            The transformed array.</span>
+
+<span class="sd">        ts: array_like, shape (n_timestamps,) or None</span>
+<span class="sd">            The timestamps after the transformation.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        transform_angular_velocity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;reference_frame&quot;</span><span class="p">:</span>
+            <span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+                <span class="n">allow_static</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;moving_frame&quot;</span><span class="p">:</span>
+            <span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span>
+                <span class="n">to_frame</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+                <span class="n">allow_static</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;representation_frame&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+                <span class="n">arr</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+                <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span>
+                <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected &#39;what&#39; to be &#39;reference_frame&#39;, &#39;moving_frame&#39; or &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;representation_frame&#39;, got </span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">arr</span><span class="p">,</span>
+            <span class="n">to_frame</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">arr</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">ts_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_arrays</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">arr</span><span class="p">,</span> <span class="n">ts</span><span class="p">),</span> <span class="p">(</span><span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">arr</span> <span class="o">+=</span> <span class="n">angular</span>
+
+        <span class="k">if</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts_out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.transform_linear_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_linear_velocity.html#rigid_body_motion.ReferenceFrame.transform_linear_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">transform_linear_velocity</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">to_frame</span><span class="p">,</span>
+        <span class="n">what</span><span class="o">=</span><span class="s2">&quot;reference_frame&quot;</span><span class="p">,</span>
+        <span class="n">moving_frame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">reference_frame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform array of linear velocities from this frame to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr: array_like</span>
+<span class="sd">            The array to transform.</span>
+
+<span class="sd">        to_frame: str or ReferenceFrame</span>
+<span class="sd">            The target reference frame. If str, the frame will be looked up</span>
+<span class="sd">            in the registry under that name.</span>
+
+<span class="sd">        what: str, default &quot;reference_frame&quot;</span>
+<span class="sd">            What frame of the velocity to transform. Can be &quot;reference_frame&quot;,</span>
+<span class="sd">            &quot;moving_frame&quot; or &quot;representation_frame&quot;.</span>
+
+<span class="sd">        moving_frame: str or ReferenceFrame, optional</span>
+<span class="sd">            The moving frame when transforming the reference frame of the</span>
+<span class="sd">            velocity.</span>
+
+<span class="sd">        reference_frame: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame when transforming the moving frame of the</span>
+<span class="sd">            velocity.</span>
+
+<span class="sd">        axis: int, default -1</span>
+<span class="sd">            The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">            velocities.</span>
+
+<span class="sd">        time_axis: int, default 0</span>
+<span class="sd">            The axis of the array representing the timestamps of the</span>
+<span class="sd">            velocities.</span>
+
+<span class="sd">        timestamps: array_like, optional</span>
+<span class="sd">            The timestamps of the velocities, corresponding to the `time_axis`</span>
+<span class="sd">            of the array. If not None, the axis defined by `time_axis` will be</span>
+<span class="sd">            re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">            defined.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">        cutoff: float, optional</span>
+<span class="sd">            Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">            velocity after the twist estimation as a fraction of the Nyquist</span>
+<span class="sd">            frequency.</span>
+
+<span class="sd">        outlier_thresh: float, optional</span>
+<span class="sd">            Suppress outliers by throwing out samples where the</span>
+<span class="sd">            norm of the second-order differences of the position is above</span>
+<span class="sd">            `outlier_thresh` and interpolating the missing values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        arr_transformed: array_like</span>
+<span class="sd">            The transformed array.</span>
+
+<span class="sd">        ts: array_like, shape (n_timestamps,) or None</span>
+<span class="sd">            The timestamps after the transformation.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        transform_linear_velocity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;reference_frame&quot;</span><span class="p">:</span>
+            <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">linear_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_twist</span><span class="p">(</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+                <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+                <span class="n">allow_static</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">angular_ts</span> <span class="o">=</span> <span class="n">linear_ts</span>
+            <span class="n">translation</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">translation_ts</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span>
+                <span class="n">moving_frame</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;moving_frame&quot;</span><span class="p">:</span>
+            <span class="n">to_frame</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">to_frame</span><span class="p">)</span>
+            <span class="n">linear</span><span class="p">,</span> <span class="n">linear_ts</span> <span class="o">=</span> <span class="n">to_frame</span><span class="o">.</span><span class="n">lookup_linear_velocity</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+                <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+                <span class="n">allow_static</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span>
+                <span class="n">reference_frame</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+                <span class="n">allow_static</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">translation</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">translation_ts</span> <span class="o">=</span> <span class="n">to_frame</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;representation_frame&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+                <span class="n">arr</span><span class="p">,</span>
+                <span class="n">to_frame</span><span class="p">,</span>
+                <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+                <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span>
+                <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+                <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected &#39;what&#39; to be &#39;reference_frame&#39;, &#39;moving_frame&#39; or &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;representation_frame&#39;, got </span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">arr</span><span class="p">,</span>
+            <span class="n">to_frame</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+            <span class="n">time_axis</span><span class="o">=</span><span class="n">time_axis</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">translation</span><span class="p">,</span> <span class="n">translation_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">translation</span><span class="p">,</span>
+            <span class="n">to_frame</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">translation_ts</span><span class="p">,</span>
+            <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">arr</span><span class="p">,</span> <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">translation</span><span class="p">,</span> <span class="n">ts_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_arrays</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">ts</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">linear_ts</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">translation_ts</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">+</span> <span class="n">linear</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">angular</span><span class="p">,</span> <span class="n">translation</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts_out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.lookup_twist"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_twist.html#rigid_body_motion.ReferenceFrame.lookup_twist">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_twist</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;quaternion&quot;</span><span class="p">,</span>
+        <span class="n">allow_static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Estimate linear and angular velocity of this frame wrt a reference.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame wrt which the twist is estimated. Defaults to</span>
+<span class="sd">            the parent frame.</span>
+
+<span class="sd">        represent_in: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame in which the twist is represented. Defaults</span>
+<span class="sd">            to the parent frame.</span>
+
+<span class="sd">        outlier_thresh: float, optional</span>
+<span class="sd">            Suppress outliers by throwing out samples where the</span>
+<span class="sd">            norm of the second-order differences of the position is above</span>
+<span class="sd">            `outlier_thresh` and interpolating the missing values.</span>
+
+<span class="sd">        cutoff: float, optional</span>
+<span class="sd">            Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">            velocity after the estimation as a fraction of the Nyquist</span>
+<span class="sd">            frequency.</span>
+
+<span class="sd">        mode: str, default &quot;quaternion&quot;</span>
+<span class="sd">            If &quot;quaternion&quot;, compute the angular velocity from the quaternion</span>
+<span class="sd">            derivative. If &quot;rotation_vector&quot;, compute the angular velocity from</span>
+<span class="sd">            the gradient of the axis-angle representation of the rotations.</span>
+
+<span class="sd">        allow_static: bool, default False</span>
+<span class="sd">            If True, return a zero velocity vector and None for timestamps if</span>
+<span class="sd">            the transform between this frame and the reference frame is static.</span>
+<span class="sd">            Otherwise, a `ValueError` will be raised.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps of the lookup.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        linear: numpy.ndarray, shape (N, 3)</span>
+<span class="sd">            Linear velocity of moving frame wrt reference frame, represented</span>
+<span class="sd">            in representation frame.</span>
+
+<span class="sd">        angular: numpy.ndarray, shape (N, 3)</span>
+<span class="sd">            Angular velocity of moving frame wrt reference frame, represented</span>
+<span class="sd">            in representation frame.</span>
+
+<span class="sd">        timestamps: each numpy.ndarray</span>
+<span class="sd">            Timestamps of the twist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="n">represent_in</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">represent_in</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> has no parent frame&quot;</span><span class="p">)</span>
+
+        <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">allow_static</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Twist cannot be estimated for static transforms&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">linear</span> <span class="o">=</span> <span class="n">_estimate_linear_velocity</span><span class="p">(</span>
+            <span class="n">translation</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">angular</span> <span class="o">=</span> <span class="n">_estimate_angular_velocity</span><span class="p">(</span>
+            <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span>
+        <span class="p">)</span>
+
+        <span class="c1"># linear velocity is represented in reference frame after estimation</span>
+        <span class="n">linear</span><span class="p">,</span> <span class="n">linear_ts</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">linear</span><span class="p">,</span> <span class="n">represent_in</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="c1"># angular velocity is represented in moving frame after estimation</span>
+        <span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">angular</span><span class="p">,</span>
+            <span class="n">represent_in</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">angular</span><span class="p">,</span> <span class="n">linear</span><span class="p">,</span> <span class="n">twist_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_arrays</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span><span class="p">),</span> <span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">linear_ts</span><span class="p">)],</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">twist_ts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.lookup_linear_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_linear_velocity.html#rigid_body_motion.ReferenceFrame.lookup_linear_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_linear_velocity</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">allow_static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Estimate linear velocity of this frame wrt a reference.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame wrt which the twist is estimated. Defaults to</span>
+<span class="sd">            the parent frame.</span>
+
+<span class="sd">        represent_in: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame in which the twist is represented. Defaults</span>
+<span class="sd">            to the parent frame.</span>
+
+<span class="sd">        outlier_thresh: float, optional</span>
+<span class="sd">            Suppress outliers by throwing out samples where the</span>
+<span class="sd">            norm of the second-order differences of the position is above</span>
+<span class="sd">            `outlier_thresh` and interpolating the missing values.</span>
+
+<span class="sd">        cutoff: float, optional</span>
+<span class="sd">            Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">            velocity after the estimation as a fraction of the Nyquist</span>
+<span class="sd">            frequency.</span>
+
+<span class="sd">        allow_static: bool, default False</span>
+<span class="sd">            If True, return a zero velocity vector and None for timestamps if</span>
+<span class="sd">            the transform between this frame and the reference frame is static.</span>
+<span class="sd">            Otherwise, a `ValueError` will be raised.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps of the lookup.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        linear: numpy.ndarray, shape (N, 3)</span>
+<span class="sd">            Linear velocity of moving frame wrt reference frame, represented</span>
+<span class="sd">            in representation frame.</span>
+
+<span class="sd">        timestamps: each numpy.ndarray</span>
+<span class="sd">            Timestamps of the linear velocity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="n">represent_in</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">represent_in</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> has no parent frame&quot;</span><span class="p">)</span>
+
+        <span class="n">translation</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">allow_static</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Velocity cannot be estimated for static transforms&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">linear</span> <span class="o">=</span> <span class="n">_estimate_linear_velocity</span><span class="p">(</span>
+            <span class="n">translation</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># linear velocity is represented in reference frame after estimation</span>
+        <span class="n">linear</span><span class="p">,</span> <span class="n">linear_ts</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">linear</span><span class="p">,</span> <span class="n">represent_in</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">linear_ts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">linear</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.lookup_angular_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_angular_velocity.html#rigid_body_motion.ReferenceFrame.lookup_angular_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_angular_velocity</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;quaternion&quot;</span><span class="p">,</span>
+        <span class="n">allow_static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Estimate angular velocity of this frame wrt a reference.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame wrt which the twist is estimated. Defaults to</span>
+<span class="sd">            the parent frame.</span>
+
+<span class="sd">        represent_in: str or ReferenceFrame, optional</span>
+<span class="sd">            The reference frame in which the twist is represented. Defaults</span>
+<span class="sd">            to the parent frame.</span>
+
+<span class="sd">        outlier_thresh: float, optional</span>
+<span class="sd">            Suppress samples where the norm of the second-order differences of</span>
+<span class="sd">            the rotation is above `outlier_thresh` and interpolate the missing</span>
+<span class="sd">            values.</span>
+
+<span class="sd">        cutoff: float, optional</span>
+<span class="sd">            Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">            velocity after the estimation as a fraction of the Nyquist</span>
+<span class="sd">            frequency.</span>
+
+<span class="sd">        mode: str, default &quot;quaternion&quot;</span>
+<span class="sd">            If &quot;quaternion&quot;, compute the angular velocity from the quaternion</span>
+<span class="sd">            derivative. If &quot;rotation_vector&quot;, compute the angular velocity from</span>
+<span class="sd">            the gradient of the axis-angle representation of the rotations.</span>
+
+<span class="sd">        allow_static: bool, default False</span>
+<span class="sd">            If True, return a zero velocity vector and None for timestamps if</span>
+<span class="sd">            the transform between this frame and the reference frame is static.</span>
+<span class="sd">            Otherwise, a `ValueError` will be raised.</span>
+
+<span class="sd">        return_timestamps: bool, default False</span>
+<span class="sd">            If True, also return the timestamps of the lookup.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        angular: numpy.ndarray, shape (N, 3)</span>
+<span class="sd">            Angular velocity of moving frame wrt reference frame, represented</span>
+<span class="sd">            in representation frame.</span>
+
+<span class="sd">        timestamps: each numpy.ndarray</span>
+<span class="sd">            Timestamps of the angular velocity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="n">represent_in</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">represent_in</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frame </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> has no parent frame&quot;</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">timestamps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">allow_static</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Velocity cannot be estimated for static transforms&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">angular</span> <span class="o">=</span> <span class="n">_estimate_angular_velocity</span><span class="p">(</span>
+            <span class="n">rotation</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># angular velocity is represented in moving frame after estimation</span>
+        <span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_vectors</span><span class="p">(</span>
+            <span class="n">angular</span><span class="p">,</span>
+            <span class="n">represent_in</span><span class="p">,</span>
+            <span class="n">timestamps</span><span class="o">=</span><span class="n">timestamps</span><span class="p">,</span>
+            <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_timestamps</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">angular</span><span class="p">,</span> <span class="n">angular_ts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">angular</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.register"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.register.html#rigid_body_motion.ReferenceFrame.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Register this frame in the registry.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        update: bool, default False</span>
+<span class="sd">            If True, overwrite if there is a frame with the same name in the</span>
+<span class="sd">            registry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReferenceFrame.deregister"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.deregister.html#rigid_body_motion.ReferenceFrame.deregister">[docs]</a>    <span class="k">def</span> <span class="nf">deregister</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove this frame from the registry. &quot;&quot;&quot;</span>
+        <span class="n">_deregister</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

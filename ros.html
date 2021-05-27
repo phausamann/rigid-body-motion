@@ -1,0 +1,959 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ROS integration &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Working with xarray" href="xarray.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarray.html">Working with xarray</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ROS integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Loading-data-from-rosbag-files">Loading data from rosbag files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Visualization-with-RViz">Visualization with RViz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>ROS integration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ros.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="admonition note">
+<p>You can <a class="reference download internal" download="" href="_downloads/eb142767c397b80468040b8bfa22b2a7/ros.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">download</span></code></a> this guide as a
+Jupyter notebook.</p>
+</div>
+<div class="section" id="ROS-integration">
+<h1>ROS integration<a class="headerlink" href="#ROS-integration" title="Permalink to this headline">¶</a></h1>
+<p>rigid_body_motion supports certain ROS functionality, provided the Python environment has been set up with the required ROS packages. This guide assumes that you are at least somewhat familiar with ROS concepts such as nodes, publishers/subscribers and messages. If not, the <a class="reference external" href="http://wiki.ros.org/ROS/Tutorials">ROS tutorials</a> are a good place to start.</p>
+<p>You also need to set up a couple of dependencies which can be done very conveniently if you are using an Anaconda Python distribution. See <a class="reference internal" href="installation.html#ros-integration"><span class="std std-ref">the ROS dependencies installation guide</span></a> for further information.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle">Note</p>
+<p>The following examples require the <code class="docutils literal notranslate"><span class="pre">pooch</span></code>, <code class="docutils literal notranslate"><span class="pre">xarray</span></code>, <code class="docutils literal notranslate"><span class="pre">netcdf4</span></code> and <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> libraries.</p>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">rigid_body_motion</span> <span class="k">as</span> <span class="nn">rbm</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Loading-data-from-rosbag-files">
+<h2>Loading data from rosbag files<a class="headerlink" href="#Loading-data-from-rosbag-files" title="Permalink to this headline">¶</a></h2>
+<p>Data can be loaded from rosbag files into numpy arrays. So far, <code class="docutils literal notranslate"><span class="pre">geometry_msgs/TransformStamped</span></code> and <code class="docutils literal notranslate"><span class="pre">nav_msgs/Odometry</span></code> messages are supported. This is done through the <a class="reference internal" href="_generated/rigid_body_motion.ros.RosbagReader.html"><span class="doc">RosbagReader</span></a> class:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">ros</span><span class="o">.</span><span class="n">RosbagReader</span><span class="p">(</span><span class="n">rbm</span><span class="o">.</span><span class="n">example_data</span><span class="p">[</span><span class="s2">&quot;rosbag&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Downloading data from &#39;https://github.com/phausamann/rbm-data/raw/main/example.bag&#39; to file &#39;/home/runner/.cache/pooch/447a93042051dbc5689c8ed153185a15-example.bag&#39;.
+</pre></div></div>
+</div>
+<p>The reader can be used as a context manager to facilitate opening and closing of the rosbag. The <code class="docutils literal notranslate"><span class="pre">get_topics_and_types</span></code> method returns a dict with topic names and corresponding message types:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">get_topics_and_types</span><span class="p">()</span>
+<span class="n">info</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;/pupil/left_eye/transform&#39;: &#39;geometry_msgs/TransformStamped&#39;,
+ &#39;/pupil/right_eye/transform&#39;: &#39;geometry_msgs/TransformStamped&#39;,
+ &#39;/t265/transform&#39;: &#39;geometry_msgs/TransformStamped&#39;}
+</pre></div></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle">Note</p>
+<p>If you get an <code class="docutils literal notranslate"><span class="pre">ModuleNotFoundError:</span> <span class="pre">No</span> <span class="pre">module</span> <span class="pre">named</span> <span class="pre">'rosbag'</span></code> at this point, there is an issue with the ROS dependencies. See <a class="reference internal" href="installation.html#troubleshooting"><span class="std std-ref">the ROS dependencies troubleshooting guide</span></a> to fix this.</p>
+</div>
+<p>The data included in the example rosbag is from a <a class="reference external" href="https://dl.acm.org/doi/pdf/10.1145/3379156.3391365">head/eye tracking study</a> and contains head-in-world pose estimated by the Intel RealSense T265 as well as eye-in-head pose for both eyes estimated by the Pupil Core eye tracker.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">load_messages</span></code> method returns a dict with the data from a specified topic:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load_messages</span><span class="p">(</span><span class="s2">&quot;/t265/transform&quot;</span><span class="p">)</span>
+<span class="n">head</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;timestamps&#39;: array([1.58060323e+09, 1.58060323e+09, 1.58060323e+09, ...,
+        1.58060357e+09, 1.58060357e+09, 1.58060357e+09]),
+ &#39;position&#39;: array([[15.9316,  0.8211, 10.5429],
+        [15.9354,  0.8208, 10.5382],
+        [15.9393,  0.8204, 10.5335],
+        ...,
+        [29.8883,  2.8952,  7.6317],
+        [29.8888,  2.8943,  7.6249],
+        [29.8892,  2.8935,  7.6182]]),
+ &#39;orientation&#39;: array([[-0.9687,  0.0917,  0.2306,  0.0039],
+        [-0.969 ,  0.0915,  0.2295,  0.005 ],
+        [-0.9693,  0.0912,  0.2285,  0.0061],
+        ...,
+        [-0.9915,  0.0915,  0.0929, -0.0022],
+        [-0.9914,  0.0922,  0.0927, -0.0017],
+        [-0.9913,  0.0932,  0.0925, -0.001 ]])}
+</pre></div></div>
+</div>
+<p>Now we can construct a reference frame tree with this data:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The T265 uses the VR coordinate convention (x right, y up, z towards the back of the device) which differs from the default ROS convention (x forward, y left, z up):</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">R_T265_ROS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+
+<span class="n">rbm</span><span class="o">.</span><span class="n">ReferenceFrame</span><span class="o">.</span><span class="n">from_rotation_matrix</span><span class="p">(</span>
+    <span class="n">R_T265_ROS</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;t265/world&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The recorded data describes the transformation from the T265 world frame to the tracker frame:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span>
+    <span class="s2">&quot;t265/tracker&quot;</span><span class="p">,</span>
+    <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;t265/world&quot;</span><span class="p">,</span>
+    <span class="n">translation</span><span class="o">=</span><span class="n">head</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">],</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="n">head</span><span class="p">[</span><span class="s2">&quot;orientation&quot;</span><span class="p">],</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">head</span><span class="p">[</span><span class="s2">&quot;timestamps&quot;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>For visualization, we define an additional <code class="docutils literal notranslate"><span class="pre">&quot;head&quot;</span></code> frame that represents the tracker pose with the ROS coordinate convention:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">ReferenceFrame</span><span class="o">.</span><span class="n">from_rotation_matrix</span><span class="p">(</span>
+    <span class="n">R_T265_ROS</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;t265/tracker&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">render_tree</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+world
+└── t265/world
+    └── t265/tracker
+        └── head
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Visualization-with-RViz">
+<h2>Visualization with RViz<a class="headerlink" href="#Visualization-with-RViz" title="Permalink to this headline">¶</a></h2>
+<p>This section will show you how to broadcast reference frame transforms on the <code class="docutils literal notranslate"><span class="pre">/tf</span></code> topic as well as publish other messages that are useful for visualization in RViz. If you are not familiar with RViz and/or tf, check out the <a class="reference external" href="http://wiki.ros.org/rviz/UserGuide">RViz user guide</a> and the <a class="reference external" href="http://wiki.ros.org/tf">tf package documentation</a>. You can download an <code class="docutils literal notranslate"><span class="pre">.rviz</span></code> file where all topics created in the following are already set up <a class="reference external" href="_static/example.rviz">here</a>.</p>
+<p>We start by creating a node for this notebook with the <a class="reference internal" href="_generated/rigid_body_motion.ros.init_node.html"><span class="doc">init_node()</span></a> method. This method will also automatically start a <code class="docutils literal notranslate"><span class="pre">roscore</span></code> when <code class="docutils literal notranslate"><span class="pre">start_master=True</span></code> and another ROS master isn’t already running:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">master</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">ros</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="s2">&quot;rbm_vis&quot;</span><span class="p">,</span> <span class="n">start_master</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-bold">started roslaunch server http://fv-az87-491:42689/</span>
+ros_comm version 1.15.9
+
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: noetic
+ * /rosversion: 1.15.9
+
+NODES
+
+auto-starting new master
+<span class="ansi-bold">process[master]: started with pid [4346]</span>
+<span class="ansi-bold">ROS_MASTER_URI=http://localhost:11311</span>
+<span class="ansi-bold">setting /run_id to master</span>
+<span class="ansi-bold">process[rosout-1]: started with pid [4357]</span>
+started core service [/rosout]
+</pre></div></div>
+</div>
+<p>Transforms between reference frames can easily be broadcast on the <code class="docutils literal notranslate"><span class="pre">/tf</span></code> topic with the <a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.html"><span class="doc">ReferenceFrameTransformBroadcaster</span></a> class:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tf_world_head</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">ros</span><span class="o">.</span><span class="n">ReferenceFrameTransformBroadcaster</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>When calling <a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.html#rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.publish"><span class="std std-ref">publish</span></a> the transform between world and head frame will be broadcast on the <code class="docutils literal notranslate"><span class="pre">/tf</span></code> topic. Since the head frame is a moving frame this will broadcast the first valid transform between the two frames by default:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tf_world_head</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>RViz should now show both frames:</p>
+<p><img alt="3b7d3ce33c274c0ca9484a4a08211976" src="_images/rviz_0.png" /></p>
+<p>The broadcaster stores all valid transforms between the two frames in the <code class="docutils literal notranslate"><span class="pre">translation</span></code>, <code class="docutils literal notranslate"><span class="pre">rotation</span></code> and <code class="docutils literal notranslate"><span class="pre">timestamps</span></code> attributes:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tf_world_head</span><span class="o">.</span><span class="n">translation</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(66629, 3)
+</pre></div></div>
+</div>
+<p>You can broadcast the transform between two frames at different points in time by specifying an index into these arrays as an argument to <a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.html#rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.publish"><span class="std std-ref">publish</span></a>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tf_world_head</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle">Note</p>
+<p>When “going back in time”, i.e., broadcasting transforms with timestamps older than the latest broadcast timestamp, RViz will not update the tf display and you may get a <code class="docutils literal notranslate"><span class="pre">TF_OLD_DATA</span></code> warning in the console. When this happens, click on the “Reset” button in the lower left corner in RViz.</p>
+</div>
+<p>The entire transformation between moving frames can be visualized with the <a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html"><span class="doc">ReferenceFrameMarkerPublisher</span></a> which publishes the translation of all valid timestamps as a <code class="docutils literal notranslate"><span class="pre">visualization_msgs/Marker</span></code> message on the <code class="docutils literal notranslate"><span class="pre">/&lt;frame_name&gt;/path</span></code> topic:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">marker_publisher</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">ros</span><span class="o">.</span><span class="n">ReferenceFrameMarkerPublisher</span><span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+<span class="n">marker_publisher</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">rospy</span>
+
+<span class="n">rospy</span><span class="o">.</span><span class="n">get_published_topics</span><span class="p">(</span><span class="s2">&quot;/head&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[[&#39;/head/path&#39;, &#39;visualization_msgs/Marker&#39;]]
+</pre></div></div>
+</div>
+<p>RViz should now show the trajectory of the head frame as a white line:</p>
+<p><img alt="d0418f4d07f840209dbb91be689f7806" src="_images/rviz_1.png" /></p>
+<p>Next, we will load data from the Pupil Core eye tracker to demonstrate how multiple moving frames can be visualized. With the <a class="reference internal" href="_generated/rigid_body_motion.ros.RosbagReader.html#rigid_body_motion.ros.RosbagReader.load_dataset"><span class="std std-ref">load_dataset</span></a> method, the data is imported as an <code class="docutils literal notranslate"><span class="pre">xarray.Dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">cache=True</span></code> enables local caching in the netCDF4 format for faster loading.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="n">left_eye</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;/pupil/left_eye/transform&quot;</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">left_eye</span> <span class="o">=</span> <span class="n">left_eye</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The transform between the T265 and the Pupil Core scene camera was determined in the study with a camera calibration routine and is provided here as hard-coded parameters:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">t_t265_pupil</span> <span class="o">=</span> <span class="p">(</span><span class="mf">24.5e-3</span><span class="p">,</span> <span class="o">-</span><span class="mf">29e-3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">r_t265_pupil</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.00125</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">6.3463e-05</span><span class="p">,</span> <span class="mf">3.977e-06</span><span class="p">)</span>
+
+<span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span>
+    <span class="s2">&quot;pupil/scene_cam&quot;</span><span class="p">,</span>
+    <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;t265/tracker&quot;</span><span class="p">,</span>
+    <span class="n">translation</span><span class="o">=</span><span class="n">t_t265_pupil</span><span class="p">,</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="n">r_t265_pupil</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The reference frame of the left eye is constructed from the Dataset:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">ReferenceFrame</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span>
+    <span class="n">left_eye</span><span class="p">,</span>
+    <span class="s2">&quot;position&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;orientation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;time&quot;</span><span class="p">,</span>
+    <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;pupil/scene_cam&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pupil/left_eye&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The eye tracker data uses yet another coordinate convention (x right, y down, z forward) which we need to take into account when visualizing the eye frame:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">R_PUPIL_ROS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+
+<span class="n">rbm</span><span class="o">.</span><span class="n">ReferenceFrame</span><span class="o">.</span><span class="n">from_rotation_matrix</span><span class="p">(</span>
+    <span class="n">R_PUPIL_ROS</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s2">&quot;pupil/left_eye&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;left_eye&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">render_tree</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+world
+└── t265/world
+    └── t265/tracker
+        ├── head
+        └── pupil/scene_cam
+            └── pupil/left_eye
+                └── left_eye
+</pre></div></div>
+</div>
+<p>Now we create another broadcaster for the transform between head and eye frame. With <code class="docutils literal notranslate"><span class="pre">publish_pose=True</span></code>, the broadcaster also publishes a <code class="docutils literal notranslate"><span class="pre">geometry_msgs/PoseStamped</span></code> message on the <code class="docutils literal notranslate"><span class="pre">/&lt;frame_name&gt;/pose</span></code> topic. This message can be visualized in RViz as an arrow which avoids cluttering for frames that are close together. In order to publish messages in sync with the world/head transform, we specify <code class="docutils literal notranslate"><span class="pre">subscribe=&quot;head&quot;</span></code>. This way, the broadcaster checks for new messages on the <code class="docutils literal notranslate"><span class="pre">/tf</span></code> topic
+where the <code class="docutils literal notranslate"><span class="pre">child_frame_id</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;head&quot;</span></code> and publishes its own transform with the closest timestamp:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tf_head_left_eye</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">ros</span><span class="o">.</span><span class="n">ReferenceFrameTransformBroadcaster</span><span class="p">(</span>
+    <span class="s2">&quot;left_eye&quot;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="n">publish_pose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subscribe</span><span class="o">=</span><span class="s2">&quot;head&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Calling the <a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.html#rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.spin"><span class="std std-ref">spin</span></a> method dispatches the broadcaster to a separate thread where it will keep checking for new world/head transforms:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tf_head_left_eye</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, the <a class="reference internal" href="_generated/rigid_body_motion.ros.play_publisher.html"><span class="doc">play_publisher</span></a> method provides a notebook widget to play back data from a broadcaster. With <code class="docutils literal notranslate"><span class="pre">step=2</span></code> it broadcasts every second transform and with <code class="docutils literal notranslate"><span class="pre">speed=0.5</span></code> the data is played back at half the recorded speed:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">ros</span><span class="o">.</span><span class="n">play_publisher</span><span class="p">(</span><span class="n">tf_world_head</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "9e927a1a94184fc483f67694e73153c5"}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "36ee4ad382ce46bc842d4724785de084"}</script></div>
+</div>
+<p>After pressing the play button, you should see the head frame moving along the white path, with the eye-in-head pose drawn as a yellow arrow:</p>
+<p><img alt="f74c61522b744d449f1f70fc7a987276" src="_images/rviz_2.png" /></p>
+<p>Finally, if you have started the ROS master from Python, you should shut it down at the end:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">master</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[rosout-1] killing on exit
+[master] killing on exit
+</pre></div></div>
+</div>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"851c6725bcd04ba988c1ac700ffafebc": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9787fae2b4c14d90925d6e7d59d2f247": {"model_name": "SliderStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "SliderStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": "", "handle_color": null}}, "cf381e7f09a84a8998a92aa59b7721a9": {"model_name": "IntSliderModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "IntSliderModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "IntSliderView", "continuous_update": true, "description": "Index", "description_tooltip": null, "disabled": false, "layout": "IPY_MODEL_851c6725bcd04ba988c1ac700ffafebc", "max": 66628, "min": 0, "orientation": "horizontal", "readout": true, "readout_format": "d", "step": 1, "style": "IPY_MODEL_9787fae2b4c14d90925d6e7d59d2f247", "value": 0}}, "751cbd36025342d8807a1d9b12a80f2f": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "50px"}}, "87a5ce814a9740539f143abe2534efca": {"model_name": "ButtonStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ButtonStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "button_color": null, "font_weight": ""}}, "f7e6d0f7ebc24e7fbba7a22be4d37322": {"model_name": "ButtonModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ButtonModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ButtonView", "button_style": "", "description": "\u25ba\u25ba", "disabled": false, "icon": "", "layout": "IPY_MODEL_751cbd36025342d8807a1d9b12a80f2f", "style": "IPY_MODEL_87a5ce814a9740539f143abe2534efca", "tooltip": ""}}, "e1d4f9a92f6542ec87f09d7257d92874": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "50px"}}, "26855ca1c3c54b33815e4ed53932f968": {"model_name": "ButtonStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ButtonStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "button_color": null, "font_weight": ""}}, "54caa8f30489475ab22b930b87199372": {"model_name": "ButtonModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ButtonModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ButtonView", "button_style": "", "description": "\u25c4\u25c4", "disabled": false, "icon": "", "layout": "IPY_MODEL_e1d4f9a92f6542ec87f09d7257d92874", "style": "IPY_MODEL_26855ca1c3c54b33815e4ed53932f968", "tooltip": ""}}, "1043c1b6f55b4a7db91d374421400ff7": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "97c65804ef714f5bb3e82c34445e5e5e": {"model_name": "DescriptionStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "fc2283a8b38d436d86328499963ac703": {"model_name": "PlayModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "PlayModel", "_playing": false, "_repeat": false, "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "PlayView", "description": "Press play", "description_tooltip": null, "disabled": false, "interval": 19, "layout": "IPY_MODEL_1043c1b6f55b4a7db91d374421400ff7", "max": 66628, "min": 0, "show_repeat": true, "step": 2, "style": "IPY_MODEL_97c65804ef714f5bb3e82c34445e5e5e", "value": 0}}, "9a92d19d88ef4d3aada24e1e6e008f24": {"model_name": "LinkModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "LinkModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": null, "source": ["IPY_MODEL_fc2283a8b38d436d86328499963ac703", "value"], "target": ["IPY_MODEL_cf381e7f09a84a8998a92aa59b7721a9", "value"]}}, "2d2a256341984909baca5f7fd5d6e166": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9e927a1a94184fc483f67694e73153c5": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_cf381e7f09a84a8998a92aa59b7721a9", "IPY_MODEL_54caa8f30489475ab22b930b87199372", "IPY_MODEL_fc2283a8b38d436d86328499963ac703", "IPY_MODEL_f7e6d0f7ebc24e7fbba7a22be4d37322"], "layout": "IPY_MODEL_2d2a256341984909baca5f7fd5d6e166"}}, "5f559c5786af4ee4b08ab753e357117f": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "36ee4ad382ce46bc842d4724785de084": {"model_name": "OutputModel", "model_module": "@jupyter-widgets/output", "model_module_version": "1.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/output", "_model_module_version": "1.0.0", "_model_name": "OutputModel", "_view_count": null, "_view_module": "@jupyter-widgets/output", "_view_module_version": "1.0.0", "_view_name": "OutputView", "layout": "IPY_MODEL_5f559c5786af4ee4b08ab753e357117f", "msg_id": "", "outputs": []}}}, "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="xarray.html" class="btn btn-neutral float-left" title="Working with xarray" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,689 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion.utils &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../rigid_body_motion.html">rigid_body_motion</a> &raquo;</li>
+        
+      <li>rigid_body_motion.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rigid_body_motion.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">quaternion</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">as_float_array</span><span class="p">,</span>
+    <span class="n">as_quat_array</span><span class="p">,</span>
+    <span class="n">from_rotation_vector</span><span class="p">,</span>
+    <span class="n">quaternion</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">quaternion</span> <span class="kn">import</span> <span class="n">rotate_vectors</span> <span class="k">as</span> <span class="n">quat_rv</span>
+<span class="kn">from</span> <span class="nn">quaternion</span> <span class="kn">import</span> <span class="n">squad</span>
+
+<span class="kn">from</span> <span class="nn">rigid_body_motion.core</span> <span class="kn">import</span> <span class="n">_resolve_axis</span>
+
+
+<div class="viewcode-block" id="qinv"><a class="viewcode-back" href="../../_generated/rigid_body_motion.qinv.html#rigid_body_motion.qinv">[docs]</a><span class="k">def</span> <span class="nf">qinv</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qaxis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Quaternion inverse.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    q: array_like</span>
+<span class="sd">        Array containing quaternions whose inverse is to be computed. Its dtype</span>
+<span class="sd">        can be quaternion, otherwise `qaxis` specifies the axis representing</span>
+<span class="sd">        the quaternions.</span>
+
+<span class="sd">    qaxis: int, default -1</span>
+<span class="sd">        If `q` is not quaternion dtype, axis of the quaternion array</span>
+<span class="sd">        representing the coordinates of the quaternions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qi: ndarray</span>
+<span class="sd">        A new array containing the inverse values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO xarray support</span>
+    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">quaternion</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">qi</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">as_quat_array</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">qi</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">q</span></div>
+
+
+<div class="viewcode-block" id="qmul"><a class="viewcode-back" href="../../_generated/rigid_body_motion.qmul.html#rigid_body_motion.qmul">[docs]</a><span class="k">def</span> <span class="nf">qmul</span><span class="p">(</span><span class="o">*</span><span class="n">q</span><span class="p">,</span> <span class="n">qaxis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Quaternion multiplication.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    q: iterable of array_like</span>
+<span class="sd">        Arrays containing quaternions to multiply. Their dtype can be</span>
+<span class="sd">        quaternion, otherwise `qaxis` specifies the axis representing</span>
+<span class="sd">        the quaternions.</span>
+
+<span class="sd">    qaxis: int, default -1</span>
+<span class="sd">        If `q` are not quaternion dtype, axis of the quaternion arrays</span>
+<span class="sd">        representing the coordinates of the quaternions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qm: ndarray</span>
+<span class="sd">        A new array containing the multiplied quaternions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO xarray support</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide at least 2 quaternions to multiply&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">qq</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">quaternion</span> <span class="k">for</span> <span class="n">qq</span> <span class="ow">in</span> <span class="n">q</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">as_quat_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">qq</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">qq</span> <span class="ow">in</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">qm</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">as_float_array</span><span class="p">(</span><span class="n">qm</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">qq</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">quaternion</span> <span class="k">for</span> <span class="n">qq</span> <span class="ow">in</span> <span class="n">q</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Either all or none of the provided quaternions must be &quot;</span>
+            <span class="s2">&quot;quaternion dtype&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="qmean"><a class="viewcode-back" href="../../_generated/rigid_body_motion.qmean.html#rigid_body_motion.qmean">[docs]</a><span class="k">def</span> <span class="nf">qmean</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qaxis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Quaternion mean.</span>
+
+<span class="sd">    Adapted from https://github.com/christophhagen/averaging-quaternions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    q: array_like</span>
+<span class="sd">        Array containing quaternions whose mean is to be computed. Its dtype</span>
+<span class="sd">        can be quaternion, otherwise `qaxis` specifies the axis representing</span>
+<span class="sd">        the quaternions.</span>
+
+<span class="sd">    axis: None or int or tuple of ints, optional</span>
+<span class="sd">        Axis or axes along which the means are computed. The default is to</span>
+<span class="sd">        compute the mean of the flattened array.</span>
+
+<span class="sd">    qaxis: int, default -1</span>
+<span class="sd">        If `q` is not quaternion dtype, axis of the quaternion array</span>
+<span class="sd">        representing the coordinates of the quaternions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qm: ndarray</span>
+<span class="sd">        A new array containing the mean values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO xarray support</span>
+    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">quaternion</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">was_quaternion</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">was_quaternion</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">_resolve_axis</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># compute outer product of quaternion elements</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+    <span class="n">qt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">qt</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+    <span class="c1"># compute largest eigenvector of A</span>
+    <span class="n">l</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="n">qm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">was_quaternion</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">as_quat_array</span><span class="p">(</span><span class="n">qm</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">qm</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="qinterp"><a class="viewcode-back" href="../../_generated/rigid_body_motion.qinterp.html#rigid_body_motion.qinterp">[docs]</a><span class="k">def</span> <span class="nf">qinterp</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">t_in</span><span class="p">,</span> <span class="n">t_out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">qaxis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Quaternion interpolation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    q: array_like</span>
+<span class="sd">        Array containing quaternions to interpolate. Its dtype</span>
+<span class="sd">        can be quaternion, otherwise `qaxis` specifies the axis representing</span>
+<span class="sd">        the quaternions.</span>
+
+<span class="sd">    t_in: array_like</span>
+<span class="sd">        Array of current sampling points of `q`.</span>
+
+<span class="sd">    t_out: array_like</span>
+<span class="sd">        Array of desired sampling points of `q`.</span>
+
+<span class="sd">    axis: int, default 0</span>
+<span class="sd">        Axis along which the quaternions are interpolated.</span>
+
+<span class="sd">    qaxis: int, default -1</span>
+<span class="sd">        If `q` is not quaternion dtype, axis of the quaternion array</span>
+<span class="sd">        representing the coordinates of the quaternions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qi: ndarray</span>
+<span class="sd">        A new array containing the interpolated values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO xarray support</span>
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">axis</span> <span class="o">%</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span>
+    <span class="n">t_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t_in</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">t_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t_out</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">quaternion</span><span class="p">:</span>
+        <span class="n">qaxis</span> <span class="o">=</span> <span class="n">qaxis</span> <span class="o">%</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="c1"># fix axis if it&#39;s the last axis of the array and will be swapped with</span>
+        <span class="c1"># axis when converting to quaternion dtype</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">qaxis</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">as_quat_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">was_quaternion</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">was_quaternion</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">qi</span> <span class="o">=</span> <span class="n">squad</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">t_in</span><span class="p">,</span> <span class="n">t_out</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Error using SQUAD with multi-dimensional array, please upgrade &quot;</span>
+            <span class="s2">&quot;the quaternion package to the latest version&quot;</span>
+        <span class="p">)</span>
+    <span class="n">qi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">qi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">was_quaternion</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">qi</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">as_float_array</span><span class="p">(</span><span class="n">qi</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rotate_vectors"><a class="viewcode-back" href="../../_generated/rigid_body_motion.rotate_vectors.html#rigid_body_motion.rotate_vectors">[docs]</a><span class="k">def</span> <span class="nf">rotate_vectors</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">qaxis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">one_to_one</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Rotate an array of vectors by an array of quaternions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    q: array_like</span>
+<span class="sd">        Array of quaternions. Its dtype can be quaternion, otherwise `q_axis`</span>
+<span class="sd">        specifies the axis representing the quaternions.</span>
+
+<span class="sd">    v: array_like</span>
+<span class="sd">        The array of vectors to be rotated.</span>
+
+<span class="sd">    axis: int, default -1</span>
+<span class="sd">        The axis of the `v` array representing the coordinates of the</span>
+<span class="sd">        vectors. Must have length 3.</span>
+
+<span class="sd">    qaxis: int, default -1</span>
+<span class="sd">        If `q` is not quaternion dtype, axis of the quaternion array</span>
+<span class="sd">        representing the coordinates of the quaternions.</span>
+
+<span class="sd">    one_to_one: bool, default True</span>
+<span class="sd">        If True, rotate each vector by a single quaternion. In this case,</span>
+<span class="sd">        non-singleton dimensions of `q` and `v` must match. Otherwise,</span>
+<span class="sd">        perform rotations for all combinations of `q` and `v`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vr: array_like</span>
+<span class="sd">        The array of rotated vectors. If `one_to_one=True` this array has</span>
+<span class="sd">        the shape of all non-singleton dimensions in `q` and `v`.</span>
+<span class="sd">        Otherwise, this array has shape `q.shape` + `v.shape`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO proper broadcasting if v is DataArray</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">quaternion</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">as_quat_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">qaxis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">one_to_one</span> <span class="ow">or</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">quat_rv</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected axis </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2"> of v to have length 3, got </span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># make sure that non-singleton axes match</span>
+    <span class="n">v_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">v_shape</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">nonmatching_axes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">qs</span> <span class="o">!=</span> <span class="n">vs</span> <span class="k">for</span> <span class="n">qs</span><span class="p">,</span> <span class="n">vs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">v_shape</span><span class="p">)</span> <span class="k">if</span> <span class="n">qs</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">vs</span> <span class="o">!=</span> <span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">nonmatching_axes</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Incompatible shapes for q and v: </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># compute rotation</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">as_float_array</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="n">rxv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axisb</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">axisc</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">vr</span> <span class="o">=</span> <span class="n">v</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">rxv</span><span class="p">,</span> <span class="n">axisb</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">axisc</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span> <span class="o">/</span> <span class="n">m</span>
+
+    <span class="k">return</span> <span class="n">vr</span></div>
+
+
+<div class="viewcode-block" id="from_euler_angles"><a class="viewcode-back" href="../../_generated/rigid_body_motion.from_euler_angles.html#rigid_body_motion.from_euler_angles">[docs]</a><span class="k">def</span> <span class="nf">from_euler_angles</span><span class="p">(</span>
+    <span class="n">rpy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">roll</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pitch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">yaw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">order</span><span class="o">=</span><span class="s2">&quot;rpy&quot;</span><span class="p">,</span>
+    <span class="n">return_quaternion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Construct quaternions from Euler angles.</span>
+
+<span class="sd">    This method differs from the method found in the quaternion package in</span>
+<span class="sd">    that it is actually useful for converting commonly found Euler angle</span>
+<span class="sd">    representations to quaternions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rpy: array-like, shape (..., 3, ...), optional</span>
+<span class="sd">        Array with roll, pitch and yaw values. Mutually exclusive with `roll`,</span>
+<span class="sd">        `pitch` and `yaw` arguments.</span>
+
+<span class="sd">    roll: array-like, optional</span>
+<span class="sd">        Array with roll values. Mutually exclusive with `rpy` argument.</span>
+
+<span class="sd">    pitch: array-like, optional</span>
+<span class="sd">        Array with pitch values. Mutually exclusive with `rpy` argument.</span>
+
+<span class="sd">    yaw: array-like, optional</span>
+<span class="sd">        Array with yaw values. Mutually exclusive with `rpy` argument.</span>
+
+<span class="sd">    axis: int, default -1</span>
+<span class="sd">        Array axis representing RPY values of `rpy` argument.</span>
+
+<span class="sd">    order: str, default &quot;rpy&quot;</span>
+<span class="sd">        Order of consecutively applied rotations. Defaults to</span>
+<span class="sd">        roll -&gt; pitch -&gt; yaw.</span>
+
+<span class="sd">    return_quaternion: bool, default False</span>
+<span class="sd">        If True, return result as quaternion dtype.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    q: array-like</span>
+<span class="sd">        Array with quaternions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rpy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">roll</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pitch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">yaw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot specify roll, pitch or yaw when rpy is provided&quot;</span>
+            <span class="p">)</span>
+        <span class="n">rpy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rpy</span><span class="p">),</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">roll</span> <span class="o">=</span> <span class="n">rpy</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">pitch</span> <span class="o">=</span> <span class="n">rpy</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">yaw</span> <span class="o">=</span> <span class="n">rpy</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">rpy</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">roll</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">roll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">roll</span><span class="p">)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">roll</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">roll</span> <span class="o">=</span> <span class="n">from_rotation_vector</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">roll</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pitch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pitch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pitch</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">pitch</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">shape</span> <span class="o">!=</span> <span class="n">pitch</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Inconsistent shape for pitch argument: expected </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">pitch</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">pitch</span> <span class="o">=</span> <span class="n">from_rotation_vector</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">yaw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">yaw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">yaw</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">yaw</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">shape</span> <span class="o">!=</span> <span class="n">yaw</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Inconsistent shape for yaw argument: expected </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">yaw</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">yaw</span> <span class="o">=</span> <span class="n">from_rotation_vector</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">yaw</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Must specify at least one of rpy, roll, pitch or yaw&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># rearrange rotors according to order</span>
+    <span class="n">rotors</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">rotors</span><span class="p">[</span><span class="n">order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">roll</span>
+        <span class="n">rotors</span><span class="p">[</span><span class="n">order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pitch</span>
+        <span class="n">rotors</span><span class="p">[</span><span class="n">order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">yaw</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;order must be a permutation of &#39;r&#39;, &#39;p&#39; and &#39;y&#39;, got </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># chain rotors</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">quaternion</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rotors</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r</span>
+
+    <span class="k">if</span> <span class="n">return_quaternion</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">as_float_array</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">is_dataarray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">require_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check whether an object is a DataArray.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj: anything</span>
+<span class="sd">        The object to be checked.</span>
+
+<span class="sd">    require_attrs: list of str, optional</span>
+<span class="sd">        The attributes the object has to have in order to pass as a DataArray.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        Whether the object is a DataArray or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">require_attrs</span> <span class="o">=</span> <span class="n">require_attrs</span> <span class="ow">or</span> <span class="p">[</span>
+        <span class="s2">&quot;values&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;coords&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dims&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;attrs&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">require_attrs</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">is_dataset</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">require_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check whether an object is a Dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj: anything</span>
+<span class="sd">        The object to be checked.</span>
+
+<span class="sd">    require_attrs: list of str, optional</span>
+<span class="sd">        The attributes the object has to have in order to pass as a Dataset.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        Whether the object is a Dataset or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">require_attrs</span> <span class="o">=</span> <span class="n">require_attrs</span> <span class="ow">or</span> <span class="p">[</span>
+        <span class="s2">&quot;data_vars&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;coords&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dims&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;to_array&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">require_attrs</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">ExampleDataStore</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Storage interface for example data. &quot;&quot;&quot;</span>
+
+    <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/phausamann/rbm-data/raw/main/&quot;</span>
+
+    <span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;head.nc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;874eddaa51bf775c7311f0046613c6f969adef6e34fe4aea2e1248a75ed3fee3&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;left_eye&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;left_eye.nc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;56d5488fb8d3ff08450663ed0136ac659c1d51eb5340a7e3ed52f5ecf019139c&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;right_eye&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;right_eye.nc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;b038c4cb2f6932e4334f135cdf7e24ff9c3b5789977b2ae0206ba80acf54c647&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;rosbag&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;example.bag&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;8d27f5e554f5a0e02e0bec59b60424e582f6104380f96c3f226b4d85c107f2bc&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">pooch</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span>
+                <span class="s2">&quot;pooch must be installed to load example data&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">known_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&#39; is not a valid example dataset&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span>
+            <span class="n">pooch</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">+</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">known_hash</span><span class="o">=</span><span class="n">known_hash</span><span class="p">)</span>
+        <span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

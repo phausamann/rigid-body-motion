@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion.lookup_angular_velocity &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rigid_body_motion.estimate_linear_velocity" href="rigid_body_motion.estimate_linear_velocity.html" />
+    <link rel="prev" title="rigid_body_motion.lookup_linear_velocity" href="rigid_body_motion.lookup_linear_velocity.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#top-level-functions">Top-level functions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../api.html#transformations">Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#reference-frames">Reference Frames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#coordinate-systems">Coordinate Systems</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../api.html#lookups">Lookups</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rigid_body_motion.lookup_transform.html">rigid_body_motion.lookup_transform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rigid_body_motion.lookup_pose.html">rigid_body_motion.lookup_pose</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rigid_body_motion.lookup_twist.html">rigid_body_motion.lookup_twist</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rigid_body_motion.lookup_linear_velocity.html">rigid_body_motion.lookup_linear_velocity</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rigid_body_motion.lookup_angular_velocity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#estimators">Estimators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#utility-functions">Utility functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#i-o-functions">I/O functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#ros-interface">ROS interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#xarray-accessors">xarray Accessors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#class-member-details">Class member details</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+      <li>rigid_body_motion.lookup_angular_velocity</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_generated/rigid_body_motion.lookup_angular_velocity.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="rigid-body-motion-lookup-angular-velocity">
+<h1>rigid_body_motion.lookup_angular_velocity<a class="headerlink" href="#rigid-body-motion-lookup-angular-velocity" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="rigid_body_motion.lookup_angular_velocity">
+<code class="sig-prename descclassname"><span class="pre">rigid_body_motion.</span></code><code class="sig-name descname"><span class="pre">lookup_angular_velocity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">represent_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outlier_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'quaternion'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataarray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion.html#lookup_angular_velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.lookup_angular_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate angular velocity of a frame wrt a reference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>frame: str or ReferenceFrame</strong></dt><dd><p>The reference frame whose velocity is estimated.</p>
+</dd>
+<dt><strong>reference: str or ReferenceFrame, optional</strong></dt><dd><p>The reference frame wrt which the velocity is estimated. Defaults to
+the parent frame of the moving frame.</p>
+</dd>
+<dt><strong>represent_in: str or ReferenceFrame, optional</strong></dt><dd><p>The reference frame in which the twist is represented. Defaults
+to the reference frame.</p>
+</dd>
+<dt><strong>outlier_thresh: float, optional</strong></dt><dd><p>Suppress samples where the norm of the second-order differences of the
+rotation is above <cite>outlier_thresh</cite> and interpolate the missing values.</p>
+</dd>
+<dt><strong>cutoff: float, optional</strong></dt><dd><p>Frequency of a low-pass filter applied to angular and angular
+velocity after the estimation as a fraction of the Nyquist
+frequency.</p>
+</dd>
+<dt><strong>mode: str, default “quaternion”</strong></dt><dd><p>If “quaternion”, compute the angular velocity from the quaternion
+derivative. If “rotation_vector”, compute the angular velocity from
+the gradient of the axis-angle representation of the rotations.</p>
+</dd>
+<dt><strong>as_dataarray: bool, default False</strong></dt><dd><p>If True, return an xarray.DataArray.</p>
+</dd>
+<dt><strong>return_timestamps: bool, default False</strong></dt><dd><p>If True and <cite>as_dataarray</cite> is False, also return the timestamps of the
+lookup.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>angular: numpy.ndarray or xarray.DataArray</dt><dd><p>Angular velocity of moving frame wrt reference frame, represented in
+representation frame.</p>
+</dd>
+<dt>timestamps: numpy.ndarray</dt><dd><p>Corresponding timestamps of the lookup if <cite>return_timestamps</cite> is True.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rigid_body_motion.estimate_linear_velocity.html" class="btn btn-neutral float-right" title="rigid_body_motion.estimate_linear_velocity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rigid_body_motion.lookup_linear_velocity.html" class="btn btn-neutral float-left" title="rigid_body_motion.lookup_linear_velocity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

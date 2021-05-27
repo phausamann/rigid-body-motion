@@ -1,0 +1,1199 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>rigid_body_motion</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rigid_body_motion</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Top-level package for rigid-body-motion.&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Peter Hausamann&quot;&quot;&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;peter.hausamann@tum.de&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.8.0&quot;</span>
+
+<span class="c1"># ROS module has to be imported first because of PyKDL</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ros</span>  <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">io</span><span class="p">,</span> <span class="n">plot</span>  <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">.coordinate_systems</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">cartesian_to_polar</span><span class="p">,</span>
+    <span class="n">cartesian_to_spherical</span><span class="p">,</span>
+    <span class="n">polar_to_cartesian</span><span class="p">,</span>
+    <span class="n">spherical_to_cartesian</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_make_dataarray</span><span class="p">,</span>
+    <span class="n">_make_transform_or_pose_dataset</span><span class="p">,</span>
+    <span class="n">_make_twist_dataset</span><span class="p">,</span>
+    <span class="n">_make_velocity_dataarray</span><span class="p">,</span>
+    <span class="n">_maybe_unpack_dataarray</span><span class="p">,</span>
+    <span class="n">_replace_dim</span><span class="p">,</span>
+    <span class="n">_resolve_rf</span><span class="p">,</span>
+    <span class="n">_transform</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.estimators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">best_fit_rotation</span><span class="p">,</span>
+    <span class="n">best_fit_transform</span><span class="p">,</span>
+    <span class="n">estimate_angular_velocity</span><span class="p">,</span>
+    <span class="n">estimate_linear_velocity</span><span class="p">,</span>
+    <span class="n">iterative_closest_point</span><span class="p">,</span>
+    <span class="n">shortest_arc_rotation</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.reference_frames</span> <span class="kn">import</span> <span class="n">ReferenceFrame</span>
+<span class="kn">from</span> <span class="nn">.reference_frames</span> <span class="kn">import</span> <span class="n">_registry</span> <span class="k">as</span> <span class="n">registry</span>
+<span class="kn">from</span> <span class="nn">.reference_frames</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clear_registry</span><span class="p">,</span>
+    <span class="n">deregister_frame</span><span class="p">,</span>
+    <span class="n">register_frame</span><span class="p">,</span>
+    <span class="n">render_tree</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ExampleDataStore</span><span class="p">,</span>
+    <span class="n">from_euler_angles</span><span class="p">,</span>
+    <span class="n">qinterp</span><span class="p">,</span>
+    <span class="n">qinv</span><span class="p">,</span>
+    <span class="n">qmean</span><span class="p">,</span>
+    <span class="n">qmul</span><span class="p">,</span>
+    <span class="n">rotate_vectors</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">rigid_body_motion.accessors</span>  <span class="c1"># noqa</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;transform_points&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transform_quaternions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transform_vectors&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transform_angular_velocity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transform_linear_velocity&quot;</span><span class="p">,</span>
+    <span class="c1"># coordinate system transforms</span>
+    <span class="s2">&quot;cartesian_to_polar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;polar_to_cartesian&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cartesian_to_spherical&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;spherical_to_cartesian&quot;</span><span class="p">,</span>
+    <span class="c1"># reference frames</span>
+    <span class="s2">&quot;registry&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;register_frame&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;deregister_frame&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clear_registry&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ReferenceFrame&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;render_tree&quot;</span><span class="p">,</span>
+    <span class="c1"># estimators</span>
+    <span class="s2">&quot;estimate_linear_velocity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;estimate_angular_velocity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;shortest_arc_rotation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;best_fit_rotation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;best_fit_transform&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iterative_closest_point&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lookup_transform&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lookup_pose&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lookup_twist&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lookup_linear_velocity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lookup_angular_velocity&quot;</span><span class="p">,</span>
+    <span class="c1"># utils</span>
+    <span class="s2">&quot;from_euler_angles&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;example_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;qinterp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;qinv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;qmean&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;qmul&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rotate_vectors&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">_cs_funcs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;cartesian&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;polar&quot;</span><span class="p">:</span> <span class="n">cartesian_to_polar</span><span class="p">,</span>
+        <span class="s2">&quot;spherical&quot;</span><span class="p">:</span> <span class="n">cartesian_to_spherical</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;polar&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cartesian&quot;</span><span class="p">:</span> <span class="n">polar_to_cartesian</span><span class="p">},</span>
+    <span class="s2">&quot;spherical&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cartesian&quot;</span><span class="p">:</span> <span class="n">spherical_to_cartesian</span><span class="p">},</span>
+<span class="p">}</span>
+
+
+<span class="n">example_data</span> <span class="o">=</span> <span class="n">ExampleDataStore</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="transform_vectors"><a class="viewcode-back" href="../_generated/rigid_body_motion.transform_vectors.html#rigid_body_motion.transform_vectors">[docs]</a><span class="k">def</span> <span class="nf">transform_vectors</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">into</span><span class="p">,</span>
+    <span class="n">outof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transform an array of vectors between reference frames.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        The array to transform.</span>
+
+<span class="sd">    into: str or ReferenceFrame</span>
+<span class="sd">        ReferenceFrame instance or name of a registered reference frame in</span>
+<span class="sd">        which the array will be represented after the transformation.</span>
+
+<span class="sd">    outof: str or ReferenceFrame, optional</span>
+<span class="sd">        ReferenceFrame instance or name of a registered reference frame in</span>
+<span class="sd">        which the array is currently represented. Can be omitted if the array</span>
+<span class="sd">        is a DataArray whose ``attrs`` contain a &quot;representation_frame&quot; entry</span>
+<span class="sd">        with the name of a registered frame.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the vectors.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        vectors. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the vectors, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the vectors.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    arr_transformed: array_like</span>
+<span class="sd">        The transformed array.</span>
+
+<span class="sd">    ts: array_like</span>
+<span class="sd">        The timestamps after the transformation.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    transform_quaternions, transform_points, ReferenceFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_transform</span><span class="p">(</span>
+        <span class="s2">&quot;transform_vectors&quot;</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">into</span><span class="p">,</span>
+        <span class="n">outof</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transform_points"><a class="viewcode-back" href="../_generated/rigid_body_motion.transform_points.html#rigid_body_motion.transform_points">[docs]</a><span class="k">def</span> <span class="nf">transform_points</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">into</span><span class="p">,</span>
+    <span class="n">outof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transform an array of points between reference frames.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        The array to transform.</span>
+
+<span class="sd">    into: str or ReferenceFrame</span>
+<span class="sd">        ReferenceFrame instance or name of a registered reference frame in</span>
+<span class="sd">        which the array will be represented after the transformation.</span>
+
+<span class="sd">    outof: str or ReferenceFrame, optional</span>
+<span class="sd">        ReferenceFrame instance or name of a registered reference frame which</span>
+<span class="sd">        is the current reference frame of the array. Can be omitted if the</span>
+<span class="sd">        array is a DataArray whose ``attrs`` contain a &quot;reference_frame&quot; entry</span>
+<span class="sd">        with the name of a registered frame.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the points.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        points. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the points, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the points.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    arr_transformed: array_like</span>
+<span class="sd">        The transformed array.</span>
+
+<span class="sd">    ts: array_like</span>
+<span class="sd">        The timestamps after the transformation.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    transform_vectors, transform_quaternions, ReferenceFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_transform</span><span class="p">(</span>
+        <span class="s2">&quot;transform_points&quot;</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">into</span><span class="p">,</span>
+        <span class="n">outof</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transform_quaternions"><a class="viewcode-back" href="../_generated/rigid_body_motion.transform_quaternions.html#rigid_body_motion.transform_quaternions">[docs]</a><span class="k">def</span> <span class="nf">transform_quaternions</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">into</span><span class="p">,</span>
+    <span class="n">outof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transform an array of quaternions between reference frames.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        The array to transform.</span>
+
+<span class="sd">    into: str or ReferenceFrame</span>
+<span class="sd">        ReferenceFrame instance or name of a registered reference frame in</span>
+<span class="sd">        which the array will be represented after the transformation.</span>
+
+<span class="sd">    outof: str or ReferenceFrame, optional</span>
+<span class="sd">        ReferenceFrame instance or name of a registered reference frame which</span>
+<span class="sd">        is the current reference frame of the array. Can be omitted if the</span>
+<span class="sd">        array is a DataArray whose ``attrs`` contain a &quot;reference_frame&quot; entry</span>
+<span class="sd">        with the name of a registered frame.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the quaternions.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        quaternions. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the quaternions, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the quaternions.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    arr_transformed: array_like</span>
+<span class="sd">        The transformed array.</span>
+
+<span class="sd">    ts: array_like</span>
+<span class="sd">        The timestamps after the transformation.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    transform_vectors, transform_points, ReferenceFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_transform</span><span class="p">(</span>
+        <span class="s2">&quot;transform_quaternions&quot;</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">into</span><span class="p">,</span>
+        <span class="n">outof</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transform_angular_velocity"><a class="viewcode-back" href="../_generated/rigid_body_motion.transform_angular_velocity.html#rigid_body_motion.transform_angular_velocity">[docs]</a><span class="k">def</span> <span class="nf">transform_angular_velocity</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">into</span><span class="p">,</span>
+    <span class="n">outof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">what</span><span class="o">=</span><span class="s2">&quot;reference_frame&quot;</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transform an array of angular velocities between frames.</span>
+
+<span class="sd">    The array represents the velocity of a moving body or frame wrt a</span>
+<span class="sd">    reference frame, expressed in a representation frame.</span>
+
+<span class="sd">    The transformation changes either the reference frame, the moving</span>
+<span class="sd">    frame or the representation frame of the velocity from this frame to</span>
+<span class="sd">    another. In either case, it is assumed that the array is represented in</span>
+<span class="sd">    the frame that is being changed and will be represented in the new</span>
+<span class="sd">    frame after the transformation.</span>
+
+<span class="sd">    When transforming the reference frame R to a new frame R&#39; while keeping</span>
+<span class="sd">    the moving frame M fixed, the transformed velocity is calculated</span>
+<span class="sd">    according to the formula:</span>
+
+<span class="sd">    .. math:: \omega_{M/R&#39;} = \omega_{M/R} + \omega_{R/R&#39;}</span>
+
+<span class="sd">    When transforming the moving frame M to a new frame M&#39; while keeping</span>
+<span class="sd">    the reference frame R fixed, the transformed velocity is calculated</span>
+<span class="sd">    according to the formula:</span>
+
+<span class="sd">    .. math:: \omega_{M&#39;/R} = \omega_{M/R} + \omega_{M&#39;/M}</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        The array to transform.</span>
+
+<span class="sd">    into: str or ReferenceFrame</span>
+<span class="sd">        The target reference frame.</span>
+
+<span class="sd">    outof: str or ReferenceFrame, optional</span>
+<span class="sd">        The source reference frame. Can be omitted if the array</span>
+<span class="sd">        is a DataArray whose ``attrs`` contain a &quot;representation_frame&quot;,</span>
+<span class="sd">        &quot;reference_frame&quot; or &quot;moving_frame&quot; entry with the name of a</span>
+<span class="sd">        registered frame (depending on what you want to transform, see `what`).</span>
+
+<span class="sd">    what: str</span>
+<span class="sd">        What frame of the velocity to transform. Can be &quot;reference_frame&quot;,</span>
+<span class="sd">        &quot;moving_frame&quot; or &quot;representation_frame&quot;.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the velocities.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        velocities. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the velocities, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the velocities.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">        velocity after the twist estimation as a fraction of the Nyquist</span>
+<span class="sd">        frequency.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    arr_transformed: array_like</span>
+<span class="sd">        The transformed array.</span>
+
+<span class="sd">    ts: array_like</span>
+<span class="sd">        The timestamps after the transformation.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    transform_linear_velocity, transform_vectors, transform_quaternions,</span>
+<span class="sd">    transform_points, ReferenceFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="k">return</span> <span class="n">_transform</span><span class="p">(</span>
+        <span class="s2">&quot;transform_angular_velocity&quot;</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">into</span><span class="p">,</span>
+        <span class="n">outof</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">what</span><span class="o">=</span><span class="n">what</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transform_linear_velocity"><a class="viewcode-back" href="../_generated/rigid_body_motion.transform_linear_velocity.html#rigid_body_motion.transform_linear_velocity">[docs]</a><span class="k">def</span> <span class="nf">transform_linear_velocity</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span>
+    <span class="n">into</span><span class="p">,</span>
+    <span class="n">outof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">what</span><span class="o">=</span><span class="s2">&quot;reference_frame&quot;</span><span class="p">,</span>
+    <span class="n">moving_frame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">reference_frame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">timestamps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transform an array of linear velocities between frames.</span>
+
+<span class="sd">    The array represents the velocity of a moving body or frame wrt a</span>
+<span class="sd">    reference frame, expressed in a representation frame.</span>
+
+<span class="sd">    The transformation changes either the reference frame, the moving</span>
+<span class="sd">    frame or the representation frame of the velocity from this frame to</span>
+<span class="sd">    another. In either case, it is assumed that the array is represented in</span>
+<span class="sd">    the frame that is being changed and will be represented in the new</span>
+<span class="sd">    frame after the transformation.</span>
+
+<span class="sd">    When transforming the reference frame R to a new frame R&#39; while keeping</span>
+<span class="sd">    the moving frame M fixed, the transformed velocity is calculated</span>
+<span class="sd">    according to the formula:</span>
+
+<span class="sd">    .. math:: v_{M/R&#39;} = v_{M/R} + v_{R/R&#39;} + \omega_{R/R&#39;} \\times t_{M/R}</span>
+
+<span class="sd">    When transforming the moving frame M to a new frame M&#39; while keeping</span>
+<span class="sd">    the reference frame R fixed, the transformed velocity is calculated</span>
+<span class="sd">    according to the formula:</span>
+
+<span class="sd">    .. math:: v_{M&#39;/R} = v_{M/R} + v_{M&#39;/M} + \omega_{M/R} \\times t_{M&#39;/M}</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        The array to transform.</span>
+
+<span class="sd">    into: str or ReferenceFrame</span>
+<span class="sd">        The target reference frame.</span>
+
+<span class="sd">    outof: str or ReferenceFrame, optional</span>
+<span class="sd">        The source reference frame. Can be omitted if the array</span>
+<span class="sd">        is a DataArray whose ``attrs`` contain a &quot;representation_frame&quot;,</span>
+<span class="sd">        &quot;reference_frame&quot; or &quot;moving_frame&quot; entry with the name of a</span>
+<span class="sd">        registered frame (depending on what you want to transform, see `what`).</span>
+
+<span class="sd">    what: str</span>
+<span class="sd">        What frame of the velocity to transform. Can be &quot;reference_frame&quot;,</span>
+<span class="sd">        &quot;moving_frame&quot; or &quot;representation_frame&quot;.</span>
+
+<span class="sd">    moving_frame: str or ReferenceFrame, optional</span>
+<span class="sd">        The moving frame when transforming the reference frame of the</span>
+<span class="sd">        velocity.</span>
+
+<span class="sd">    reference_frame: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame when transforming the moving frame of the</span>
+<span class="sd">        velocity.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension</span>
+<span class="sd">        representing the spatial coordinates of the velocities.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the spatial coordinates of the</span>
+<span class="sd">        velocities. Defaults to the last axis of the array.</span>
+
+<span class="sd">    timestamps: array_like or str, optional</span>
+<span class="sd">        The timestamps of the velocities, corresponding to the `time_axis`</span>
+<span class="sd">        of the array. If str and the array is a DataArray, the name of the</span>
+<span class="sd">        coordinate with the timestamps. The axis defined by `time_axis` will</span>
+<span class="sd">        be re-sampled to the timestamps for which the transformation is</span>
+<span class="sd">        defined.</span>
+
+<span class="sd">    time_axis: int, optional</span>
+<span class="sd">        The axis of the array representing the timestamps of the velocities.</span>
+<span class="sd">        Defaults to the first axis of the array.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">        velocity after the twist estimation as a fraction of the Nyquist</span>
+<span class="sd">        frequency.</span>
+
+<span class="sd">    outlier_thresh: float, optional</span>
+<span class="sd">        Some SLAM-based trackers introduce position corrections when a new</span>
+<span class="sd">        camera frame becomes available. This introduces outliers in the</span>
+<span class="sd">        linear velocity estimate. The estimation algorithm used here</span>
+<span class="sd">        can suppress these outliers by throwing out samples where the</span>
+<span class="sd">        norm of the second-order differences of the position is above</span>
+<span class="sd">        `outlier_thresh` and interpolating the missing values. For</span>
+<span class="sd">        measurements from the Intel RealSense T265 tracker, set this value</span>
+<span class="sd">        to 1e-3.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, also return the timestamps after the transformation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    arr_transformed: array_like</span>
+<span class="sd">        The transformed array.</span>
+
+<span class="sd">    ts: array_like</span>
+<span class="sd">        The timestamps after the transformation.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    transform_angular_velocity, transform_vectors, transform_quaternions,</span>
+<span class="sd">    transform_points, ReferenceFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="k">return</span> <span class="n">_transform</span><span class="p">(</span>
+        <span class="s2">&quot;transform_linear_velocity&quot;</span><span class="p">,</span>
+        <span class="n">arr</span><span class="p">,</span>
+        <span class="n">into</span><span class="p">,</span>
+        <span class="n">outof</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">axis</span><span class="p">,</span>
+        <span class="n">timestamps</span><span class="p">,</span>
+        <span class="n">time_axis</span><span class="p">,</span>
+        <span class="n">what</span><span class="o">=</span><span class="n">what</span><span class="p">,</span>
+        <span class="n">moving_frame</span><span class="o">=</span><span class="n">moving_frame</span><span class="p">,</span>
+        <span class="n">reference_frame</span><span class="o">=</span><span class="n">reference_frame</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="n">return_timestamps</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="transform_coordinates"><a class="viewcode-back" href="../_generated/rigid_body_motion.transform_coordinates.html#rigid_body_motion.transform_coordinates">[docs]</a><span class="k">def</span> <span class="nf">transform_coordinates</span><span class="p">(</span>
+    <span class="n">arr</span><span class="p">,</span> <span class="n">into</span><span class="p">,</span> <span class="n">outof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replace_dim</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transform motion between coordinate systems.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr: array_like</span>
+<span class="sd">        The array to transform.</span>
+
+<span class="sd">    into: str</span>
+<span class="sd">        The name of a coordinate system in which the array will be represented</span>
+<span class="sd">        after the transformation.</span>
+
+<span class="sd">    outof: str, optional</span>
+<span class="sd">        The name of a coordinate system in which the array is currently</span>
+<span class="sd">        represented. Can be omitted if the array is a DataArray whose ``attrs``</span>
+<span class="sd">        contain a &quot;coordinate_system&quot; entry with the name of a valid coordinate</span>
+<span class="sd">        system.</span>
+
+<span class="sd">    dim: str, optional</span>
+<span class="sd">        If the array is a DataArray, the name of the dimension representing</span>
+<span class="sd">        the coordinates of the motion.</span>
+
+<span class="sd">    axis: int, optional</span>
+<span class="sd">        The axis of the array representing the coordinates of the motion.</span>
+<span class="sd">        Defaults to the last axis of the array.</span>
+
+<span class="sd">    replace_dim: bool, default True</span>
+<span class="sd">        If True and the array is a DataArray, replace the dimension</span>
+<span class="sd">        representing the coordinates by a new dimension that describes the</span>
+<span class="sd">        new coordinate system and its axes (e.g.</span>
+<span class="sd">        ``cartesian_axis: [x, y, z]``). All coordinates that contained the</span>
+<span class="sd">        original dimension will be dropped.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    arr_transformed: array_like</span>
+<span class="sd">        The transformed array.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    cartesian_to_polar, polar_to_cartesian, cartesian_to_spherical,</span>
+<span class="sd">    spherical_to_cartesian</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span> <span class="o">=</span> <span class="n">_maybe_unpack_dataarray</span><span class="p">(</span>
+        <span class="n">arr</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">outof</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;coordinate_system&quot;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="c1"># TODO warn if outof(.name) != attrs[&quot;coordinate_system&quot;]</span>
+            <span class="n">outof</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;coordinate_system&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;outof&#39; must be specified unless you provide a DataArray &quot;</span>
+                <span class="s2">&quot;whose ``attrs`` contain a &#39;coordinate_system&#39; entry with the &quot;</span>
+                <span class="s2">&quot;name of a valid coordinate system&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">transform_func</span> <span class="o">=</span> <span class="n">_cs_funcs</span><span class="p">[</span><span class="n">outof</span><span class="p">][</span><span class="n">into</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported transformation: </span><span class="si">{</span><span class="n">outof</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">into</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;coordinate_system&quot;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+        <span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;coordinate_system&quot;</span><span class="p">:</span> <span class="n">into</span><span class="p">})</span>
+
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">transform_func</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">replace_dim</span><span class="p">:</span>
+            <span class="c1"># TODO accept (name, coord) tuple</span>
+            <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">_replace_dim</span><span class="p">(</span>
+                <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">into</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_make_dataarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="lookup_transform"><a class="viewcode-back" href="../_generated/rigid_body_motion.lookup_transform.html#rigid_body_motion.lookup_transform">[docs]</a><span class="k">def</span> <span class="nf">lookup_transform</span><span class="p">(</span><span class="n">outof</span><span class="p">,</span> <span class="n">into</span><span class="p">,</span> <span class="n">as_dataset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Look up transformation from one frame to another.</span>
+
+<span class="sd">    The transformation is a rotation `r` followed by a translation `t` which,</span>
+<span class="sd">    when applied to a point expressed wrt the base frame `B`, yields that</span>
+<span class="sd">    point wrt the target frame `T`:</span>
+
+<span class="sd">    .. math:: p_T = rot(r, p_B) + t</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outof: str or ReferenceFrame</span>
+<span class="sd">        Base frame of the transformation.</span>
+
+<span class="sd">    into: str or ReferenceFrame</span>
+<span class="sd">        Target frame of the transformation.</span>
+
+<span class="sd">    as_dataset: bool, default False</span>
+<span class="sd">        If True, return an xarray.Dataset. Otherwise, return a tuple of</span>
+<span class="sd">        translation and rotation.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, and `as_dataset` is False, also return the timestamps of the</span>
+<span class="sd">        lookup.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    translation, rotation: each numpy.ndarray</span>
+<span class="sd">        Translation and rotation of transformation between the frames,</span>
+<span class="sd">        if `as_dataset` is False.</span>
+
+<span class="sd">    timestamps: numpy.ndarray</span>
+<span class="sd">        Corresponding timestamps of the lookup if `return_timestamps` is True.</span>
+
+<span class="sd">    ds: xarray.Dataset</span>
+<span class="sd">        The above arrays as an xarray.Dataset, if `as_dataset` is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">into</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">into</span><span class="p">)</span>
+    <span class="n">outof</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">outof</span><span class="p">)</span>
+    <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">outof</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">into</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">as_dataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_make_transform_or_pose_dataset</span><span class="p">(</span>
+            <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">outof</span><span class="p">,</span> <span class="n">timestamps</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">return_timestamps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">timestamps</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span></div>
+
+
+<div class="viewcode-block" id="lookup_pose"><a class="viewcode-back" href="../_generated/rigid_body_motion.lookup_pose.html#rigid_body_motion.lookup_pose">[docs]</a><span class="k">def</span> <span class="nf">lookup_pose</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">as_dataset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Look up pose of one frame wrt a reference.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame: str or ReferenceFrame</span>
+<span class="sd">        Frame for which to look up the pose.</span>
+
+<span class="sd">    reference: str or ReferenceFrame</span>
+<span class="sd">        Reference frame of the pose.</span>
+
+<span class="sd">    as_dataset: bool, default False</span>
+<span class="sd">        If True, return an xarray.Dataset. Otherwise, return a tuple of</span>
+<span class="sd">        position and orientation.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, and `as_dataset` is False, also return the timestamps of the</span>
+<span class="sd">        lookup.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    position, orientation: each numpy.ndarray</span>
+<span class="sd">        Position and orientation of the pose between the frames,</span>
+<span class="sd">        if `as_dataset` is False.</span>
+
+<span class="sd">    timestamps: numpy.ndarray</span>
+<span class="sd">        Corresponding timestamps of the lookup if `return_timestamps` is True.</span>
+
+<span class="sd">    ds: xarray.Dataset</span>
+<span class="sd">        The above arrays as an xarray.Dataset, if `as_dataset` is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">as_dataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_make_transform_or_pose_dataset</span><span class="p">(</span>
+            <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">pose</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">return_timestamps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">timestamps</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span></div>
+
+
+<div class="viewcode-block" id="lookup_twist"><a class="viewcode-back" href="../_generated/rigid_body_motion.lookup_twist.html#rigid_body_motion.lookup_twist">[docs]</a><span class="k">def</span> <span class="nf">lookup_twist</span><span class="p">(</span>
+    <span class="n">frame</span><span class="p">,</span>
+    <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;quaternion&quot;</span><span class="p">,</span>
+    <span class="n">as_dataset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate linear and angular velocity of a frame wrt a reference.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame: str or ReferenceFrame</span>
+<span class="sd">        The reference frame whose twist is estimated.</span>
+
+<span class="sd">    reference: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame wrt which the twist is estimated. Defaults to</span>
+<span class="sd">        the parent frame of the moving frame.</span>
+
+<span class="sd">    represent_in: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame in which the twist is represented. Defaults</span>
+<span class="sd">        to the reference frame.</span>
+
+<span class="sd">    outlier_thresh: float, optional</span>
+<span class="sd">        Some SLAM-based trackers introduce position corrections when a new</span>
+<span class="sd">        camera frame becomes available. This introduces outliers in the</span>
+<span class="sd">        linear velocity estimate. The estimation algorithm used here</span>
+<span class="sd">        can suppress these outliers by throwing out samples where the</span>
+<span class="sd">        norm of the second-order differences of the position is above</span>
+<span class="sd">        `outlier_thresh` and interpolating the missing values. For</span>
+<span class="sd">        measurements from the Intel RealSense T265 tracker, set this value</span>
+<span class="sd">        to 1e-3.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">        velocity after the estimation as a fraction of the Nyquist</span>
+<span class="sd">        frequency.</span>
+
+<span class="sd">    mode: str, default &quot;quaternion&quot;</span>
+<span class="sd">        If &quot;quaternion&quot;, compute the angular velocity from the quaternion</span>
+<span class="sd">        derivative. If &quot;rotation_vector&quot;, compute the angular velocity from</span>
+<span class="sd">        the gradient of the axis-angle representation of the rotations.</span>
+
+<span class="sd">    as_dataset: bool, default False</span>
+<span class="sd">        If True, return an xarray.Dataset. Otherwise, return a tuple of linear</span>
+<span class="sd">        and angular velocity.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True, and `as_dataset` is False, also return the timestamps of the</span>
+<span class="sd">        lookup.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    linear, angular: each numpy.ndarray</span>
+<span class="sd">        Linear and angular velocity of moving frame wrt reference frame,</span>
+<span class="sd">        represented in representation frame, if `as_dataset` is False.</span>
+
+<span class="sd">    timestamps: numpy.ndarray</span>
+<span class="sd">        Corresponding timestamps of the lookup if `return_timestamps` is True.</span>
+
+<span class="sd">    ds: xarray.Dataset</span>
+<span class="sd">        The above arrays as an xarray.Dataset, if `as_dataset` is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span> <span class="ow">or</span> <span class="n">frame</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+    <span class="n">represent_in</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">represent_in</span> <span class="ow">or</span> <span class="n">reference</span><span class="p">)</span>
+
+    <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">lookup_twist</span><span class="p">(</span>
+        <span class="n">reference</span><span class="p">,</span>
+        <span class="n">represent_in</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">as_dataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_make_twist_dataset</span><span class="p">(</span>
+            <span class="n">angular</span><span class="p">,</span> <span class="n">linear</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">represent_in</span><span class="p">,</span> <span class="n">timestamps</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">return_timestamps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">timestamps</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span></div>
+
+
+<div class="viewcode-block" id="lookup_linear_velocity"><a class="viewcode-back" href="../_generated/rigid_body_motion.lookup_linear_velocity.html#rigid_body_motion.lookup_linear_velocity">[docs]</a><span class="k">def</span> <span class="nf">lookup_linear_velocity</span><span class="p">(</span>
+    <span class="n">frame</span><span class="p">,</span>
+    <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">as_dataarray</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate linear velocity of a frame wrt a reference.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame: str or ReferenceFrame</span>
+<span class="sd">        The reference frame whose velocity is estimated.</span>
+
+<span class="sd">    reference: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame wrt which the velocity is estimated. Defaults to</span>
+<span class="sd">        the parent frame of the moving frame.</span>
+
+<span class="sd">    represent_in: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame in which the twist is represented. Defaults</span>
+<span class="sd">        to the reference frame.</span>
+
+<span class="sd">    outlier_thresh: float, optional</span>
+<span class="sd">        Some SLAM-based trackers introduce position corrections when a new</span>
+<span class="sd">        camera frame becomes available. This introduces outliers in the</span>
+<span class="sd">        linear velocity estimate. The estimation algorithm used here</span>
+<span class="sd">        can suppress these outliers by throwing out samples where the</span>
+<span class="sd">        norm of the second-order differences of the position is above</span>
+<span class="sd">        `outlier_thresh` and interpolating the missing values. For</span>
+<span class="sd">        measurements from the Intel RealSense T265 tracker, set this value</span>
+<span class="sd">        to 1e-3.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to linear and angular</span>
+<span class="sd">        velocity after the estimation as a fraction of the Nyquist</span>
+<span class="sd">        frequency.</span>
+
+<span class="sd">    as_dataarray: bool, default False</span>
+<span class="sd">        If True, return an xarray.DataArray.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True and `as_dataarray` is False, also return the timestamps of the</span>
+<span class="sd">        lookup.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    linear: numpy.ndarray or xarray.DataArray</span>
+<span class="sd">        Linear velocity of moving frame wrt reference frame, represented in</span>
+<span class="sd">        representation frame.</span>
+
+<span class="sd">    timestamps: numpy.ndarray</span>
+<span class="sd">        Corresponding timestamps of the lookup if `return_timestamps` is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span> <span class="ow">or</span> <span class="n">frame</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+    <span class="n">represent_in</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">represent_in</span> <span class="ow">or</span> <span class="n">reference</span><span class="p">)</span>
+
+    <span class="n">linear</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">lookup_linear_velocity</span><span class="p">(</span>
+        <span class="n">reference</span><span class="p">,</span>
+        <span class="n">represent_in</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">as_dataarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_make_velocity_dataarray</span><span class="p">(</span>
+            <span class="n">linear</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">represent_in</span><span class="p">,</span> <span class="n">timestamps</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">return_timestamps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">timestamps</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">linear</span></div>
+
+
+<div class="viewcode-block" id="lookup_angular_velocity"><a class="viewcode-back" href="../_generated/rigid_body_motion.lookup_angular_velocity.html#rigid_body_motion.lookup_angular_velocity">[docs]</a><span class="k">def</span> <span class="nf">lookup_angular_velocity</span><span class="p">(</span>
+    <span class="n">frame</span><span class="p">,</span>
+    <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outlier_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;quaternion&quot;</span><span class="p">,</span>
+    <span class="n">as_dataarray</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Estimate angular velocity of a frame wrt a reference.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame: str or ReferenceFrame</span>
+<span class="sd">        The reference frame whose velocity is estimated.</span>
+
+<span class="sd">    reference: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame wrt which the velocity is estimated. Defaults to</span>
+<span class="sd">        the parent frame of the moving frame.</span>
+
+<span class="sd">    represent_in: str or ReferenceFrame, optional</span>
+<span class="sd">        The reference frame in which the twist is represented. Defaults</span>
+<span class="sd">        to the reference frame.</span>
+
+<span class="sd">    outlier_thresh: float, optional</span>
+<span class="sd">        Suppress samples where the norm of the second-order differences of the</span>
+<span class="sd">        rotation is above `outlier_thresh` and interpolate the missing values.</span>
+
+<span class="sd">    cutoff: float, optional</span>
+<span class="sd">        Frequency of a low-pass filter applied to angular and angular</span>
+<span class="sd">        velocity after the estimation as a fraction of the Nyquist</span>
+<span class="sd">        frequency.</span>
+
+<span class="sd">    mode: str, default &quot;quaternion&quot;</span>
+<span class="sd">        If &quot;quaternion&quot;, compute the angular velocity from the quaternion</span>
+<span class="sd">        derivative. If &quot;rotation_vector&quot;, compute the angular velocity from</span>
+<span class="sd">        the gradient of the axis-angle representation of the rotations.</span>
+
+<span class="sd">    as_dataarray: bool, default False</span>
+<span class="sd">        If True, return an xarray.DataArray.</span>
+
+<span class="sd">    return_timestamps: bool, default False</span>
+<span class="sd">        If True and `as_dataarray` is False, also return the timestamps of the</span>
+<span class="sd">        lookup.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    angular: numpy.ndarray or xarray.DataArray</span>
+<span class="sd">        Angular velocity of moving frame wrt reference frame, represented in</span>
+<span class="sd">        representation frame.</span>
+
+<span class="sd">    timestamps: numpy.ndarray</span>
+<span class="sd">        Corresponding timestamps of the lookup if `return_timestamps` is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">reference</span> <span class="ow">or</span> <span class="n">frame</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+    <span class="n">represent_in</span> <span class="o">=</span> <span class="n">_resolve_rf</span><span class="p">(</span><span class="n">represent_in</span> <span class="ow">or</span> <span class="n">reference</span><span class="p">)</span>
+
+    <span class="n">angular</span><span class="p">,</span> <span class="n">timestamps</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">lookup_angular_velocity</span><span class="p">(</span>
+        <span class="n">reference</span><span class="p">,</span>
+        <span class="n">represent_in</span><span class="p">,</span>
+        <span class="n">outlier_thresh</span><span class="o">=</span><span class="n">outlier_thresh</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">return_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">as_dataarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_make_velocity_dataarray</span><span class="p">(</span>
+            <span class="n">angular</span><span class="p">,</span> <span class="s2">&quot;angular&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">represent_in</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">return_timestamps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">angular</span><span class="p">,</span> <span class="n">timestamps</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">angular</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

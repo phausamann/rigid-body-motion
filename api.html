@@ -1,0 +1,606 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API Reference &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rigid_body_motion.transform_vectors" href="_generated/rigid_body_motion.transform_vectors.html" />
+    <link rel="prev" title="ROS integration" href="ros.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#top-level-functions">Top-level functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#transformations">Transformations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.transform_vectors.html">rigid_body_motion.transform_vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.transform_points.html">rigid_body_motion.transform_points</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.transform_quaternions.html">rigid_body_motion.transform_quaternions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.transform_coordinates.html">rigid_body_motion.transform_coordinates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.transform_angular_velocity.html">rigid_body_motion.transform_angular_velocity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.transform_linear_velocity.html">rigid_body_motion.transform_linear_velocity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#reference-frames">Reference Frames</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.ReferenceFrame.html">rigid_body_motion.ReferenceFrame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.register_frame.html">rigid_body_motion.register_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.deregister_frame.html">rigid_body_motion.deregister_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.clear_registry.html">rigid_body_motion.clear_registry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.render_tree.html">rigid_body_motion.render_tree</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#coordinate-systems">Coordinate Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.cartesian_to_polar.html">rigid_body_motion.cartesian_to_polar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.polar_to_cartesian.html">rigid_body_motion.polar_to_cartesian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.cartesian_to_spherical.html">rigid_body_motion.cartesian_to_spherical</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.spherical_to_cartesian.html">rigid_body_motion.spherical_to_cartesian</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#lookups">Lookups</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.lookup_transform.html">rigid_body_motion.lookup_transform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.lookup_pose.html">rigid_body_motion.lookup_pose</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.lookup_twist.html">rigid_body_motion.lookup_twist</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.lookup_linear_velocity.html">rigid_body_motion.lookup_linear_velocity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.lookup_angular_velocity.html">rigid_body_motion.lookup_angular_velocity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estimators">Estimators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.estimate_linear_velocity.html">rigid_body_motion.estimate_linear_velocity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.estimate_angular_velocity.html">rigid_body_motion.estimate_angular_velocity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.shortest_arc_rotation.html">rigid_body_motion.shortest_arc_rotation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.best_fit_rotation.html">rigid_body_motion.best_fit_rotation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.best_fit_transform.html">rigid_body_motion.best_fit_transform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.iterative_closest_point.html">rigid_body_motion.iterative_closest_point</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.from_euler_angles.html">rigid_body_motion.from_euler_angles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.qinv.html">rigid_body_motion.qinv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.qmul.html">rigid_body_motion.qmul</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.qmean.html">rigid_body_motion.qmean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.qinterp.html">rigid_body_motion.qinterp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/rigid_body_motion.rotate_vectors.html">rigid_body_motion.rotate_vectors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#i-o-functions">I/O functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.io.load_optitrack.html">rigid_body_motion.io.load_optitrack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting">Plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.plot.reference_frame.html">rigid_body_motion.plot.reference_frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.plot.points.html">rigid_body_motion.plot.points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.plot.quaternions.html">rigid_body_motion.plot.quaternions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.plot.vectors.html">rigid_body_motion.plot.vectors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ros-interface">ROS interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.RosbagReader.html">rigid_body_motion.ros.RosbagReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.RosbagWriter.html">rigid_body_motion.ros.RosbagWriter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.html">rigid_body_motion.ros.ReferenceFrameTransformBroadcaster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html">rigid_body_motion.ros.ReferenceFrameMarkerPublisher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.Transformer.html">rigid_body_motion.ros.Transformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.init_node.html">rigid_body_motion.ros.init_node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/rigid_body_motion.ros.play_publisher.html">rigid_body_motion.ros.play_publisher</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#xarray-accessors">xarray Accessors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/xarray.DataArray.rbm.qinterp.html">xarray.DataArray.rbm.qinterp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/xarray.DataArray.rbm.qinv.html">xarray.DataArray.rbm.qinv</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#class-member-details">Class member details</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/reference_frames.html">reference_frames</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="api-reference">
+<span id="id1"></span><h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="top-level-functions">
+<h2>Top-level functions<a class="headerlink" href="#top-level-functions" title="Permalink to this headline">¶</a></h2>
+<p>Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">rigid_body_motion</span></code></p>
+<div class="section" id="transformations">
+<h3>Transformations<a class="headerlink" href="#transformations" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.transform_vectors.html#rigid_body_motion.transform_vectors" title="rigid_body_motion.transform_vectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_vectors</span></code></a></p></td>
+<td><p>Transform an array of vectors between reference frames.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.transform_points.html#rigid_body_motion.transform_points" title="rigid_body_motion.transform_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_points</span></code></a></p></td>
+<td><p>Transform an array of points between reference frames.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.transform_quaternions.html#rigid_body_motion.transform_quaternions" title="rigid_body_motion.transform_quaternions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_quaternions</span></code></a></p></td>
+<td><p>Transform an array of quaternions between reference frames.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.transform_coordinates.html#rigid_body_motion.transform_coordinates" title="rigid_body_motion.transform_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_coordinates</span></code></a></p></td>
+<td><p>Transform motion between coordinate systems.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.transform_angular_velocity.html#rigid_body_motion.transform_angular_velocity" title="rigid_body_motion.transform_angular_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_angular_velocity</span></code></a></p></td>
+<td><p>Transform an array of angular velocities between frames.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.transform_linear_velocity.html#rigid_body_motion.transform_linear_velocity" title="rigid_body_motion.transform_linear_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_linear_velocity</span></code></a></p></td>
+<td><p>Transform an array of linear velocities between frames.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference-frames">
+<h3>Reference Frames<a class="headerlink" href="#reference-frames" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ReferenceFrame.html#rigid_body_motion.ReferenceFrame" title="rigid_body_motion.ReferenceFrame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReferenceFrame</span></code></a></p></td>
+<td><p>A three-dimensional reference frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.register_frame.html#rigid_body_motion.register_frame" title="rigid_body_motion.register_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_frame</span></code></a></p></td>
+<td><p>Register a new reference frame in the registry.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.deregister_frame.html#rigid_body_motion.deregister_frame" title="rigid_body_motion.deregister_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deregister_frame</span></code></a></p></td>
+<td><p>Remove a reference frame from the registry.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.clear_registry.html#rigid_body_motion.clear_registry" title="rigid_body_motion.clear_registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_registry</span></code></a></p></td>
+<td><p>Clear the reference frame registry.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.render_tree.html#rigid_body_motion.render_tree" title="rigid_body_motion.render_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render_tree</span></code></a></p></td>
+<td><p>Render a reference frame tree.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="coordinate-systems">
+<h3>Coordinate Systems<a class="headerlink" href="#coordinate-systems" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.cartesian_to_polar.html#rigid_body_motion.cartesian_to_polar" title="rigid_body_motion.cartesian_to_polar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cartesian_to_polar</span></code></a></p></td>
+<td><p>Transform cartesian to polar coordinates in two dimensions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.polar_to_cartesian.html#rigid_body_motion.polar_to_cartesian" title="rigid_body_motion.polar_to_cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">polar_to_cartesian</span></code></a></p></td>
+<td><p>Transform polar to cartesian coordinates in two dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.cartesian_to_spherical.html#rigid_body_motion.cartesian_to_spherical" title="rigid_body_motion.cartesian_to_spherical"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cartesian_to_spherical</span></code></a></p></td>
+<td><p>Transform cartesian to spherical coordinates in three dimensions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.spherical_to_cartesian.html#rigid_body_motion.spherical_to_cartesian" title="rigid_body_motion.spherical_to_cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spherical_to_cartesian</span></code></a></p></td>
+<td><p>Transform spherical to cartesian coordinates in three dimensions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="lookups">
+<h3>Lookups<a class="headerlink" href="#lookups" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.lookup_transform.html#rigid_body_motion.lookup_transform" title="rigid_body_motion.lookup_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_transform</span></code></a></p></td>
+<td><p>Look up transformation from one frame to another.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.lookup_pose.html#rigid_body_motion.lookup_pose" title="rigid_body_motion.lookup_pose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_pose</span></code></a></p></td>
+<td><p>Look up pose of one frame wrt a reference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.lookup_twist.html#rigid_body_motion.lookup_twist" title="rigid_body_motion.lookup_twist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_twist</span></code></a></p></td>
+<td><p>Estimate linear and angular velocity of a frame wrt a reference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.lookup_linear_velocity.html#rigid_body_motion.lookup_linear_velocity" title="rigid_body_motion.lookup_linear_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_linear_velocity</span></code></a></p></td>
+<td><p>Estimate linear velocity of a frame wrt a reference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.lookup_angular_velocity.html#rigid_body_motion.lookup_angular_velocity" title="rigid_body_motion.lookup_angular_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_angular_velocity</span></code></a></p></td>
+<td><p>Estimate angular velocity of a frame wrt a reference.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="estimators">
+<h3>Estimators<a class="headerlink" href="#estimators" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.estimate_linear_velocity.html#rigid_body_motion.estimate_linear_velocity" title="rigid_body_motion.estimate_linear_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_linear_velocity</span></code></a></p></td>
+<td><p>Estimate linear velocity from a time series of translation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.estimate_angular_velocity.html#rigid_body_motion.estimate_angular_velocity" title="rigid_body_motion.estimate_angular_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_angular_velocity</span></code></a></p></td>
+<td><p>Estimate angular velocity from a time series of rotations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.shortest_arc_rotation.html#rigid_body_motion.shortest_arc_rotation" title="rigid_body_motion.shortest_arc_rotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortest_arc_rotation</span></code></a></p></td>
+<td><p>Estimate the shortest-arc rotation between two arrays of vectors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.best_fit_rotation.html#rigid_body_motion.best_fit_rotation" title="rigid_body_motion.best_fit_rotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">best_fit_rotation</span></code></a></p></td>
+<td><p>Least-squares best-fit rotation between two arrays of vectors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.best_fit_transform.html#rigid_body_motion.best_fit_transform" title="rigid_body_motion.best_fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">best_fit_transform</span></code></a></p></td>
+<td><p>Least-squares best-fit transform between two arrays of vectors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.iterative_closest_point.html#rigid_body_motion.iterative_closest_point" title="rigid_body_motion.iterative_closest_point"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterative_closest_point</span></code></a></p></td>
+<td><p>Iterative closest point algorithm matching two arrays of vectors.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utility-functions">
+<h3>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.from_euler_angles.html#rigid_body_motion.from_euler_angles" title="rigid_body_motion.from_euler_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_euler_angles</span></code></a></p></td>
+<td><p>Construct quaternions from Euler angles.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.qinv.html#rigid_body_motion.qinv" title="rigid_body_motion.qinv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qinv</span></code></a></p></td>
+<td><p>Quaternion inverse.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.qmul.html#rigid_body_motion.qmul" title="rigid_body_motion.qmul"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qmul</span></code></a></p></td>
+<td><p>Quaternion multiplication.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.qmean.html#rigid_body_motion.qmean" title="rigid_body_motion.qmean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qmean</span></code></a></p></td>
+<td><p>Quaternion mean.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.qinterp.html#rigid_body_motion.qinterp" title="rigid_body_motion.qinterp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qinterp</span></code></a></p></td>
+<td><p>Quaternion interpolation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.rotate_vectors.html#rigid_body_motion.rotate_vectors" title="rigid_body_motion.rotate_vectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate_vectors</span></code></a></p></td>
+<td><p>Rotate an array of vectors by an array of quaternions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="i-o-functions">
+<h2>I/O functions<a class="headerlink" href="#i-o-functions" title="Permalink to this headline">¶</a></h2>
+<p>Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">rigid_body_motion.io</span></code></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.io.load_optitrack.html#rigid_body_motion.io.load_optitrack" title="rigid_body_motion.io.load_optitrack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_optitrack</span></code></a></p></td>
+<td><p>Load rigid body poses from OptiTrack csv export.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<p>Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">rigid_body_motion.plot</span></code></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.plot.reference_frame.html#rigid_body_motion.plot.reference_frame" title="rigid_body_motion.plot.reference_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_frame</span></code></a></p></td>
+<td><p>Plot a 3D coordinate system representing a static reference frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.plot.points.html#rigid_body_motion.plot.points" title="rigid_body_motion.plot.points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">points</span></code></a></p></td>
+<td><p>Plot an array of 3D points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.plot.quaternions.html#rigid_body_motion.plot.quaternions" title="rigid_body_motion.plot.quaternions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quaternions</span></code></a></p></td>
+<td><p>Plot an array of quaternions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.plot.vectors.html#rigid_body_motion.plot.vectors" title="rigid_body_motion.plot.vectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vectors</span></code></a></p></td>
+<td><p>Plot an array of 3D vectors.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="ros-interface">
+<h2>ROS interface<a class="headerlink" href="#ros-interface" title="Permalink to this headline">¶</a></h2>
+<p>Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">rigid_body_motion.ros</span></code></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.RosbagReader.html#rigid_body_motion.ros.RosbagReader" title="rigid_body_motion.ros.RosbagReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosbagReader</span></code></a>(bag_file)</p></td>
+<td><p>Reader for motion topics from rosbag files.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.RosbagWriter.html#rigid_body_motion.ros.RosbagWriter" title="rigid_body_motion.ros.RosbagWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosbagWriter</span></code></a>(bag_file)</p></td>
+<td><p>Writer for motion topics to rosbag files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameTransformBroadcaster.html#rigid_body_motion.ros.ReferenceFrameTransformBroadcaster" title="rigid_body_motion.ros.ReferenceFrameTransformBroadcaster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReferenceFrameTransformBroadcaster</span></code></a>(frame[, …])</p></td>
+<td><p>TF broadcaster for the transform of a reference frame wrt another.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html#rigid_body_motion.ros.ReferenceFrameMarkerPublisher" title="rigid_body_motion.ros.ReferenceFrameMarkerPublisher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReferenceFrameMarkerPublisher</span></code></a>(frame[, base, …])</p></td>
+<td><p>Publisher for the translation of a reference frame wrt another.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.Transformer.html#rigid_body_motion.ros.Transformer" title="rigid_body_motion.ros.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a>([cache_time])</p></td>
+<td><p>Wrapper class for tf2_ros.Buffer.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.init_node.html#rigid_body_motion.ros.init_node" title="rigid_body_motion.ros.init_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_node</span></code></a></p></td>
+<td><p>Register a client node with the master.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/rigid_body_motion.ros.play_publisher.html#rigid_body_motion.ros.play_publisher" title="rigid_body_motion.ros.play_publisher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">play_publisher</span></code></a></p></td>
+<td><p>Interactive widget for playing back messages from a publisher.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="xarray-accessors">
+<h2>xarray Accessors<a class="headerlink" href="#xarray-accessors" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_generated/xarray.DataArray.rbm.qinterp.html#xarray.DataArray.rbm.qinterp" title="xarray.DataArray.rbm.qinterp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataArray.rbm.qinterp</span></code></a>(self[, coords, qdim])</p></td>
+<td><p>Quaternion interpolation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_generated/xarray.DataArray.rbm.qinv.html#xarray.DataArray.rbm.qinv" title="xarray.DataArray.rbm.qinv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataArray.rbm.qinv</span></code></a>(self[, qdim])</p></td>
+<td><p>Quaternion inverse.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="class-member-details">
+<h2>Class member details<a class="headerlink" href="#class-member-details" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/reference_frames.html">reference_frames</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="_generated/rigid_body_motion.transform_vectors.html" class="btn btn-neutral float-right" title="rigid_body_motion.transform_vectors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ros.html" class="btn btn-neutral float-left" title="ROS integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

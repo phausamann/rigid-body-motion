@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rigid_body_motion.ReferenceFrame.transform_linear_velocity &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="rigid_body_motion.ReferenceFrame.lookup_transform" href="rigid_body_motion.ReferenceFrame.lookup_transform.html" />
+    <link rel="prev" title="rigid_body_motion.ReferenceFrame.transform_angular_velocity" href="rigid_body_motion.ReferenceFrame.transform_angular_velocity.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#top-level-functions">Top-level functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#i-o-functions">I/O functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#ros-interface">ROS interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#xarray-accessors">xarray Accessors</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#class-member-details">Class member details</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../reference_frames.html">reference_frames</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../reference_frames.html#referenceframe">ReferenceFrame</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../reference_frames.html">reference_frames</a> &raquo;</li>
+        
+      <li>rigid_body_motion.ReferenceFrame.transform_linear_velocity</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/_generated/rigid_body_motion.ReferenceFrame.transform_linear_velocity.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="rigid-body-motion-referenceframe-transform-linear-velocity">
+<h1>rigid_body_motion.ReferenceFrame.transform_linear_velocity<a class="headerlink" href="#rigid-body-motion-referenceframe-transform-linear-velocity" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="rigid_body_motion.ReferenceFrame.transform_linear_velocity">
+<code class="sig-prename descclassname"><span class="pre">ReferenceFrame.</span></code><code class="sig-name descname"><span class="pre">transform_linear_velocity</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'reference_frame'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outlier_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rigid_body_motion/reference_frames.html#ReferenceFrame.transform_linear_velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ReferenceFrame.transform_linear_velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform array of linear velocities from this frame to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>arr: array_like</strong></dt><dd><p>The array to transform.</p>
+</dd>
+<dt><strong>to_frame: str or ReferenceFrame</strong></dt><dd><p>The target reference frame. If str, the frame will be looked up
+in the registry under that name.</p>
+</dd>
+<dt><strong>what: str, default “reference_frame”</strong></dt><dd><p>What frame of the velocity to transform. Can be “reference_frame”,
+“moving_frame” or “representation_frame”.</p>
+</dd>
+<dt><strong>moving_frame: str or ReferenceFrame, optional</strong></dt><dd><p>The moving frame when transforming the reference frame of the
+velocity.</p>
+</dd>
+<dt><strong>reference_frame: str or ReferenceFrame, optional</strong></dt><dd><p>The reference frame when transforming the moving frame of the
+velocity.</p>
+</dd>
+<dt><strong>axis: int, default -1</strong></dt><dd><p>The axis of the array representing the spatial coordinates of the
+velocities.</p>
+</dd>
+<dt><strong>time_axis: int, default 0</strong></dt><dd><p>The axis of the array representing the timestamps of the
+velocities.</p>
+</dd>
+<dt><strong>timestamps: array_like, optional</strong></dt><dd><p>The timestamps of the velocities, corresponding to the <cite>time_axis</cite>
+of the array. If not None, the axis defined by <cite>time_axis</cite> will be
+re-sampled to the timestamps for which the transformation is
+defined.</p>
+</dd>
+<dt><strong>return_timestamps: bool, default False</strong></dt><dd><p>If True, also return the timestamps after the transformation.</p>
+</dd>
+<dt><strong>cutoff: float, optional</strong></dt><dd><p>Frequency of a low-pass filter applied to linear and angular
+velocity after the twist estimation as a fraction of the Nyquist
+frequency.</p>
+</dd>
+<dt><strong>outlier_thresh: float, optional</strong></dt><dd><p>Suppress outliers by throwing out samples where the
+norm of the second-order differences of the position is above
+<cite>outlier_thresh</cite> and interpolating the missing values.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>arr_transformed: array_like</dt><dd><p>The transformed array.</p>
+</dd>
+<dt>ts: array_like, shape (n_timestamps,) or None</dt><dd><p>The timestamps after the transformation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../_generated/rigid_body_motion.transform_linear_velocity.html#rigid_body_motion.transform_linear_velocity" title="rigid_body_motion.transform_linear_velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_linear_velocity</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rigid_body_motion.ReferenceFrame.lookup_transform.html" class="btn btn-neutral float-right" title="rigid_body_motion.ReferenceFrame.lookup_transform" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rigid_body_motion.ReferenceFrame.transform_angular_velocity.html" class="btn btn-neutral float-left" title="rigid_body_motion.ReferenceFrame.transform_angular_velocity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

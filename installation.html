@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; rigid-body-motion 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference frames" href="reference_frames.html" />
+    <link rel="prev" title="rigid-body-motion" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> rigid-body-motion
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#latest-version">Latest version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-dependencies">Optional dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ros-integration">ROS integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example-environments">Example environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-release-version">Pre-release version</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ros.html">ROS integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Help &amp; reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rigid-body-motion</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="latest-version">
+<h2>Latest version<a class="headerlink" href="#latest-version" title="Permalink to this headline">¶</a></h2>
+<p>rigid-body-motion can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install rigid-body-motion
+</pre></div>
+</div>
+<p>or via <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -c phausamann -c conda-forge rigid-body-motion
+</pre></div>
+</div>
+</div>
+<div class="section" id="optional-dependencies">
+<h2>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Optional dependencies can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code> (just replace
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span></code>).</p>
+<p>Transformations can be sped up significantly by installing the numba library:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install numba
+</pre></div>
+</div>
+<p>rigid-body-motion supports xarray data types:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install xarray
+</pre></div>
+</div>
+<p>Loading the example datasets requires the pooch and netCDF4 libraries:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install pooch netcdf4
+</pre></div>
+</div>
+<p>Plotting functions require matplotlib:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install matplotlib
+</pre></div>
+</div>
+</div>
+<div class="section" id="ros-integration">
+<h2>ROS integration<a class="headerlink" href="#ros-integration" title="Permalink to this headline">¶</a></h2>
+<p>The package also integrates with <a class="reference external" href="https://www.ros.org/">ROS</a>, which can be installed quite
+conveniently via <code class="docutils literal notranslate"><span class="pre">conda</span></code> thanks to the amazing work by the people from
+<a class="reference external" href="https://github.com/RoboStack">RoboStack</a>. This even works on Windows and macOS! The necessary dependencies
+are:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -c conda-forge -c robostack ros-noetic-rospy ros-noetic-tf ros-noetic-tf2-ros ros-noetic-tf2-geometry-msgs ros-noetic-geometry-msgs ros-noetic-visualization-msgs python-orocos-kdl <span class="nv">boost</span><span class="o">=</span><span class="m">1</span>.74
+</pre></div>
+</div>
+<p>Note that these packages are only available for Python 3.6 and 3.8.</p>
+<p>In order to use RViz for visualization you need to install that as well:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -c conda-forge -c robostack ros-noetic-rviz
+</pre></div>
+</div>
+<p>Since ROS can communicate across conda environments, we would however recommend
+installing RViz in a dedicated environment:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda create -n ros -c conda-forge -c robostack ros-noetic-rviz
+</pre></div>
+</div>
+<p>After installing, you can spin up a <code class="docutils literal notranslate"><span class="pre">roscore</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda activate ros
+<span class="gp">$ </span>roscore
+</pre></div>
+</div>
+<p>and, from a second terminal, launch RViz:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda activate ros
+<span class="gp">$ </span>rviz
+</pre></div>
+</div>
+<div class="section" id="troubleshooting">
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h3>
+<p>In order to make sure all ROS dependencies have been set up correctly, run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python -m rigid_body_motion.ros.check_install
+</pre></div>
+</div>
+<p>If this is not successful, you need to fix some of your dependencies. The
+following outlines solutions for common issues:</p>
+<ol class="arabic">
+<li><p>Problem: boost version</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ImportError: libboost_thread.so.1.74.0: cannot open shared object file:</span>
+<span class="go">No such file or directory</span>
+</pre></div>
+</div>
+<p>Solution: install correct boost version</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -c conda-forge <span class="nv">boost</span><span class="o">=</span><span class="m">1</span>.74
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">1.74</span></code> with whatever version the traceback tells you is missing.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="example-environments">
+<h2>Example environments<a class="headerlink" href="#example-environments" title="Permalink to this headline">¶</a></h2>
+<p>We recommend using rigid_body_motion in a dedicated conda environment.
+For the examples in the user guide, we provide an
+<a class="reference download internal" download="" href="_downloads/f237fc77e987f8bcc10fa99334420094/example-env.yml"><code class="xref download docutils literal notranslate"><span class="pre">environment</span> <span class="pre">file</span></code></a>
+that you can download and set up with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda env create -f example-env.yml
+</pre></div>
+</div>
+<p>There’s also an example environment that includes the necessary ROS packages
+(<a class="reference download internal" download="" href="_downloads/dfe8f9f09c98c60296263592dd6250bc/example-env-ros.yml"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>) that you can set up with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda env create -f example-env-ros.yml
+</pre></div>
+</div>
+<p>If you download the examples as Jupyter notebooks, it is sufficient to have
+the Jupyter notebook server installed in your base environment alongside
+<code class="docutils literal notranslate"><span class="pre">nb_conda</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -n base nb_conda
+</pre></div>
+</div>
+<p>Now you can open any of the example notebooks, go to <em>Kernel &gt; Change kernel</em>
+and select <em>Python [conda env:rbm-examples]</em>
+(or <em>Python [conda env:rbm-examples-ros]</em>).</p>
+</div>
+<div class="section" id="pre-release-version">
+<h2>Pre-release version<a class="headerlink" href="#pre-release-version" title="Permalink to this headline">¶</a></h2>
+<p>The latest pre-release can be installed from the GitHub master branch:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install git+https://github.com/phausamann/rigid-body-motion.git
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="reference_frames.html" class="btn btn-neutral float-right" title="Reference frames" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="rigid-body-motion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Peter Hausamann
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

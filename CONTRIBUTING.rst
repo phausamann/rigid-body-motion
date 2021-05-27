@@ -64,11 +64,9 @@ Ready to contribute? Here's how to set up `rigid-body-motion` for local developm
 
     $ git clone git@github.com:your_name_here/rigid-body-motion.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. The recommended way of setting up the project is in a conda environment::
 
-    $ mkvirtualenv rigid-body-motion
-    $ cd rigid-body-motion/
-    $ python setup.py develop
+    $ conda env create
 
 4. Create a branch for local development::
 
@@ -76,22 +74,27 @@ Ready to contribute? Here's how to set up `rigid-body-motion` for local developm
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass the tests::
 
-    $ flake8 rigid_body_motion tests
-    $ python setup.py test or py.test
-    $ tox
+    $ conda activate rbm
+    $ pytest
 
-   To get flake8 and tox, just pip install them into your virtualenv.
+6. The project uses black for code formatting, isort for import sorting and
+   flake8 for linting. You can set up these checks as pre-commit hooks::
 
-6. Commit your changes and push your branch to GitHub::
+    $ conda activate rbm
+    $ conda install pre-commit
+    $ pre-commit install
+
+   Note that the project currently uses black version 19.10b0.
+
+7. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 -----------------------
@@ -101,10 +104,9 @@ Before you submit a pull request, check that it meets these guidelines:
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.4, 3.5 and 3.6, and for PyPy. Check
-   https://travis-ci.org/phausamann/rigid-body-motion/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+   feature to the list in HISTORY.rst.
+3. The pull request should work for Python 3.6, 3.7, 3.8 and 3.9. See the
+   checks at the bottom of the pull request page to resolve any issues.
 
 
 Deploying
@@ -116,6 +118,3 @@ Then run::
 
 $ bumpversion patch # possible: major / minor / patch
 $ git push
-$ git push --tags
-
-Travis will then deploy to PyPI if tests pass.

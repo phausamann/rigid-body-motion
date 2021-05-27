@@ -25,27 +25,15 @@ dependencies:
   - numpydoc=0.9.1
   - matplotlib=3.3.2
   - jinja2=2.11.3
-  # additional dev tools
-  {% if "RBM_DEV_TOOLS" in os.environ %}
-  - watchdog=2.0.2
-  - tox=3.5.2
-  - bump2version=1.0.0
-  - flake8=3.7.9
-  - pre-commit=2.5.1
-  - black=19.10b0
-  - isort=5.0.4
-  {% endif %}
   # ROS dependencies
-  {% if "RBM_ROS" in os.environ %}
-  - ros-noetic-rospy
-  - ros-noetic-tf
-  - ros-noetic-tf2-ros
-  - ros-noetic-tf2-geometry-msgs
-  - ros-noetic-geometry-msgs
-  - ros-noetic-visualization-msgs
-  - python-orocos-kdl
+  - ros-noetic-rospy=1.15.9
+  - ros-noetic-tf=1.13.2
+  - ros-noetic-tf2-ros=0.7.5
+  - ros-noetic-tf2-geometry-msgs=0.7.5
+  - ros-noetic-geometry-msgs=1.13.0
+  - ros-noetic-visualization-msgs=1.13.0
+  - python-orocos-kdl=1.4.0
   - boost=1.74
-  - ipywidgets
-  {% endif %}
+  - ipywidgets=7.6.0
   - pip:
-      - --editable "{{ root }}"
+      - --editable .

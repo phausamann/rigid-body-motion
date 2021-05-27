@@ -52,7 +52,7 @@ autosummary_generate = True
 numpydoc_show_class_members = False
 
 nbsphinx_kernel_name = "python3"
-nbsphinx_execute = "auto"
+nbsphinx_execute = os.environ.get("NBSPHINX_EXEC", "auto")
 nbsphinx_prolog = """
 .. nbinfo::
 
@@ -61,7 +61,7 @@ nbsphinx_prolog = """
 """
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -103,9 +103,6 @@ pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
-# Templates path
-templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # -- Options for HTML output -------------------------------------------
 
@@ -201,4 +198,4 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 def setup(app):
-    app.add_javascript("copybutton.js")
+    app.add_js_file("copybutton.js")

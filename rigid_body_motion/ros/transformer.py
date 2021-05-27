@@ -1,40 +1,18 @@
 from threading import Thread
 
 import numpy as np
-import pandas as pd
-import rospy
 from anytree import PreOrderIter
-from geometry_msgs.msg import PoseStamped, TwistStamped
-
-try:
-    import rospkg
-    import tf2_geometry_msgs
-    import tf2_ros
-    from tf.msg import tfMessage
-except rospkg.ResourceNotFound:
-    raise ImportError(
-        "The rospkg module was found but tf2_ros failed to import, "
-        "make sure you've set up the necessary environment variables"
-    )
 
 from rigid_body_motion.core import _resolve_rf
 from rigid_body_motion.reference_frames import ReferenceFrame
 
-from .msg import (
-    make_point_msg,
-    make_pose_msg,
-    make_transform_msg,
-    make_twist_msg,
-    make_vector_msg,
-    static_rf_to_transform_msg,
-    unpack_point_msg,
-    unpack_pose_msg,
-    unpack_transform_msg,
-    unpack_vector_msg,
-)
-
 
 class Transformer:
+    """ Wrapper class for tf2_ros.Buffer.
+
+    Can be constructed from a ReferenceFrame instance.
+    """
+
     def __init__(self, cache_time=None):
         """ Constructor.
 
@@ -43,6 +21,9 @@ class Transformer:
         cache_time : float, optional
             Cache time of the buffer in seconds.
         """
+        import rospy
+        import tf2_ros
+
         if cache_time is not None:
             self._buffer = tf2_ros.Buffer(
                 cache_time=rospy.Duration.from_sec(cache_time), debug=False
@@ -67,6 +48,7 @@ class Transformer:
         root = reference_frame.root
 
         # get the first and last timestamps for all moving reference frames
+        # TODO float timestamps
         t_start_end = list(
             zip(
                 *[
@@ -107,6 +89,8 @@ class Transformer:
         reference_frame : ReferenceFrame
             Static reference frame to add.
         """
+        from .msg import static_rf_to_transform_msg
+
         self._buffer.set_transform_static(
             static_rf_to_transform_msg(reference_frame), "default_authority"
         )
@@ -119,6 +103,8 @@ class Transformer:
         reference_frame : ReferenceFrame
             Static reference frame to add.
         """
+        from .msg import make_transform_msg
+
         for translation, rotation, timestamp in zip(
             reference_frame.translation,
             reference_frame.rotation,
@@ -154,6 +140,8 @@ class Transformer:
         bool
             True if the transform is possible, false otherwise.
         """
+        import rospy
+
         return self._buffer.can_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -180,6 +168,10 @@ class Transformer:
         r : tuple, len 4
             The rotation between the frames.
         """
+        import rospy
+
+        from .msg import unpack_transform_msg
+
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -208,6 +200,11 @@ class Transformer:
         tuple, len 3
             Transformed vector in target frame.
         """
+        import rospy
+        import tf2_geometry_msgs
+
+        from .msg import make_vector_msg, unpack_vector_msg
+
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -238,6 +235,11 @@ class Transformer:
         tuple, len 3
             Transformed point in target frame.
         """
+        import rospy
+        import tf2_geometry_msgs
+
+        from .msg import make_point_msg, unpack_point_msg
+
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -266,8 +268,13 @@ class Transformer:
         Returns
         -------
         tuple, len 4
-            Transformed quaternion in target frame.
+            Transformed quaternion in target med quaternion in target frame.
         """
+        import rospy
+        import tf2_geometry_msgs
+
+        from .msg import make_pose_msg, unpack_pose_msg
+
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -304,6 +311,11 @@ class Transformer:
         ot : tuple, len 4
             Transformed orientation in target frame.
         """
+        import rospy
+        import tf2_geometry_msgs
+
+        from .msg import make_pose_msg, unpack_pose_msg
+
         transform = self._buffer.lookup_transform(
             target_frame, source_frame, rospy.Time.from_sec(time)
         )
@@ -355,6 +367,12 @@ class ReferenceFrameTransformBroadcaster:
             broadcaster will be listening for TF messages with this
             `child_frame_id`.
         """
+        import pandas as pd
+        import rospy
+        import tf2_ros
+        from geometry_msgs.msg import PoseStamped, TwistStamped
+        from tf.msg import tfMessage
+
         self.frame = _resolve_rf(frame)
         self.base = _resolve_rf(base or self.frame.parent)
         (
@@ -419,6 +437,8 @@ class ReferenceFrameTransformBroadcaster:
             Index of the transform to publish for a moving reference frame.
             Uses ``self.idx`` as default.
         """
+        from .msg import make_pose_msg, make_transform_msg, make_twist_msg
+
         if self.timestamps is None:
             transform = make_transform_msg(
                 self.translation,
@@ -462,6 +482,9 @@ class ReferenceFrameTransformBroadcaster:
 
     def handle_incoming_msg(self, msg):
         """ Publish on incoming message. """
+        import pandas as pd
+        import rospy
+
         for transform in msg.transforms:
             if transform.child_frame_id == self.subscribe_to_frame:
                 if self.timestamps is not None:
@@ -475,6 +498,9 @@ class ReferenceFrameTransformBroadcaster:
 
     def _spin_blocking(self):
         """ Continuously publish messages. """
+        import pandas as pd
+        import rospy
+
         self.stopped = False
 
         if self.subscriber is None and self.timestamps is not None:

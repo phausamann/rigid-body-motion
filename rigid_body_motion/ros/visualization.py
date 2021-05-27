@@ -1,11 +1,6 @@
 from io import BytesIO
 from threading import Thread
 
-import rospy
-from geometry_msgs.msg import Point, Quaternion, Vector3
-from std_msgs.msg import ColorRGBA
-from visualization_msgs.msg import Marker
-
 from rigid_body_motion.core import _resolve_rf
 
 
@@ -22,12 +17,14 @@ def hex_to_rgba(h):
     c : ColorRGBA
         ColorRGBA message.
     """
+    from std_msgs.msg import ColorRGBA
+
     h = h.lstrip("#")
     return ColorRGBA(*(int(h[i : i + 2], 16) / 255 for i in (0, 2, 4, 6)))
 
 
 def get_marker(
-    marker_type=Marker.LINE_STRIP,
+    marker_type=None,
     frame_id="world",
     scale=1.0,
     color="#ffffffff",
@@ -61,9 +58,12 @@ def get_marker(
     marker: Marker
         Marker message.
     """
+    from geometry_msgs.msg import Point, Quaternion, Vector3
+    from visualization_msgs.msg import Marker
+
     marker = Marker()
 
-    marker.type = marker_type
+    marker.type = marker_type or Marker.LINE_STRIP
     marker.header.frame_id = frame_id
 
     if isinstance(scale, float):
@@ -98,6 +98,9 @@ class BaseMarkerPublisher:
         publish_interval : float, default 0.0
             Time in seconds between publishing when calling ``spin``.
         """
+        import rospy
+        from visualization_msgs.msg import Marker
+
         self.marker = marker
         self.topic = topic
         self.publish_interval = publish_interval
@@ -124,6 +127,8 @@ class BaseMarkerPublisher:
 
     def _spin_blocking(self):
         """ Continuously publish messages. """
+        import rospy
+
         self.stopped = False
 
         while not rospy.is_shutdown() and not self.stopped:
@@ -194,6 +199,8 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         publish_interval : float, default 0.0
             Time in seconds between publishing when calling ``spin``.
         """
+        from geometry_msgs.msg import Point
+
         self.frame = _resolve_rf(frame)
         self.base = _resolve_rf(base or self.frame.parent)
         self.translation, _, _ = self.frame.lookup_transform(self.base)

@@ -2,6 +2,21 @@
 History
 =======
 
+0.8.0 (May 27th, 2021)
+----------------------
+
+New features
+~~~~~~~~~~~~
+
+* New ``ros.init_node`` method to initialize a ROS node and optionally start
+  a ROS master.
+
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+* All ROS dependencies are now lazily imported.
+
+
 0.7.0 (May 19th, 2021)
 ----------------------
 

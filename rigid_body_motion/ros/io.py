@@ -1,15 +1,6 @@
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
-import rosbag
-
-from rigid_body_motion.ros.msg import (
-    make_transform_msg,
-    unpack_point_msg,
-    unpack_quaternion_msg,
-    unpack_vector_msg,
-)
 
 
 class RosbagReader:
@@ -28,6 +19,8 @@ class RosbagReader:
         self._bag = None
 
     def __enter__(self):
+        import rosbag
+
         self._bag = rosbag.Bag(self.bag_file, "r")
         return self
 
@@ -104,6 +97,13 @@ class RosbagReader:
         messages: dict
             Dict containing arrays of timestamps and other message contents.
         """
+
+        from .msg import (
+            unpack_point_msg,
+            unpack_quaternion_msg,
+            unpack_vector_msg,
+        )
+
         if self._bag is None:
             raise RuntimeError(
                 "load_messages must be called from within the RosbagReader "
@@ -176,6 +176,7 @@ class RosbagReader:
             Messages as dataset.
         """
         # TODO attrs
+        import pandas as pd
         import xarray as xr
 
         if cache:
@@ -256,6 +257,8 @@ class RosbagWriter:
         self._bag = None
 
     def __enter__(self):
+        import rosbag
+
         self._bag = rosbag.Bag(self.bag_file, "w")
         return self
 
@@ -288,6 +291,8 @@ class RosbagWriter:
         child_frame: str
             Child frame of the transform.
         """
+        from .msg import make_transform_msg
+
         # check timestamps
         timestamps = np.asarray(timestamps)
         if timestamps.ndim != 1:

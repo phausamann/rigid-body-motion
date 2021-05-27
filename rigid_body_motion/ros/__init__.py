@@ -1,61 +1,15 @@
 """"""
-import os
-import traceback
-
-debug = os.environ.get("RBM_ROS_DEBUG")
-
-
-class FailedImportStub:
-    """ Class that raises import error on construction. """
-
-    msg = "Reason: unknown"
-
-    def __init__(self, *args, **kwargs):
-        raise ImportError(
-            f"Failed to import {type(self).__name__}.\n\n{self.msg}"
-        )
-
-
+# PyKDL has to be imported here because it will fail if matplotlib is imported
+# first
 try:
-    from .transformer import (  # noqa
-        ReferenceFrameTransformBroadcaster,
-        Transformer,
-    )
+    import PyKDL  # noqa
 except ImportError:
-    if debug:
-        raise
-    else:
+    pass
 
-        class ReferenceFrameTransformBroadcaster(FailedImportStub):
-            msg = traceback.format_exc()
-
-        class Transformer(FailedImportStub):
-            msg = traceback.format_exc()
-
-
-try:
-    from .visualization import ReferenceFrameMarkerPublisher  # noqa
-except ImportError:
-    if debug:
-        raise
-    else:
-
-        class ReferenceFrameMarkerPublisher(FailedImportStub):
-            msg = traceback.format_exc()
-
-
-try:
-    from .io import RosbagReader, RosbagWriter  # noqa
-except ImportError:
-    if debug:
-        raise
-    else:
-
-        class RosbagReader(FailedImportStub):
-            msg = traceback.format_exc()
-
-        class RosbagWriter(FailedImportStub):
-            msg = traceback.format_exc()
-
-
-from .utils import play_publisher  # noqa
+from .io import RosbagReader, RosbagWriter  # noqa
+from .transformer import (  # noqa
+    ReferenceFrameTransformBroadcaster,
+    Transformer,
+)
+from .utils import init_node, play_publisher  # noqa
+from .visualization import ReferenceFrameMarkerPublisher  # noqa

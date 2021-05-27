@@ -95,6 +95,8 @@ Utility functions
 I/O functions
 -------------
 
+Module: :py:mod:`rigid_body_motion.io`
+
 .. currentmodule:: rigid_body_motion.io
 
 .. autosummary::
@@ -107,6 +109,8 @@ I/O functions
 Plotting
 --------
 
+Module: :py:mod:`rigid_body_motion.plot`
+
 .. currentmodule:: rigid_body_motion.plot
 
 .. autosummary::
@@ -117,6 +121,33 @@ Plotting
     points
     quaternions
     vectors
+
+
+ROS interface
+-------------
+
+Module: :py:mod:`rigid_body_motion.ros`
+
+.. currentmodule:: rigid_body_motion.ros
+
+.. autosummary::
+    :toctree: _generated
+    :template: custom-class-template.rst
+    :recursive:
+
+    RosbagReader
+    RosbagWriter
+    ReferenceFrameTransformBroadcaster
+    ReferenceFrameMarkerPublisher
+    Transformer
+
+
+.. autosummary::
+    :nosignatures:
+    :toctree: _generated
+
+    init_node
+    play_publisher
 
 
 xarray Accessors

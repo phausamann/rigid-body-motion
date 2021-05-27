@@ -2,7 +2,7 @@
 # PyKDL has to be imported here because it will fail if matplotlib is imported
 # first
 try:
-    import PyKDL
+    import PyKDL  # noqa
 except ImportError:
     pass
 

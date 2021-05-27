@@ -13,5 +13,9 @@ sphinx:
 formats: all
 
 # Optionally set the version of Python and requirements required to build your docs
-conda:
-  environment: ci/environment_docs.yml
+python:
+  version: 3.7
+  install:
+    - requirements: ci/requirements_docs.txt
+    - method: pip
+      path: .

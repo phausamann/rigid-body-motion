@@ -34,6 +34,7 @@ test:
     - netcdf4
     - pooch
     - numba
+    - matplotlib
     - ipywidgets
     - ros-noetic-rospy
     - ros-noetic-tf

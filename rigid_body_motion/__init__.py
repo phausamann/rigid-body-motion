@@ -3,7 +3,9 @@ __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
 __version__ = "0.7.0"
 
-from . import io, plot, ros  # noqa
+# ROS module has to be imported first because of PyKDL
+from . import ros  # noqa
+from . import io, plot  # noqa
 from .coordinate_systems import (
     cartesian_to_polar,
     cartesian_to_spherical,

@@ -6,10 +6,10 @@ channels:
 dependencies:
   - python=3.8
   - pip=21.1
-  - numpy=1.20
-  - scipy=1.6
-  - pandas=1.2
-  - xarray=0.18
+  - numpy=1.19
+  - scipy=1.5
+  - pandas=1.1
+  - xarray=0.16
   - netcdf4=1.5
   - quaternion>=2020.9.5.14.42.2
   - numba=0.53
@@ -22,7 +22,7 @@ dependencies:
   - nbsphinx=0.8
   - numpydoc=1.1
   #  - sphinx-autosummary-accessors=0.2.0
-  - matplotlib=3.4
+  - matplotlib=3.3
   - jinja2=2
   # ROS dependencies
   - ros-noetic-rospy

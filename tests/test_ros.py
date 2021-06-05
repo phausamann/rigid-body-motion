@@ -297,7 +297,8 @@ class TestRosbagReader:
         }
 
         # regression test for using header timestamps if available
-        assert np.mean(np.diff(ds.time)).astype(int) == 4998060
+        dt_ns = np.mean(np.diff(ds.time)).astype(int)
+        assert 4998060 <= dt_ns <= 4998061
 
     def test_write_netcdf(self, RosbagReader, rosbag_path, export_folder):
         """"""

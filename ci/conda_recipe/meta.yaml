@@ -28,7 +28,7 @@ test:
   source_files:
     - tests
   requires:
-    - python 3.6
+    - python 3.8
     - pandas
     - xarray
     - netcdf4

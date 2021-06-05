@@ -3,8 +3,8 @@ channels:
 - conda-forge
 - phausamann
 dependencies:
-- python=3.6
-- rigid-body-motion
+- python=3.8
+- rigid-body-motion=0.8.0
 - numba
 - xarray
 - netcdf4

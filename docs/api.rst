@@ -131,6 +131,7 @@ Module: :py:mod:`rigid_body_motion.ros`
 .. currentmodule:: rigid_body_motion.ros
 
 .. autosummary::
+    :nosignatures:
     :toctree: _generated
     :template: custom-class-template.rst
     :recursive:
@@ -156,6 +157,7 @@ xarray Accessors
 .. currentmodule:: xarray
 
 .. autosummary::
+    :nosignatures:
     :toctree: _generated
     :template: autosummary/accessor_method.rst
 

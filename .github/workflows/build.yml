@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements_dev.txt
+          pip install -r requirements.txt
       - name: Install package
         run: python setup.py install
       - name: Test with pytest
@@ -69,7 +69,7 @@ jobs:
         run: conda mambabuild ci/conda_recipe -c conda-forge -c robostack
       - name: Upload to channel on tags
         if: startsWith(github.ref, 'refs/tags/')
-        run: anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload /usr/share/miniconda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
+        run: anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload -u phausamann /usr/share/miniconda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
 
   docs:
     runs-on: ubuntu-18.04

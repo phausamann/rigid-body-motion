@@ -5,5 +5,6 @@ xarray
 numpy-quaternion
 numba
 anytree
-pytest
+matplotlib
 pooch
+pytest

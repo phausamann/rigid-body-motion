@@ -70,8 +70,8 @@ class TestTransformer:
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
         t_act, r_act = transformer.lookup_transform("child2", "child1")
-        np.testing.assert_allclose(t_act, t)
-        np.testing.assert_allclose(r_act, r)
+        np.testing.assert_almost_equal(t_act, t)
+        np.testing.assert_almost_equal(r_act, r)
 
     def test_transform_vector(self, transform_grid, Transformer, get_rf_tree):
         """"""
@@ -82,7 +82,7 @@ class TestTransformer:
         v0t = transformer.transform_point((0.0, 0.0, 0.0), "child2", "child1")
         vt = np.array(pt) - np.array(v0t)
         # large relative differences at machine precision
-        np.testing.assert_allclose(vt_act, vt, rtol=1.0)
+        np.testing.assert_almost_equal(vt_act, vt)
 
     def test_transform_point(self, transform_grid, Transformer, get_rf_tree):
         """"""
@@ -90,7 +90,7 @@ class TestTransformer:
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
         pt_act = transformer.transform_point(p, "child2", "child1")
-        np.testing.assert_allclose(pt_act, pt)
+        np.testing.assert_almost_equal(pt_act, pt)
 
     def test_transform_quaternion(
         self, transform_grid, Transformer, get_rf_tree
@@ -101,7 +101,7 @@ class TestTransformer:
         transformer = Transformer.from_reference_frame(rf_world)
         ot_act = transformer.transform_quaternion(o, "child2", "child1")
         # large relative differences at machine precision
-        np.testing.assert_allclose(ot_act, ot, rtol=1.0)
+        np.testing.assert_almost_equal(ot_act, ot)
 
     def test_transform_pose(self, transform_grid, Transformer, get_rf_tree):
         """"""
@@ -109,9 +109,9 @@ class TestTransformer:
         rf_world, _, _ = get_rf_tree(tc1, rc1, tc2, rc2)
         transformer = Transformer.from_reference_frame(rf_world)
         pt_act, ot_act = transformer.transform_pose(p, o, "child2", "child1")
-        np.testing.assert_allclose(pt_act, pt)
+        np.testing.assert_almost_equal(pt_act, pt)
         # large relative differences at machine precision
-        np.testing.assert_allclose(ot_act, ot, rtol=1.0)
+        np.testing.assert_almost_equal(ot_act, ot)
 
 
 @pytest.fixture()
@@ -297,7 +297,7 @@ class TestRosbagReader:
         }
 
         # regression test for using header timestamps if available
-        assert np.mean(np.diff(ds.time)).astype(int) == 4998061
+        assert np.mean(np.diff(ds.time)).astype(int) == 4998060
 
     def test_write_netcdf(self, RosbagReader, rosbag_path, export_folder):
         """"""

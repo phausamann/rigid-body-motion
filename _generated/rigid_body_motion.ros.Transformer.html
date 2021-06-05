@@ -1,26 +1,38 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>rigid_body_motion.ros.Transformer &mdash; rigid-body-motion 0.8.0 documentation</title>
   
 
   
-  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -31,11 +43,6 @@
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rigid_body_motion.ros.init_node" href="rigid_body_motion.ros.init_node.html" />
@@ -80,6 +87,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -128,6 +136,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -162,11 +171,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../api.html">API Reference</a> &raquo;</li>
         
@@ -175,7 +186,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/_generated/rigid_body_motion.ros.Transformer.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -216,14 +227,14 @@
 <div class="section" id="rigid-body-motion-ros-transformer">
 <h1>rigid_body_motion.ros.Transformer<a class="headerlink" href="#rigid-body-motion-ros-transformer" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="rigid_body_motion.ros.Transformer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rigid_body_motion.ros.</span></code><code class="sig-name descname"><span class="pre">Transformer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rigid_body_motion.ros.</span></span><span class="sig-name descname"><span class="pre">Transformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Wrapper class for tf2_ros.Buffer.</p>
 <p>Can be constructed from a ReferenceFrame instance.</p>
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -242,41 +253,41 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.__init__" title="rigid_body_motion.ros.Transformer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self[, cache_time])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.__init__" title="rigid_body_motion.ros.Transformer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([cache_time])</p></td>
 <td><p>Constructor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.can_transform" title="rigid_body_motion.ros.Transformer.can_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">can_transform</span></code></a>(self, target_frame, source_frame)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.can_transform" title="rigid_body_motion.ros.Transformer.can_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">can_transform</span></code></a>(target_frame, source_frame[, time])</p></td>
 <td><p>Check if transform from source to target frame is possible.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.from_reference_frame" title="rigid_body_motion.ros.Transformer.from_reference_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_reference_frame</span></code></a>(reference_frame)</p></td>
 <td><p>Construct Transformer instance from static reference frame tree.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.lookup_transform" title="rigid_body_motion.ros.Transformer.lookup_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_transform</span></code></a>(self, target_frame, …[, time])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.lookup_transform" title="rigid_body_motion.ros.Transformer.lookup_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lookup_transform</span></code></a>(target_frame, source_frame)</p></td>
 <td><p>Get the transform from the source frame to the target frame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.set_transform_static" title="rigid_body_motion.ros.Transformer.set_transform_static"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_transform_static</span></code></a>(self, reference_frame)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.set_transform_static" title="rigid_body_motion.ros.Transformer.set_transform_static"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_transform_static</span></code></a>(reference_frame)</p></td>
 <td><p>Add static transform from reference frame to buffer.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.set_transforms" title="rigid_body_motion.ros.Transformer.set_transforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_transforms</span></code></a>(self, reference_frame)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.set_transforms" title="rigid_body_motion.ros.Transformer.set_transforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_transforms</span></code></a>(reference_frame)</p></td>
 <td><p>Add transforms from moving reference frame to buffer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_point" title="rigid_body_motion.ros.Transformer.transform_point"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_point</span></code></a>(self, p, target_frame, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_point" title="rigid_body_motion.ros.Transformer.transform_point"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_point</span></code></a>(p, target_frame, source_frame)</p></td>
 <td><p>Transform a point from the source frame to the target frame.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_pose" title="rigid_body_motion.ros.Transformer.transform_pose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_pose</span></code></a>(self, p, o, target_frame, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_pose" title="rigid_body_motion.ros.Transformer.transform_pose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_pose</span></code></a>(p, o, target_frame, source_frame)</p></td>
 <td><p>Transform a pose from the source frame to the target frame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_quaternion" title="rigid_body_motion.ros.Transformer.transform_quaternion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_quaternion</span></code></a>(self, q, target_frame, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_quaternion" title="rigid_body_motion.ros.Transformer.transform_quaternion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_quaternion</span></code></a>(q, target_frame, …[, …])</p></td>
 <td><p>Transform a quaternion from the source frame to the target frame.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_vector" title="rigid_body_motion.ros.Transformer.transform_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_vector</span></code></a>(self, v, target_frame, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rigid_body_motion.ros.Transformer.transform_vector" title="rigid_body_motion.ros.Transformer.transform_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_vector</span></code></a>(v, target_frame, source_frame)</p></td>
 <td><p>Transform a vector from the source frame to the target frame.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.can_transform">
-<code class="sig-name descname"><span class="pre">can_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.can_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.can_transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.can_transform">
+<span class="sig-name descname"><span class="pre">can_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.can_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.can_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if transform from source to target frame is possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -299,8 +310,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.from_reference_frame">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">from_reference_frame</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.from_reference_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.from_reference_frame" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.from_reference_frame">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_reference_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.from_reference_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.from_reference_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct Transformer instance from static reference frame tree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -319,8 +330,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.lookup_transform">
-<code class="sig-name descname"><span class="pre">lookup_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.lookup_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.lookup_transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.lookup_transform">
+<span class="sig-name descname"><span class="pre">lookup_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.lookup_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.lookup_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the transform from the source frame to the target frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -345,8 +356,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.set_transform_static">
-<code class="sig-name descname"><span class="pre">set_transform_static</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.set_transform_static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.set_transform_static" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.set_transform_static">
+<span class="sig-name descname"><span class="pre">set_transform_static</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.set_transform_static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.set_transform_static" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add static transform from reference frame to buffer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -359,8 +370,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.set_transforms">
-<code class="sig-name descname"><span class="pre">set_transforms</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.set_transforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.set_transforms" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.set_transforms">
+<span class="sig-name descname"><span class="pre">set_transforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.set_transforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.set_transforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add transforms from moving reference frame to buffer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -373,8 +384,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.transform_point">
-<code class="sig-name descname"><span class="pre">transform_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_point" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.transform_point">
+<span class="sig-name descname"><span class="pre">transform_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_point" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a point from the source frame to the target frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -399,8 +410,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.transform_pose">
-<code class="sig-name descname"><span class="pre">transform_pose</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_pose" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.transform_pose">
+<span class="sig-name descname"><span class="pre">transform_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_pose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a pose from the source frame to the target frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -429,8 +440,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.transform_quaternion">
-<code class="sig-name descname"><span class="pre">transform_quaternion</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_quaternion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_quaternion" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.transform_quaternion">
+<span class="sig-name descname"><span class="pre">transform_quaternion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_quaternion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_quaternion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a quaternion from the source frame to the target frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -455,8 +466,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="rigid_body_motion.ros.Transformer.transform_vector">
-<code class="sig-name descname"><span class="pre">transform_vector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_vector" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rigid_body_motion.ros.Transformer.transform_vector">
+<span class="sig-name descname"><span class="pre">transform_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/ros/transformer.html#Transformer.transform_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ros.Transformer.transform_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a vector from the source frame to the target frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -489,29 +500,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="rigid_body_motion.ros.init_node.html" class="btn btn-neutral float-right" title="rigid_body_motion.ros.init_node" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html" class="btn btn-neutral float-left" title="rigid_body_motion.ros.ReferenceFrameMarkerPublisher" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="rigid_body_motion.ros.init_node.html" class="btn btn-neutral float-right" title="rigid_body_motion.ros.init_node" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rigid_body_motion.ros.ReferenceFrameMarkerPublisher.html" class="btn btn-neutral float-left" title="rigid_body_motion.ros.ReferenceFrameMarkerPublisher" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Peter Hausamann
+        &#169; Copyright 2020, Peter Hausamann.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -519,7 +530,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

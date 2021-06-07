@@ -11,7 +11,7 @@ Construction
 
 .. autosummary::
     :nosignatures:
-    :toctree: _generated
+    :toctree: ../_generated
 
     ReferenceFrame.from_dataset
     ReferenceFrame.from_translation_dataarray
@@ -23,7 +23,7 @@ Transforms
 
 .. autosummary::
     :nosignatures:
-    :toctree: _generated
+    :toctree: ../_generated
 
     ReferenceFrame.transform_points
     ReferenceFrame.transform_quaternions
@@ -36,7 +36,7 @@ Lookups
 
 .. autosummary::
     :nosignatures:
-    :toctree: _generated
+    :toctree: ../_generated
 
     ReferenceFrame.lookup_transform
     ReferenceFrame.lookup_angular_velocity
@@ -49,7 +49,7 @@ Registry
 
 .. autosummary::
     :nosignatures:
-    :toctree: _generated
+    :toctree: ../_generated
 
     ReferenceFrame.register
     ReferenceFrame.deregister

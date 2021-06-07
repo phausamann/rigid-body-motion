@@ -21,7 +21,7 @@ dependencies:
   - sphinx_rtd_theme=0.5
   - nbsphinx=0.8
   - numpydoc=1.1
-  #  - sphinx-autosummary-accessors=0.2.0
+  - sphinx-autosummary-accessors=0.2.1
   - matplotlib=3.3
   - jinja2=2
   # ROS dependencies
@@ -35,5 +35,4 @@ dependencies:
   - boost=1.74
   - ipywidgets
   - pip:
-      - git+https://github.com/xarray-contrib/sphinx-autosummary-accessors
       - --editable .

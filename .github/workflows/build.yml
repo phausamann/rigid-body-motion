@@ -54,6 +54,12 @@ jobs:
         run: python setup.py install
       - name: Test with pytest
         run: pytest
+      - name: Publish package
+#        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
 
   conda-build:
     runs-on: ubuntu-18.04

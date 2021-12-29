@@ -21,8 +21,9 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     description="Python utilities for estimating and transforming "
     "rigid body motion.",
@@ -35,6 +36,6 @@ setup(
     name="rigid-body-motion",
     packages=find_packages(exclude=["tests"]),
     url="https://github.com/phausamann/rigid-body-motion",
-    version="0.8.0",
+    version="0.9.0",
     zip_safe=False,
 )

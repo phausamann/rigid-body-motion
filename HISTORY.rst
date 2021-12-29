@@ -2,6 +2,20 @@
 History
 =======
 
+0.9.0 (December 29th, 2021)
+---------------------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+* Dropped support for Python 3.6.
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Fixed issue with matplotlib versions >= 3.5.
+
+
 0.8.0 (May 27th, 2021)
 ----------------------
 

@@ -1,7 +1,7 @@
 """Top-level package for rigid-body-motion."""
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 # ROS module has to be imported first because of PyKDL
 from . import ros  # noqa

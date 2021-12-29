@@ -7,15 +7,15 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rigid_body_motion.ReferenceFrame.lookup_linear_velocity &mdash; rigid-body-motion 0.8.0 documentation</title>
+  <title>rigid_body_motion.ReferenceFrame.lookup_linear_velocity &mdash; rigid-body-motion 0.9.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
 
   
   
@@ -27,24 +27,24 @@
 
   
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/copybutton.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/copybutton.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rigid_body_motion.ReferenceFrame.lookup_twist" href="rigid_body_motion.ReferenceFrame.lookup_twist.html" />
     <link rel="prev" title="rigid_body_motion.ReferenceFrame.lookup_angular_velocity" href="rigid_body_motion.ReferenceFrame.lookup_angular_velocity.html" /> 
 </head>
@@ -60,7 +60,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> rigid-body-motion
+            <a href="../index.html" class="icon icon-home"> rigid-body-motion
           
 
           
@@ -70,14 +70,14 @@
             
             
               <div class="version">
-                0.8.0
+                0.9.0
               </div>
             
           
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -97,37 +97,37 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../reference_frames.html">Reference frames</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../velocities.html">Linear and angular velocity</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../estimators.html">Estimating transforms from data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../xarray.html">Working with xarray</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ros.html">ROS integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference_frames.html">Reference frames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../velocities.html">Linear and angular velocity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../estimators.html">Estimating transforms from data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xarray.html">Working with xarray</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ros.html">ROS integration</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Help &amp; reference</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#top-level-functions">Top-level functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#i-o-functions">I/O functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#plotting">Plotting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#ros-interface">ROS interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#xarray-accessors">xarray Accessors</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#class-member-details">Class member details</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="../reference_frames.html">reference_frames</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="../reference_frames.html#referenceframe">ReferenceFrame</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#top-level-functions">Top-level functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#i-o-functions">I/O functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#ros-interface">ROS interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#xarray-accessors">xarray Accessors</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#class-member-details">Class member details</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../api/reference_frames.html">reference_frames</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../api/reference_frames.html#referenceframe">ReferenceFrame</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Development roadmap</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Development roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
 </ul>
 
             
@@ -143,7 +143,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">rigid-body-motion</a>
+          <a href="../index.html">rigid-body-motion</a>
         
       </nav>
 
@@ -174,11 +174,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../../api.html">API Reference</a> &raquo;</li>
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../reference_frames.html">reference_frames</a> &raquo;</li>
+          <li><a href="../api/reference_frames.html">reference_frames</a> &raquo;</li>
         
       <li>rigid_body_motion.ReferenceFrame.lookup_linear_velocity</li>
     
@@ -186,7 +186,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../../_sources/api/_generated/rigid_body_motion.ReferenceFrame.lookup_linear_velocity.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_generated/rigid_body_motion.ReferenceFrame.lookup_linear_velocity.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -227,7 +227,7 @@
 <h1>rigid_body_motion.ReferenceFrame.lookup_linear_velocity<a class="headerlink" href="#rigid-body-motion-referenceframe-lookup-linear-velocity" title="Permalink to this headline">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="rigid_body_motion.ReferenceFrame.lookup_linear_velocity">
-<span class="sig-prename descclassname"><span class="pre">ReferenceFrame.</span></span><span class="sig-name descname"><span class="pre">lookup_linear_velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">represent_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outlier_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rigid_body_motion/reference_frames.html#ReferenceFrame.lookup_linear_velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ReferenceFrame.lookup_linear_velocity" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ReferenceFrame.</span></span><span class="sig-name descname"><span class="pre">lookup_linear_velocity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">represent_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outlier_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_timestamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rigid_body_motion/reference_frames.html#ReferenceFrame.lookup_linear_velocity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rigid_body_motion.ReferenceFrame.lookup_linear_velocity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate linear velocity of this frame wrt a reference.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

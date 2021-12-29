@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Estimating transforms from data &mdash; rigid-body-motion 0.8.0 documentation</title>
+  <title>Estimating transforms from data &mdash; rigid-body-motion 0.9.0 documentation</title>
   
 
   
@@ -40,7 +40,7 @@
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "math|output_area"}}</script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -72,7 +72,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.9.0
               </div>
             
           
@@ -746,7 +746,7 @@ array([ 0.92387953, -0.        , -0.        ,  0.38268343])
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 (array([ 1.00000000e+00,  1.00000000e+00, -3.46944695e-18]),
- array([9.23879533e-01, 3.77482691e-17, 2.77555756e-16, 3.82683432e-01]))
+ array([ 9.23879533e-01,  5.78989649e-18, -1.97758476e-16,  3.82683432e-01]))
 </pre></div></div>
 </div>
 </div>
@@ -769,8 +769,8 @@ permuting the second array:</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(array([ 1.0000000e+00,  1.0000000e+00, -2.3939184e-16]),
- array([ 9.23879533e-01,  1.41365934e-16, -0.00000000e+00,  3.82683432e-01]))
+(array([ 0.955258  ,  0.97355512, -0.02946829]),
+ array([-0.97406627, -0.21235908,  0.06683836,  0.04038764]))
 </pre></div></div>
 </div>
 <p>Note that there is a discrepancy in the estimated transform compared to the best fit transform. ICP usually yields better results with a larger number of points that have more spatial structure.</p>

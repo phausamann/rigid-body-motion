@@ -4,7 +4,7 @@ channels:
 - phausamann
 dependencies:
 - python=3.8
-- rigid-body-motion=0.8.0
+- rigid-body-motion=0.9.0
 - numba
 - xarray
 - netcdf4

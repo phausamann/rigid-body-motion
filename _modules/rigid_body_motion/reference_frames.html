@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rigid_body_motion.reference_frames &mdash; rigid-body-motion 0.8.0 documentation</title>
+  <title>rigid_body_motion.reference_frames &mdash; rigid-body-motion 0.9.0 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.8.0
+                0.9.0
               </div>
             
           
@@ -513,7 +513,7 @@
 
         <span class="k">return</span> <span class="n">matcher</span>
 
-<div class="viewcode-block" id="ReferenceFrame.from_dataset"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_dataset.html#rigid_body_motion.ReferenceFrame.from_dataset">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ReferenceFrame.from_dataset"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.from_dataset.html#rigid_body_motion.ReferenceFrame.from_dataset">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">ds</span><span class="p">,</span>
@@ -577,7 +577,7 @@
             <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.from_translation_dataarray"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_translation_dataarray.html#rigid_body_motion.ReferenceFrame.from_translation_dataarray">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ReferenceFrame.from_translation_dataarray"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.from_translation_dataarray.html#rigid_body_motion.ReferenceFrame.from_translation_dataarray">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_translation_dataarray</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -624,7 +624,7 @@
             <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.from_rotation_dataarray"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_rotation_dataarray.html#rigid_body_motion.ReferenceFrame.from_rotation_dataarray">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ReferenceFrame.from_rotation_dataarray"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.from_rotation_dataarray.html#rigid_body_motion.ReferenceFrame.from_rotation_dataarray">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_rotation_dataarray</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -671,7 +671,7 @@
             <span class="n">discrete</span><span class="o">=</span><span class="n">discrete</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.from_rotation_matrix"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.from_rotation_matrix.html#rigid_body_motion.ReferenceFrame.from_rotation_matrix">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ReferenceFrame.from_rotation_matrix"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.from_rotation_matrix.html#rigid_body_motion.ReferenceFrame.from_rotation_matrix">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_rotation_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Construct a static reference frame from a rotation matrix.</span>
 
@@ -728,7 +728,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_transform</span><span class="p">(</span><span class="n">to_frame</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ReferenceFrame.lookup_transform"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_transform.html#rigid_body_motion.ReferenceFrame.lookup_transform">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_frame</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceFrame.lookup_transform"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.lookup_transform.html#rigid_body_motion.ReferenceFrame.lookup_transform">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Look up the transformation from this frame to another.</span>
 
 <span class="sd">        Parameters</span>
@@ -756,7 +756,7 @@
 
         <span class="k">return</span> <span class="n">matcher</span><span class="o">.</span><span class="n">get_transformation</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.transform_vectors"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_vectors.html#rigid_body_motion.ReferenceFrame.transform_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">transform_vectors</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.transform_vectors"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.transform_vectors.html#rigid_body_motion.ReferenceFrame.transform_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">transform_vectors</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">arr</span><span class="p">,</span>
         <span class="n">to_frame</span><span class="p">,</span>
@@ -817,7 +817,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.transform_points"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_points.html#rigid_body_motion.ReferenceFrame.transform_points">[docs]</a>    <span class="k">def</span> <span class="nf">transform_points</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.transform_points"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.transform_points.html#rigid_body_motion.ReferenceFrame.transform_points">[docs]</a>    <span class="k">def</span> <span class="nf">transform_points</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">arr</span><span class="p">,</span>
         <span class="n">to_frame</span><span class="p">,</span>
@@ -880,7 +880,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.transform_quaternions"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_quaternions.html#rigid_body_motion.ReferenceFrame.transform_quaternions">[docs]</a>    <span class="k">def</span> <span class="nf">transform_quaternions</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.transform_quaternions"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.transform_quaternions.html#rigid_body_motion.ReferenceFrame.transform_quaternions">[docs]</a>    <span class="k">def</span> <span class="nf">transform_quaternions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">arr</span><span class="p">,</span>
         <span class="n">to_frame</span><span class="p">,</span>
@@ -944,7 +944,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">arr</span><span class="p">,</span> <span class="n">ts</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.transform_angular_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_angular_velocity.html#rigid_body_motion.ReferenceFrame.transform_angular_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">transform_angular_velocity</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.transform_angular_velocity"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.transform_angular_velocity.html#rigid_body_motion.ReferenceFrame.transform_angular_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">transform_angular_velocity</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">arr</span><span class="p">,</span>
         <span class="n">to_frame</span><span class="p">,</span>
@@ -1059,7 +1059,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">arr</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.transform_linear_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.transform_linear_velocity.html#rigid_body_motion.ReferenceFrame.transform_linear_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">transform_linear_velocity</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.transform_linear_velocity"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.transform_linear_velocity.html#rigid_body_motion.ReferenceFrame.transform_linear_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">transform_linear_velocity</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">arr</span><span class="p">,</span>
         <span class="n">to_frame</span><span class="p">,</span>
@@ -1214,7 +1214,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">arr</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.lookup_twist"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_twist.html#rigid_body_motion.ReferenceFrame.lookup_twist">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_twist</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.lookup_twist"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.lookup_twist.html#rigid_body_motion.ReferenceFrame.lookup_twist">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_twist</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1318,7 +1318,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">linear</span><span class="p">,</span> <span class="n">angular</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.lookup_linear_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_linear_velocity.html#rigid_body_motion.ReferenceFrame.lookup_linear_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_linear_velocity</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.lookup_linear_velocity"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.lookup_linear_velocity.html#rigid_body_motion.ReferenceFrame.lookup_linear_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_linear_velocity</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1398,7 +1398,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">linear</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.lookup_angular_velocity"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.lookup_angular_velocity.html#rigid_body_motion.ReferenceFrame.lookup_angular_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_angular_velocity</span><span class="p">(</span>
+<div class="viewcode-block" id="ReferenceFrame.lookup_angular_velocity"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.lookup_angular_velocity.html#rigid_body_motion.ReferenceFrame.lookup_angular_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_angular_velocity</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">represent_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1489,7 +1489,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">angular</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.register"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.register.html#rigid_body_motion.ReferenceFrame.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceFrame.register"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.register.html#rigid_body_motion.ReferenceFrame.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Register this frame in the registry.</span>
 
 <span class="sd">        Parameters</span>
@@ -1500,7 +1500,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ReferenceFrame.deregister"><a class="viewcode-back" href="../../api/_generated/rigid_body_motion.ReferenceFrame.deregister.html#rigid_body_motion.ReferenceFrame.deregister">[docs]</a>    <span class="k">def</span> <span class="nf">deregister</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ReferenceFrame.deregister"><a class="viewcode-back" href="../../_generated/rigid_body_motion.ReferenceFrame.deregister.html#rigid_body_motion.ReferenceFrame.deregister">[docs]</a>    <span class="k">def</span> <span class="nf">deregister</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Remove this frame from the registry. &quot;&quot;&quot;</span>
         <span class="n">_deregister</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div></div>
 </pre></div>

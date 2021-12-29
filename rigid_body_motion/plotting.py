@@ -90,7 +90,7 @@ def _set_axes_equal(ax):
 
     from https://stackoverflow.com/questions/8130823/set-matplotlib-3d-plot-aspect-ratio#comment115706463_64453375
     """
-    limits = np.array([getattr(ax, f'get_{axis}lim')() for axis in 'xyz'])
+    limits = np.array([getattr(ax, f"get_{axis}lim")() for axis in "xyz"])
     ax.set_box_aspect(np.ptp(limits, axis=1))
 
 

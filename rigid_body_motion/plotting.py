@@ -87,11 +87,26 @@ def _add_frame(ax, frame, world_frame=None, arrow_len=1.0):
 
 def _set_axes_equal(ax):
     """ Make axes of 3D plot have equal scale.
-
-    from https://stackoverflow.com/questions/8130823/set-matplotlib-3d-plot-aspect-ratio#comment115706463_64453375
+    from https://stackoverflow.com/a/31364297
     """
-    limits = np.array([getattr(ax, f"get_{axis}lim")() for axis in "xyz"])
-    ax.set_box_aspect(np.ptp(limits, axis=1))
+    x_limits = ax.get_xlim3d()
+    y_limits = ax.get_ylim3d()
+    z_limits = ax.get_zlim3d()
+
+    x_range = abs(x_limits[1] - x_limits[0])
+    x_middle = np.mean(x_limits)
+    y_range = abs(y_limits[1] - y_limits[0])
+    y_middle = np.mean(y_limits)
+    z_range = abs(z_limits[1] - z_limits[0])
+    z_middle = np.mean(z_limits)
+
+    # The plot bounding box is a sphere in the sense of the infinity
+    # norm, hence I call half the max range the plot radius.
+    plot_radius = 0.5 * max([x_range, y_range, z_range])
+
+    ax.set_xlim3d([x_middle - plot_radius, x_middle + plot_radius])
+    ax.set_ylim3d([y_middle - plot_radius, y_middle + plot_radius])
+    ax.set_zlim3d([z_middle - plot_radius, z_middle + plot_radius])
 
 
 def plot_reference_frame(

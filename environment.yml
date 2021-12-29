@@ -20,6 +20,7 @@ dependencies:
   - sphinx=4.0
   - sphinx_rtd_theme=0.5
   - nbsphinx=0.8
+  - pandoc=2.16
   - numpydoc=1.1
   - sphinx-autosummary-accessors=0.2.1
   - matplotlib=3.5

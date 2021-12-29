@@ -22,7 +22,7 @@ dependencies:
   - nbsphinx=0.8
   - numpydoc=1.1
   - sphinx-autosummary-accessors=0.2.1
-  - matplotlib=3.3
+  - matplotlib=3.5
   - jinja2=2
   # ROS dependencies
   - ros-noetic-rospy

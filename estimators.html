@@ -399,7 +399,7 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
@@ -474,8 +474,7 @@ Jupyter notebook.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">rigid_body_motion</span> <span class="k">as</span> <span class="nn">rbm</span>
 
@@ -487,8 +486,7 @@ Jupyter notebook.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbm</span><span class="o">.</span><span class="n">register_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -499,8 +497,7 @@ Jupyter notebook.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -509,8 +506,7 @@ Jupyter notebook.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
 
 <span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -536,8 +532,7 @@ Jupyter notebook.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">shortest_arc_rotation</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbm</span><span class="o">.</span><span class="n">shortest_arc_rotation</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -555,8 +550,7 @@ array([0.92387953, 0.        , 0.        , 0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">r</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">from_euler_angles</span><span class="p">(</span><span class="n">yaw</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">from_euler_angles</span><span class="p">(</span><span class="n">yaw</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -565,8 +559,7 @@ array([0.92387953, 0.        , 0.        , 0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">v2_arr</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">one_to_one</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v2_arr</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">one_to_one</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -574,8 +567,7 @@ array([0.92387953, 0.        , 0.        , 0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
 
 <span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -598,8 +590,7 @@ array([0.92387953, 0.        , 0.        , 0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">shortest_arc_rotation</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2_arr</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbm</span><span class="o">.</span><span class="n">shortest_arc_rotation</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2_arr</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -629,8 +620,7 @@ array([[0.92387953, 0.        , 0.        , 0.38268343],
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">v1_arr</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">one_to_one</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v1_arr</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">one_to_one</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -638,8 +628,7 @@ array([[0.92387953, 0.        , 0.        , 0.38268343],
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
 
 <span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -665,8 +654,7 @@ array([[0.92387953, 0.        , 0.        , 0.38268343],
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">best_fit_rotation</span><span class="p">(</span><span class="n">v1_arr</span><span class="p">,</span> <span class="n">v2_arr</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbm</span><span class="o">.</span><span class="n">best_fit_rotation</span><span class="p">(</span><span class="n">v1_arr</span><span class="p">,</span> <span class="n">v2_arr</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -687,8 +675,7 @@ array([ 0.92387953, -0.        , -0.        ,  0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">p1_arr</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p1_arr</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -696,8 +683,7 @@ array([ 0.92387953, -0.        , -0.        ,  0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">from_euler_angles</span><span class="p">(</span><span class="n">yaw</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">p2_arr</span> <span class="o">=</span> <span class="n">rbm</span><span class="o">.</span><span class="n">rotate_vectors</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">p1_arr</span><span class="p">,</span> <span class="n">one_to_one</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="n">t</span>
 </pre></div>
@@ -707,8 +693,7 @@ array([ 0.92387953, -0.        , -0.        ,  0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
 
 <span class="n">rbm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">reference_frame</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -734,8 +719,7 @@ array([ 0.92387953, -0.        , -0.        ,  0.38268343])
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">best_fit_transform</span><span class="p">(</span><span class="n">p1_arr</span><span class="p">,</span> <span class="n">p2_arr</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbm</span><span class="o">.</span><span class="n">best_fit_transform</span><span class="p">(</span><span class="n">p1_arr</span><span class="p">,</span> <span class="n">p2_arr</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -745,8 +729,8 @@ array([ 0.92387953, -0.        , -0.        ,  0.38268343])
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(array([ 1.00000000e+00,  1.00000000e+00, -3.46944695e-18]),
- array([ 9.23879533e-01,  5.78989649e-18, -1.97758476e-16,  3.82683432e-01]))
+(array([1.00000000e+00, 1.00000000e+00, 1.73472348e-18]),
+ array([-0.92387953, -0.        , -0.        , -0.38268343]))
 </pre></div></div>
 </div>
 </div>
@@ -758,8 +742,7 @@ permuting the second array:</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">rbm</span><span class="o">.</span><span class="n">iterative_closest_point</span><span class="p">(</span><span class="n">p1_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">p2_arr</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rbm</span><span class="o">.</span><span class="n">iterative_closest_point</span><span class="p">(</span><span class="n">p1_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">p2_arr</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -769,8 +752,8 @@ permuting the second array:</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(array([ 0.955258  ,  0.97355512, -0.02946829]),
- array([-0.97406627, -0.21235908,  0.06683836,  0.04038764]))
+(array([0.93538191, 0.98041406, 0.01644152]),
+ array([-0.35367667,  0.32016714,  0.17500419, -0.86126613]))
 </pre></div></div>
 </div>
 <p>Note that there is a discrepancy in the estimated transform compared to the best fit transform. ICP usually yields better results with a larger number of points that have more spatial structure.</p>

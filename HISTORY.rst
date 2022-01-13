@@ -2,6 +2,15 @@
 History
 =======
 
+0.9.1 (January 13th, 2022)
+--------------------------
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Fixed package installation through pip (version 0.9.0 is no longer available).
+
+
 0.9.0 (December 29th, 2021)
 ---------------------------
 

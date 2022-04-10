@@ -121,7 +121,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Install dependencies
-        run: pip install black==19.10b0 flake8 isort twine click<8.1
+        run: pip install black==19.10b0 flake8 isort twine "click<8.1"
       - name: Check black code style
         run: black --check .
       - name: Lint with flake8

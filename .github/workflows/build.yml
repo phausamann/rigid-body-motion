@@ -111,12 +111,6 @@ jobs:
           make -C docs/ html
           make -C docs/ doctest
           touch docs/_build/html/.nojekyll
-      - name: Deploy docs on master
-        if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@4.1.3
-        with:
-          branch: docs
-          folder: docs/_build/html
 
   lint:
     runs-on: ubuntu-18.04
@@ -127,7 +121,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Install dependencies
-        run: pip install black==19.10b0 flake8 isort twine
+        run: pip install black==19.10b0 flake8 isort twine "click<8.1"
       - name: Check black code style
         run: black --check .
       - name: Lint with flake8

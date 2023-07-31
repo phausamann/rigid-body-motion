@@ -2,6 +2,14 @@
 History
 =======
 
+0.9.2 (TBD)
+--------------------------
+
+Bug fixes & improvements
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Fixed an error related to a deprecated matplotlib.pyplot reference, see `Issue #35 <https://github.com/phausamann/rigid-body-motion/issues/35>`.
+
 0.9.1 (January 13th, 2022)
 --------------------------
 

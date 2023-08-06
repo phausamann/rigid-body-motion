@@ -7,7 +7,7 @@ on:
 
 jobs:
   pip:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     strategy:
       max-parallel: 3
       matrix:
@@ -28,7 +28,7 @@ jobs:
         run: pytest
 
   minimal:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python 3.8
@@ -43,7 +43,7 @@ jobs:
         run: pytest
 
   latest:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python 3.9
@@ -58,7 +58,7 @@ jobs:
         run: pytest
 
   package:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python 3.9
@@ -77,7 +77,7 @@ jobs:
           password: ${{ secrets.PYPI_TOKEN }}
 
   conda-build:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -93,7 +93,7 @@ jobs:
         run: anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload -u phausamann /usr/share/miniconda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
 
   docs:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -112,7 +112,7 @@ jobs:
           touch docs/_build/html/.nojekyll
 
   lint:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python 3.8

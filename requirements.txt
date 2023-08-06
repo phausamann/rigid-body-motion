@@ -1,3 +1,4 @@
+importlib-metadata==4.13.*
 numpy==1.21.*
 scipy==1.7.*
 pandas==1.3.*

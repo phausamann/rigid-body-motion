@@ -74,7 +74,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "rigid-body-motion"
-copyright = "2020, Peter Hausamann"
+copyright = "2025, Peter Hausamann"
 author = "Peter Hausamann"
 
 # The version info for the project you're documenting, acts as replacement

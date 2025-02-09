@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies and package
-        run: uv sync --all-extras --group tests
+        run: uv sync --all-extras --group test
       - name: Test with pytest
         run: uv run pytest
 
@@ -56,7 +56,7 @@ jobs:
       - name: Set up Python with uv
         uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
       - name: Package
         run: uv build
       - name: Publish package
@@ -87,7 +87,7 @@ jobs:
       - name: Set up Python with uv
         uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
       - name: Install dependencies and package
         run: uv sync --all-extras --group docs
       - name: Build Sphinx docs and run doctests
@@ -105,7 +105,9 @@ jobs:
       - name: Set up Python with uv
         uses: astral-sh/setup-uv@v5
         with:
-          python-version: 3.10
+          python-version: "3.10"
+      - name: Install dependencies
+        run: uv sync --no-install-workspace --group lint
       - name: Check black code style
         run: uv run black --check .
       - name: Lint with flake8

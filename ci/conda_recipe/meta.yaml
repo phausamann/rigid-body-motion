@@ -2,7 +2,7 @@
 
 package:
   name: rigid-body-motion
-  version: {{ data['version'] }}
+  version: {{ data['project']['version'] }}
 
 source:
   path: ../..

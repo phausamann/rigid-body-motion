@@ -42,6 +42,6 @@ def make_test_motion(
             as_quat_array(rotation), np.array(offset)[np.newaxis, :]
         )
 
-    timestamps = pd.date_range(start=0, periods=n_samples, freq=f"{1/fs}s")
+    timestamps = pd.date_range(start=0, periods=n_samples, freq=f"{1/fs}S")
 
     return translation, rotation, timestamps

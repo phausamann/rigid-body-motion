@@ -1,7 +1,8 @@
-""" Generate test cases for reference frame transforms.
+"""Generate test cases for reference frame transforms.
 
 This script requires a ROS environment in order to run properly.
 """
+
 from itertools import product
 from pathlib import Path
 

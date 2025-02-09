@@ -5,7 +5,7 @@ from rigid_body_motion.core import _resolve_rf
 
 
 def hex_to_rgba(h):
-    """ Convert hex color string to ColorRGBA message.
+    """Convert hex color string to ColorRGBA message.
 
     Parameters
     ----------
@@ -31,7 +31,7 @@ def get_marker(
     position=(0.0, 0.0, 0.0),
     orientation=(0.0, 0.0, 0.0, 1.0),
 ):
-    """ Create a Marker visualization message.
+    """Create a Marker visualization message.
 
     Parameters
     ----------
@@ -82,10 +82,10 @@ def get_marker(
 
 
 class BaseMarkerPublisher:
-    """ Base class for Marker publishers. """
+    """Base class for Marker publishers."""
 
     def __init__(self, marker, topic, publish_interval=0.0, verbose=False):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -117,7 +117,7 @@ class BaseMarkerPublisher:
         self._thread = None
 
     def publish(self):
-        """ Publish a marker message. """
+        """Publish a marker message."""
         current_message = BytesIO()
         self.marker.serialize(current_message)
 
@@ -126,7 +126,7 @@ class BaseMarkerPublisher:
             self.publisher.publish(self.marker)
 
     def _spin_blocking(self):
-        """ Continuously publish messages. """
+        """Continuously publish messages."""
         import rospy
 
         self.stopped = False
@@ -138,7 +138,7 @@ class BaseMarkerPublisher:
         self.stopped = True
 
     def spin(self, block=False):
-        """ Continuously publish messages.
+        """Continuously publish messages.
 
         Parameters
         ----------
@@ -160,12 +160,12 @@ class BaseMarkerPublisher:
             self._thread.start()
 
     def stop(self):
-        """ Stop publishing. """
+        """Stop publishing."""
         self.stopped = True
 
 
 class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
-    """ Publisher for the translation of a reference frame wrt another. """
+    """Publisher for the translation of a reference frame wrt another."""
 
     def __init__(
         self,
@@ -178,7 +178,7 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         color="#ffffffff",
         verbose=False,
     ):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -218,7 +218,7 @@ class ReferenceFrameMarkerPublisher(BaseMarkerPublisher):
         )
 
     def get_ros3d_widget(self, ros=None, tf_client=None):
-        """ Get a ros3d.Marker widget to display in a ros3d.Viewer.
+        """Get a ros3d.Marker widget to display in a ros3d.Viewer.
 
         Parameters
         ----------

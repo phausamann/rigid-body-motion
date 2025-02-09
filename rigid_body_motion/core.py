@@ -1,4 +1,5 @@
 """"""
+
 import warnings
 from collections import namedtuple
 
@@ -15,22 +16,23 @@ from scipy.interpolate import interp1d
 from scipy.signal import butter, filtfilt
 
 Frame = namedtuple(
-    "Frame", ("translation", "rotation", "timestamps", "discrete", "inverse"),
+    "Frame",
+    ("translation", "rotation", "timestamps", "discrete", "inverse"),
 )
 Array = namedtuple("Array", ("data", "timestamps"))
 
 
 class TransformMatcher:
-    """ Matcher for timestamps from reference frames and arrays. """
+    """Matcher for timestamps from reference frames and arrays."""
 
     def __init__(self):
-        """ Constructor. """
+        """Constructor."""
         self.frames = []
         self.arrays = []
 
     @classmethod
     def _check_timestamps(cls, timestamps, arr_shape):
-        """ Make sure timestamps are monotonic. """
+        """Make sure timestamps are monotonic."""
         if timestamps is not None:
             if np.any(np.diff(timestamps.astype(float)) < 0):
                 raise ValueError("Timestamps must be monotonic")
@@ -42,7 +44,7 @@ class TransformMatcher:
 
     @classmethod
     def _transform_from_frame(cls, frame, timestamps):
-        """ Get the transform from a frame resampled to the timestamps. """
+        """Get the transform from a frame resampled to the timestamps."""
         if timestamps is None and frame.timestamps is not None:
             raise ValueError("Cannot convert timestamped to static transform")
 
@@ -77,7 +79,7 @@ class TransformMatcher:
 
     @classmethod
     def _resample_array(cls, array, timestamps):
-        """ Resample an array to the timestamps. """
+        """Resample an array to the timestamps."""
         if timestamps is None and array.timestamps is not None:
             raise ValueError("Cannot convert timestamped to static array")
 
@@ -103,7 +105,7 @@ class TransformMatcher:
                 )(timestamps.astype(float))
 
     def add_reference_frame(self, frame, inverse=False):
-        """ Add a reference frame to the matcher.
+        """Add a reference frame to the matcher.
 
         Parameters
         ----------
@@ -125,7 +127,7 @@ class TransformMatcher:
         )
 
     def add_array(self, array, timestamps=None):
-        """ Add an array to the matcher.
+        """Add an array to the matcher.
 
         Parameters
         ----------
@@ -139,7 +141,7 @@ class TransformMatcher:
         self.arrays.append(Array(array, timestamps))
 
     def get_range(self):
-        """ Get the range for which the transformation is defined.
+        """Get the range for which the transformation is defined.
 
         Returns
         -------
@@ -171,7 +173,7 @@ class TransformMatcher:
         return first, last
 
     def get_timestamps(self, arrays_first=True):
-        """ Get the timestamps for which the transformation is defined.
+        """Get the timestamps for which the transformation is defined.
 
         Parameters
         ----------
@@ -233,7 +235,7 @@ class TransformMatcher:
         return timestamps
 
     def get_transformation(self, timestamps=None, arrays_first=True):
-        """ Get the transformation across all reference frames.
+        """Get the transformation across all reference frames.
 
         Parameters
         ----------
@@ -282,7 +284,7 @@ class TransformMatcher:
         return translation, as_float_array(rotation), timestamps
 
     def get_arrays(self, timestamps=None, arrays_first=True):
-        """ Get re-sampled arrays
+        """Get re-sampled arrays
 
         Parameters
         ----------
@@ -314,7 +316,7 @@ class TransformMatcher:
 
 
 def _resolve_axis(axis, ndim):
-    """ Convert axis argument into actual array axes. """
+    """Convert axis argument into actual array axes."""
     if isinstance(axis, int) and axis < 0:
         axis = ndim + axis
     elif isinstance(axis, tuple):
@@ -332,7 +334,7 @@ def _resolve_axis(axis, ndim):
 
 
 def _resolve_rf(rf):
-    """ Retrieve frame by name from registry, if applicable. """
+    """Retrieve frame by name from registry, if applicable."""
     # TODO test
     # TODO raise error if not ReferenceFrame instance?
     from rigid_body_motion.reference_frames import ReferenceFrame, _registry
@@ -352,7 +354,7 @@ def _resolve_rf(rf):
 
 
 def _replace_dim(coords, dims, axis, into, dimensionality):
-    """ Replace the spatial dimension. """
+    """Replace the spatial dimension."""
     # TODO can we improve this with assign_coords / swap_dims?
     old_dim = dims[axis]
 
@@ -385,7 +387,7 @@ def _replace_dim(coords, dims, axis, into, dimensionality):
 def _maybe_unpack_dataarray(
     arr, dim=None, axis=None, time_axis=None, timestamps=None
 ):
-    """ If input is DataArray, unpack into data, coords and dims. """
+    """If input is DataArray, unpack into data, coords and dims."""
     from rigid_body_motion.utils import is_dataarray
 
     ndim = np.asanyarray(arr).ndim
@@ -455,7 +457,7 @@ def _maybe_unpack_dataarray(
 
 
 def _make_dataarray(arr, coords, dims, name, attrs, time_dim, ts_out):
-    """ Make DataArray out of transformation results. """
+    """Make DataArray out of transformation results."""
     import xarray as xr
 
     if time_dim is None:
@@ -507,7 +509,7 @@ def _transform(
     return_timestamps=False,
     **kwargs,
 ):
-    """ Base transform method. """
+    """Base transform method."""
     (
         arr,
         axis,
@@ -596,7 +598,7 @@ def _transform(
 def _make_transform_or_pose_dataset(
     translation, rotation, frame, timestamps, pose=False
 ):
-    """ Create Dataset with translation and rotation. """
+    """Create Dataset with translation and rotation."""
     import xarray as xr
 
     if pose:
@@ -655,7 +657,7 @@ def _make_transform_or_pose_dataset(
 def _make_twist_dataset(
     angular, linear, moving_frame, reference, represent_in, timestamps
 ):
-    """ Create Dataset with linear and angular velocity. """
+    """Create Dataset with linear and angular velocity."""
     import xarray as xr
 
     twist = xr.Dataset(
@@ -694,7 +696,7 @@ def _make_twist_dataset(
 def _make_velocity_dataarray(
     velocity, motion_type, moving_frame, reference, represent_in, timestamps
 ):
-    """ Create DataArray with linear or angular velocity. """
+    """Create DataArray with linear or angular velocity."""
     import xarray as xr
 
     if motion_type not in ("linear", "angular"):
@@ -732,7 +734,7 @@ def _estimate_angular_velocity(
     outlier_thresh=None,
     cutoff=None,
 ):
-    """ Estimate angular velocity of transform. """
+    """Estimate angular velocity of transform."""
     if np.issubdtype(timestamps.dtype, np.datetime64):
         timestamps = timestamps.astype(float) / 1e9
 
@@ -795,7 +797,7 @@ def _estimate_angular_velocity(
 def _estimate_linear_velocity(
     translation, timestamps, time_axis=0, outlier_thresh=None, cutoff=None
 ):
-    """ Estimate linear velocity of transform. """
+    """Estimate linear velocity of transform."""
     if np.issubdtype(timestamps.dtype, np.datetime64):
         timestamps = timestamps.astype(float) / 1e9
 

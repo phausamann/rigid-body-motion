@@ -1,4 +1,5 @@
 """"""
+
 import numpy as np
 from quaternion import as_float_array, from_rotation_matrix
 from scipy.spatial import cKDTree
@@ -14,7 +15,7 @@ from rigid_body_motion.utils import rotate_vectors
 
 
 def _reshape_vectors(v1, v2, axis, dim, same_shape=True):
-    """ Reshape input vectors to two dimensions. """
+    """Reshape input vectors to two dimensions."""
     # TODO v2 as DataArray with possibly different dimension order
     v1, axis, _, _, _, _, coords, *_ = _maybe_unpack_dataarray(
         v1, dim, axis, None, False
@@ -40,7 +41,7 @@ def _reshape_vectors(v1, v2, axis, dim, same_shape=True):
 
 
 def _make_transform_dataarrays(translation, rotation):
-    """ Make translation and rotation DataArrays. """
+    """Make translation and rotation DataArrays."""
     import xarray as xr
 
     translation = xr.DataArray(
@@ -68,7 +69,7 @@ def estimate_linear_velocity(
     outlier_thresh=None,
     cutoff=None,
 ):
-    """ Estimate linear velocity from a time series of translation.
+    """Estimate linear velocity from a time series of translation.
 
     Parameters
     ----------
@@ -154,7 +155,7 @@ def estimate_angular_velocity(
     outlier_thresh=None,
     cutoff=None,
 ):
-    """ Estimate angular velocity from a time series of rotations.
+    """Estimate angular velocity from a time series of rotations.
 
     Parameters
     ----------
@@ -233,7 +234,7 @@ def estimate_angular_velocity(
 
 
 def shortest_arc_rotation(v1, v2, dim=None, axis=None):
-    """ Estimate the shortest-arc rotation between two arrays of vectors.
+    """Estimate the shortest-arc rotation between two arrays of vectors.
 
     This method computes the rotation `r` that satisfies:
 
@@ -266,8 +267,8 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
     v1 = np.asarray(v1)
     v2 = np.asarray(v2)
 
-    sn1 = np.sum(v1 ** 2, axis=axis, keepdims=True)
-    sn2 = np.sum(v2 ** 2, axis=axis, keepdims=True)
+    sn1 = np.sum(v1**2, axis=axis, keepdims=True)
+    sn2 = np.sum(v2**2, axis=axis, keepdims=True)
     d12 = np.sum(v1 * v2, axis=axis, keepdims=True)
     c12 = np.cross(v1, v2, axis=axis)
     rotation = np.concatenate((np.sqrt(sn1 * sn2) + d12, c12), axis=axis)
@@ -281,7 +282,7 @@ def shortest_arc_rotation(v1, v2, dim=None, axis=None):
 
 
 def best_fit_rotation(v1, v2, dim=None, axis=None):
-    """ Least-squares best-fit rotation between two arrays of vectors.
+    """Least-squares best-fit rotation between two arrays of vectors.
 
     Finds the rotation `r` that minimizes:
 
@@ -340,7 +341,7 @@ def best_fit_rotation(v1, v2, dim=None, axis=None):
 
 
 def best_fit_transform(v1, v2, dim=None, axis=None):
-    """ Least-squares best-fit transform between two arrays of vectors.
+    """Least-squares best-fit transform between two arrays of vectors.
 
     Finds the rotation `r` and the translation `t` that minimize:
 
@@ -411,7 +412,7 @@ def best_fit_transform(v1, v2, dim=None, axis=None):
 
 
 def _nearest_neighbor(v1, v2):
-    """ Find the nearest neighbor in v2 for each point in v1. """
+    """Find the nearest neighbor in v2 for each point in v1."""
     kd_tree = cKDTree(v2)
     distances, idx = kd_tree.query(v1, 1)
 
@@ -427,7 +428,7 @@ def iterative_closest_point(
     max_iterations=20,
     tolerance=1e-3,
 ):
-    """ Iterative closest point algorithm matching two arrays of vectors.
+    """Iterative closest point algorithm matching two arrays of vectors.
 
     Finds the rotation `r` and the translation `t` such that:
 

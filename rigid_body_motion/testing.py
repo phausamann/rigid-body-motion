@@ -1,4 +1,5 @@
 """"""
+
 import numpy as np
 from quaternion import as_float_array, as_quat_array, from_rotation_vector
 
@@ -14,7 +15,7 @@ def make_test_motion(
     inverse=False,
     offset=None,
 ):
-    """ Create sinusoidal linear and angular motion around all three axes. """
+    """Create sinusoidal linear and angular motion around all three axes."""
     import pandas as pd
 
     if inverse:
@@ -41,6 +42,6 @@ def make_test_motion(
             as_quat_array(rotation), np.array(offset)[np.newaxis, :]
         )
 
-    timestamps = pd.date_range(start=0, periods=n_samples, freq=f"{1/fs}S")
+    timestamps = pd.date_range(start=0, periods=n_samples, freq=f"{1/fs}s")
 
     return translation, rotation, timestamps

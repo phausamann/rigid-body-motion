@@ -64,9 +64,9 @@ Ready to contribute? Here's how to set up `rigid-body-motion` for local developm
 
     $ git clone git@github.com:your_name_here/rigid-body-motion.git
 
-3. The recommended way of setting up the project is in a conda environment::
+3. The recommended way of setting up the project is in with uv::
 
-    $ conda env create
+    $ uv sync --all-extras --all-groups
 
 4. Create a branch for local development::
 
@@ -76,14 +76,11 @@ Ready to contribute? Here's how to set up `rigid-body-motion` for local developm
 
 5. When you're done making changes, check that your changes pass the tests::
 
-    $ conda activate rbm
-    $ pytest
+    $ uv run pytest
 
 6. The project uses black for code formatting, isort for import sorting and
    flake8 for linting. You can set up these checks as pre-commit hooks::
 
-    $ conda activate rbm
-    $ conda install pre-commit
     $ pre-commit install
 
    Note that the project currently uses black version 19.10b0.

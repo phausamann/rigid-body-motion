@@ -7,14 +7,14 @@ from .utils import qinterp, qinv
 
 @xr.register_dataarray_accessor("rbm")
 class DataArrayAccessor:
-    """ Accessor for DataArrays. """
+    """Accessor for DataArrays."""
 
     def __init__(self, obj):
-        """ Constructor. """
+        """Constructor."""
         self._obj = obj
 
     def qinterp(self, coords=None, qdim="quaternion_axis", **coords_kwargs):
-        """ Quaternion interpolation.
+        """Quaternion interpolation.
 
         Parameters
         ----------
@@ -41,11 +41,11 @@ class DataArrayAccessor:
         >>> ds_head = xr.load_dataset(rbm.example_data["head"])
         >>> ds_left_eye = xr.load_dataset(rbm.example_data["left_eye"])
         >>> ds_head.orientation.rbm.qinterp(time=ds_left_eye.time) # doctest:+ELLIPSIS
-        <xarray.DataArray 'orientation' (time: 113373, quaternion_axis: 4)>
+        <xarray.DataArray 'orientation' (time: 113373, quaternion_axis: 4)>...
         array(...)
         Coordinates:
           * time             (time) datetime64[ns] ...
-          * quaternion_axis  (quaternion_axis) object 'w' 'x' 'y' 'z'
+          * quaternion_axis  (quaternion_axis) <U1 16B 'w' 'x' 'y' 'z'
         Attributes:
             long_name:  Orientation
         """  # noqa
@@ -101,7 +101,7 @@ class DataArrayAccessor:
         return interpolated
 
     def qinv(self, qdim="quaternion_axis"):
-        """ Quaternion inverse.
+        """Quaternion inverse.
 
         Parameters
         ----------
@@ -119,11 +119,11 @@ class DataArrayAccessor:
         >>> import rigid_body_motion as rbm
         >>> ds_head = xr.load_dataset(rbm.example_data["head"])
         >>> ds_head.orientation.rbm.qinv() # doctest:+ELLIPSIS
-        <xarray.DataArray 'orientation' (time: 66629, quaternion_axis: 4)>
+        <xarray.DataArray 'orientation' (time: 66629, quaternion_axis: 4)>...
         array(...)
         Coordinates:
           * time             (time) datetime64[ns] ...
-          * quaternion_axis  (quaternion_axis) object 'w' 'x' 'y' 'z'
+          * quaternion_axis  (quaternion_axis) <U1 16B 'w' 'x' 'y' 'z'
         Attributes:
             long_name:  Orientation
         """

@@ -15,7 +15,7 @@ class RospyPublisher:
         headers=None,
         queue_size=None,
     ):
-        """ Monkey patch drop in for rospy.Publisher. """
+        """Monkey patch drop in for rospy.Publisher."""
         self.name = name
         self.data_class = data_class
         self.subscriber_listener = subscriber_listener
@@ -53,7 +53,12 @@ class TestTransformer:
         """"""
         rbm.register_frame("world")
         rf_head = rbm.ReferenceFrame.from_dataset(
-            head_dataset, "position", "orientation", "time", "world", "head",
+            head_dataset,
+            "position",
+            "orientation",
+            "time",
+            "world",
+            "head",
         )
 
         Transformer.from_reference_frame(rf_head)
@@ -146,7 +151,9 @@ class TestReferenceFrameTransformBroadcaster:
         assert broadcaster.base.name == "world"
 
     def test_publish(
-        self, ReferenceFrameTransformBroadcaster, head_rf_tree,
+        self,
+        ReferenceFrameTransformBroadcaster,
+        head_rf_tree,
     ):
         """"""
         broadcaster = ReferenceFrameTransformBroadcaster(
@@ -337,7 +344,10 @@ class TestRosbagWriter:
 
         with RosbagWriter(rosbag_path) as writer:
             writer.write_transform_stamped_dataset(
-                head_dataset.isel(time=range(100)), "/test", "world", "body",
+                head_dataset.isel(time=range(100)),
+                "/test",
+                "world",
+                "body",
             )
 
         assert rosbag_path.exists()

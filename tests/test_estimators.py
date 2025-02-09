@@ -47,7 +47,9 @@ class TestEstimators:
         assert (angular < 1e-10).all()
 
         angular = estimate_angular_velocity(
-            gaze.rotation.T, dim="quaternion_axis", timestamps="time",
+            gaze.rotation.T,
+            dim="quaternion_axis",
+            timestamps="time",
         )
         assert angular.dims == ("cartesian_axis", "time")
         assert (angular < 1e-10).all()
@@ -72,7 +74,9 @@ class TestEstimators:
         assert (linear < 0.06).all()
 
         linear = estimate_linear_velocity(
-            gaze.translation.T, dim="cartesian_axis", timestamps="time",
+            gaze.translation.T,
+            dim="cartesian_axis",
+            timestamps="time",
         )
         assert linear.dims == ("cartesian_axis", "time")
         assert (linear < 1e-10).all()

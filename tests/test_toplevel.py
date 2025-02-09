@@ -71,7 +71,10 @@ class TestTopLevel:
             attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_points(
-            da_child2, into="child1", dim="cartesian_axis", timestamps="time",
+            da_child2,
+            into="child1",
+            dim="cartesian_axis",
+            timestamps="time",
         )
         assert da_child1.shape == (5, 10, 3)
         assert da_child1.dims == ("extra_dim", "time", "cartesian_axis")
@@ -104,7 +107,10 @@ class TestTopLevel:
             attrs={"reference_frame": "child2"},
         )
         da_child1 = rbm.transform_quaternions(
-            da_child2, into="child1", dim="quaternion_axis", timestamps="time",
+            da_child2,
+            into="child1",
+            dim="quaternion_axis",
+            timestamps="time",
         )
         assert da_child1.shape == (10, 4)
         assert da_child1.attrs["reference_frame"] == "child1"
@@ -170,7 +176,10 @@ class TestTopLevel:
             attrs={"representation_frame": "child2"},
         )
         da_child1 = rbm.transform_vectors(
-            da_child2, into="child1", dim="cartesian_axis", timestamps="time",
+            da_child2,
+            into="child1",
+            dim="cartesian_axis",
+            timestamps="time",
         )
         assert da_child1.shape == (10, 3)
         assert da_child1.attrs["representation_frame"] == "child1"
@@ -323,7 +332,12 @@ class TestTopLevel:
         # moving frame
         rbm.register_frame("world", update=True)
         rbm.ReferenceFrame.from_dataset(
-            head_dataset, "position", "orientation", "time", "world", "head",
+            head_dataset,
+            "position",
+            "orientation",
+            "time",
+            "world",
+            "head",
         ).register(update=True)
 
         transform = rbm.lookup_transform("head", "world", as_dataset=True)
@@ -353,7 +367,12 @@ class TestTopLevel:
         # moving frame
         rbm.register_frame("world", update=True)
         rbm.ReferenceFrame.from_dataset(
-            head_dataset, "position", "orientation", "time", "world", "head",
+            head_dataset,
+            "position",
+            "orientation",
+            "time",
+            "world",
+            "head",
         ).register(update=True)
 
         pose = rbm.lookup_pose("head", "world", as_dataset=True)
@@ -368,7 +387,12 @@ class TestTopLevel:
         """"""
         rbm.register_frame("world")
         rbm.ReferenceFrame.from_dataset(
-            head_dataset, "position", "orientation", "time", "world", "head",
+            head_dataset,
+            "position",
+            "orientation",
+            "time",
+            "world",
+            "head",
         ).register(update=True)
 
         twist = rbm.lookup_twist(
@@ -396,7 +420,12 @@ class TestTopLevel:
         """"""
         rbm.register_frame("world")
         rbm.ReferenceFrame.from_dataset(
-            head_dataset, "position", "orientation", "time", "world", "head",
+            head_dataset,
+            "position",
+            "orientation",
+            "time",
+            "world",
+            "head",
         ).register(update=True)
 
         da = rbm.lookup_linear_velocity(
@@ -415,11 +444,20 @@ class TestTopLevel:
         """"""
         rbm.register_frame("world")
         rbm.ReferenceFrame.from_dataset(
-            head_dataset, "position", "orientation", "time", "world", "head",
+            head_dataset,
+            "position",
+            "orientation",
+            "time",
+            "world",
+            "head",
         ).register(update=True)
 
         da = rbm.lookup_angular_velocity(
-            "head", "world", "world", cutoff=0.25, as_dataarray=True,
+            "head",
+            "world",
+            "world",
+            cutoff=0.25,
+            as_dataarray=True,
         )
 
         err_v = (da - head_dataset.angular_velocity.interp(time=da.time)) ** 2

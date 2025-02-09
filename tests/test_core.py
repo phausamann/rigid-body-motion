@@ -399,7 +399,8 @@ class TestCoreEstimators:
     def test_estimate_angular_velocity(self, left_eye_dataset):
         """"""
         w = _estimate_angular_velocity(
-            left_eye_dataset.orientation.values, left_eye_dataset.time.values,
+            left_eye_dataset.orientation.values,
+            left_eye_dataset.time.values,
         )
 
         npt.assert_equal(

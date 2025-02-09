@@ -1,4 +1,4 @@
-{% set data = load_setup_py_data() %}
+{% set data = load_file_data('pyproject.toml') %}
 
 package:
   name: rigid-body-motion
@@ -15,10 +15,10 @@ build:
 
 requirements:
   host:
-    - python >=3.6
+    - python >=3.8
     - setuptools
   run:
-    - python >=3.6
+    - python >=3.8
     - numpy
     - scipy
     - quaternion

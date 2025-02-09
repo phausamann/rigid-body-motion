@@ -1,3 +1,74 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rigid-body-motion"
+version = "0.9.1"
+description = "Python utilities for estimating and transforming rigid body motion."
+readme = "README.rst"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = ["rigid_body_motion"]
+authors = [
+    { name = "Peter Hausamann", email = "peter.hausamann@tum.de" }
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy",
+    "numpy-quaternion",
+    "scipy",
+    "anytree",
+]
+
+[project.urls]
+Homepage = "https://github.com/phausamann/rigid-body-motion"
+
+[project.optional-dependencies]
+all = [
+    "pandas",
+    "xarray",
+    "numba",
+    "pooch",
+    "netcdf4",
+    "matplotlib",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["rigid_body_motion"]
+
+
+[dependency-groups]
+test = [
+    "pytest>=8.3.4",
+]
+lint = [
+    "black>=24.8.0",
+    "flake8>=5.0.4",
+    "isort>=5.13.2",
+]
+docs = [
+    "ipykernel>=6.29.5",
+    "ipython>=8.12.3",
+    "nbsphinx>=0.9.6",
+    "numpydoc>=1.7.0",
+    "pandoc>=2.4",
+    "sphinx>=7.1.2",
+    "sphinx-autosummary-accessors>=2023.4.0",
+    "sphinx-rtd-theme>=3.0.2",
+]
+
 [tool.black]
 line-length = 79
 target_version = ['py38']

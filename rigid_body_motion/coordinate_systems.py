@@ -1,9 +1,10 @@
 """"""
+
 import numpy as np
 
 
 def cartesian_to_polar(arr, axis=-1):
-    """ Transform cartesian to polar coordinates in two dimensions.
+    """Transform cartesian to polar coordinates in two dimensions.
 
     Parameters
     ----------
@@ -30,7 +31,7 @@ def cartesian_to_polar(arr, axis=-1):
 
 
 def polar_to_cartesian(arr, axis=-1):
-    """ Transform polar to cartesian coordinates in two dimensions.
+    """Transform polar to cartesian coordinates in two dimensions.
 
     Parameters
     ----------
@@ -57,7 +58,7 @@ def polar_to_cartesian(arr, axis=-1):
 
 
 def cartesian_to_spherical(arr, axis=-1):
-    """ Transform cartesian to spherical coordinates in three dimensions.
+    """Transform cartesian to spherical coordinates in three dimensions.
 
     The spherical coordinate system is defined according to ISO 80000-2.
 
@@ -87,7 +88,7 @@ def cartesian_to_spherical(arr, axis=-1):
 
 
 def spherical_to_cartesian(arr, axis=-1):
-    """ Transform spherical to cartesian coordinates in three dimensions.
+    """Transform spherical to cartesian coordinates in three dimensions.
 
     The spherical coordinate system is defined according to ISO 80000-2.
 

@@ -16,7 +16,7 @@ from geometry_msgs.msg import (
 
 
 def make_transform_msg(t, r, frame_id, child_frame_id, time=0.0):
-    """ Create a TransformStamped message. """
+    """Create a TransformStamped message."""
     msg = TransformStamped()
     msg.header.stamp = rospy.Time.from_sec(time)
     msg.header.frame_id = frame_id
@@ -28,7 +28,7 @@ def make_transform_msg(t, r, frame_id, child_frame_id, time=0.0):
 
 
 def unpack_transform_msg(msg, stamped=False):
-    """ Get translation and rotation from a Transform(Stamped) message. """
+    """Get translation and rotation from a Transform(Stamped) message."""
     if stamped:
         t = msg.transform.translation
         r = msg.transform.rotation
@@ -40,7 +40,7 @@ def unpack_transform_msg(msg, stamped=False):
 
 
 def make_pose_msg(p, o, frame_id, time=0.0):
-    """ Create a PoseStamped message. """
+    """Create a PoseStamped message."""
     msg = PoseStamped()
     msg.header.stamp = rospy.Time.from_sec(time)
     msg.header.frame_id = frame_id
@@ -51,7 +51,7 @@ def make_pose_msg(p, o, frame_id, time=0.0):
 
 
 def unpack_pose_msg(msg, stamped=False):
-    """ Get position and orientation from a Pose(Stamped) message. """
+    """Get position and orientation from a Pose(Stamped) message."""
     if stamped:
         p = msg.pose.position
         o = msg.pose.orientation
@@ -63,7 +63,7 @@ def unpack_pose_msg(msg, stamped=False):
 
 
 def make_twist_msg(v, w, frame_id, time=0.0):
-    """ Create a TwistStamped message. """
+    """Create a TwistStamped message."""
     msg = TwistStamped()
     msg.header.stamp = rospy.Time.from_sec(time)
     msg.header.frame_id = frame_id
@@ -74,7 +74,7 @@ def make_twist_msg(v, w, frame_id, time=0.0):
 
 
 def unpack_twist_msg(msg, stamped=False):
-    """ Get linear and angular velocity from a Twist(Stamped) message. """
+    """Get linear and angular velocity from a Twist(Stamped) message."""
     if stamped:
         v = msg.twist.linear
         w = msg.twist.angular
@@ -86,7 +86,7 @@ def unpack_twist_msg(msg, stamped=False):
 
 
 def make_vector_msg(v, frame_id, time=0.0):
-    """ Create a Vector3Stamped message. """
+    """Create a Vector3Stamped message."""
     msg = Vector3Stamped()
     msg.header.stamp = rospy.Time.from_sec(time)
     msg.header.frame_id = frame_id
@@ -96,7 +96,7 @@ def make_vector_msg(v, frame_id, time=0.0):
 
 
 def unpack_vector_msg(msg, stamped=False):
-    """ Get coordinates from a Vector3(Stamped) message. """
+    """Get coordinates from a Vector3(Stamped) message."""
     if stamped:
         v = msg.vector
     else:
@@ -106,7 +106,7 @@ def unpack_vector_msg(msg, stamped=False):
 
 
 def make_point_msg(p, frame_id, time=0.0):
-    """ Create a PointStamped message. """
+    """Create a PointStamped message."""
     msg = PointStamped()
     msg.header.stamp = rospy.Time.from_sec(time)
     msg.header.frame_id = frame_id
@@ -116,7 +116,7 @@ def make_point_msg(p, frame_id, time=0.0):
 
 
 def unpack_point_msg(msg, stamped=False):
-    """ Get coordinates from a Point(Stamped) message. """
+    """Get coordinates from a Point(Stamped) message."""
     if stamped:
         p = msg.point
     else:
@@ -126,7 +126,7 @@ def unpack_point_msg(msg, stamped=False):
 
 
 def make_quaternion_msg(q, frame_id, time=0.0):
-    """ Create a QuaternionStamped message. """
+    """Create a QuaternionStamped message."""
     msg = QuaternionStamped()
     msg.header.stamp = rospy.Time.from_sec(time)
     msg.header.frame_id = frame_id
@@ -136,7 +136,7 @@ def make_quaternion_msg(q, frame_id, time=0.0):
 
 
 def unpack_quaternion_msg(msg, stamped=False):
-    """ Get coordinates from a Quaternion(Stamped) message. """
+    """Get coordinates from a Quaternion(Stamped) message."""
     if stamped:
         q = msg.quaternion
     else:
@@ -146,7 +146,7 @@ def unpack_quaternion_msg(msg, stamped=False):
 
 
 def static_rf_to_transform_msg(rf, time=0.0):
-    """ Convert a static ReferenceFrame to a TransformStamped message.
+    """Convert a static ReferenceFrame to a TransformStamped message.
 
     Parameters
     ----------

@@ -8,13 +8,13 @@ from rigid_body_motion.reference_frames import ReferenceFrame
 
 
 class Transformer:
-    """ Wrapper class for tf2_ros.Buffer.
+    """Wrapper class for tf2_ros.Buffer.
 
     Can be constructed from a ReferenceFrame instance.
     """
 
     def __init__(self, cache_time=None):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -33,7 +33,7 @@ class Transformer:
 
     @staticmethod
     def from_reference_frame(reference_frame):
-        """ Construct Transformer instance from static reference frame tree.
+        """Construct Transformer instance from static reference frame tree.
 
         Parameters
         ----------
@@ -82,7 +82,7 @@ class Transformer:
         return transformer
 
     def set_transform_static(self, reference_frame):
-        """ Add static transform from reference frame to buffer.
+        """Add static transform from reference frame to buffer.
 
         Parameters
         ----------
@@ -96,7 +96,7 @@ class Transformer:
         )
 
     def set_transforms(self, reference_frame):
-        """ Add transforms from moving reference frame to buffer.
+        """Add transforms from moving reference frame to buffer.
 
         Parameters
         ----------
@@ -122,7 +122,7 @@ class Transformer:
             )
 
     def can_transform(self, target_frame, source_frame, time=0.0):
-        """ Check if transform from source to target frame is possible.
+        """Check if transform from source to target frame is possible.
 
         Parameters
         ----------
@@ -147,7 +147,7 @@ class Transformer:
         )
 
     def lookup_transform(self, target_frame, source_frame, time=0.0):
-        """ Get the transform from the source frame to the target frame.
+        """Get the transform from the source frame to the target frame.
 
         Parameters
         ----------
@@ -179,7 +179,7 @@ class Transformer:
         return unpack_transform_msg(transform, stamped=True)
 
     def transform_vector(self, v, target_frame, source_frame, time=0.0):
-        """ Transform a vector from the source frame to the target frame.
+        """Transform a vector from the source frame to the target frame.
 
         Parameters
         ----------
@@ -214,7 +214,7 @@ class Transformer:
         return unpack_vector_msg(vt_msg, stamped=True)
 
     def transform_point(self, p, target_frame, source_frame, time=0.0):
-        """ Transform a point from the source frame to the target frame.
+        """Transform a point from the source frame to the target frame.
 
         Parameters
         ----------
@@ -249,7 +249,7 @@ class Transformer:
         return unpack_point_msg(pt_msg, stamped=True)
 
     def transform_quaternion(self, q, target_frame, source_frame, time=0.0):
-        """ Transform a quaternion from the source frame to the target frame.
+        """Transform a quaternion from the source frame to the target frame.
 
         Parameters
         ----------
@@ -284,7 +284,7 @@ class Transformer:
         return unpack_pose_msg(pt_msg, stamped=True)[1]
 
     def transform_pose(self, p, o, target_frame, source_frame, time=0.0):
-        """ Transform a pose from the source frame to the target frame.
+        """Transform a pose from the source frame to the target frame.
 
         Parameters
         ----------
@@ -326,7 +326,7 @@ class Transformer:
 
 
 class ReferenceFrameTransformBroadcaster:
-    """ TF broadcaster for the transform of a reference frame wrt another. """
+    """TF broadcaster for the transform of a reference frame wrt another."""
 
     def __init__(
         self,
@@ -338,7 +338,7 @@ class ReferenceFrameTransformBroadcaster:
         twist_cutoff=None,
         twist_outlier_thresh=None,
     ):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -429,7 +429,7 @@ class ReferenceFrameTransformBroadcaster:
         self._thread = None
 
     def publish(self, idx=None):
-        """ Publish a transform message.
+        """Publish a transform message.
 
         Parameters
         ----------
@@ -448,7 +448,9 @@ class ReferenceFrameTransformBroadcaster:
             )
             if self.pose_publisher is not None:
                 pose = make_pose_msg(
-                    self.translation, self.rotation, self.base.name,
+                    self.translation,
+                    self.rotation,
+                    self.base.name,
                 )
         else:
             idx = idx or self.idx
@@ -481,7 +483,7 @@ class ReferenceFrameTransformBroadcaster:
             )
 
     def handle_incoming_msg(self, msg):
-        """ Publish on incoming message. """
+        """Publish on incoming message."""
         import pandas as pd
         import rospy
 
@@ -497,7 +499,7 @@ class ReferenceFrameTransformBroadcaster:
                     self.publish()
 
     def _spin_blocking(self):
-        """ Continuously publish messages. """
+        """Continuously publish messages."""
         import pandas as pd
         import rospy
 
@@ -530,7 +532,7 @@ class ReferenceFrameTransformBroadcaster:
         self.stopped = True
 
     def spin(self, block=False):
-        """ Continuously publish messages.
+        """Continuously publish messages.
 
         Parameters
         ----------
@@ -554,5 +556,5 @@ class ReferenceFrameTransformBroadcaster:
             self._thread.start()
 
     def stop(self):
-        """ Stop publishing. """
+        """Stop publishing."""
         self.stopped = True

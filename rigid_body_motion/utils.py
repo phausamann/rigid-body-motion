@@ -1,4 +1,5 @@
 """"""
+
 import operator
 from functools import reduce
 from pathlib import Path
@@ -17,7 +18,7 @@ from rigid_body_motion.core import _resolve_axis
 
 
 def qinv(q, qaxis=-1):
-    """ Quaternion inverse.
+    """Quaternion inverse.
 
     Parameters
     ----------
@@ -45,7 +46,7 @@ def qinv(q, qaxis=-1):
 
 
 def qmul(*q, qaxis=-1):
-    """ Quaternion multiplication.
+    """Quaternion multiplication.
 
     Parameters
     ----------
@@ -81,7 +82,7 @@ def qmul(*q, qaxis=-1):
 
 
 def qmean(q, axis=None, qaxis=-1):
-    """ Quaternion mean.
+    """Quaternion mean.
 
     Adapted from https://github.com/christophhagen/averaging-quaternions.
 
@@ -134,7 +135,7 @@ def qmean(q, axis=None, qaxis=-1):
 
 
 def qinterp(q, t_in, t_out, axis=0, qaxis=-1):
-    """ Quaternion interpolation.
+    """Quaternion interpolation.
 
     Parameters
     ----------
@@ -194,7 +195,7 @@ def qinterp(q, t_in, t_out, axis=0, qaxis=-1):
 
 
 def rotate_vectors(q, v, axis=-1, qaxis=-1, one_to_one=True):
-    """ Rotate an array of vectors by an array of quaternions.
+    """Rotate an array of vectors by an array of quaternions.
 
     Parameters
     ----------
@@ -271,7 +272,7 @@ def from_euler_angles(
     order="rpy",
     return_quaternion=False,
 ):
-    """ Construct quaternions from Euler angles.
+    """Construct quaternions from Euler angles.
 
     This method differs from the method found in the quaternion package in
     that it is actually useful for converting commonly found Euler angle
@@ -382,7 +383,7 @@ def from_euler_angles(
 
 
 def is_dataarray(obj, require_attrs=None):
-    """ Check whether an object is a DataArray.
+    """Check whether an object is a DataArray.
 
     Parameters
     ----------
@@ -409,7 +410,7 @@ def is_dataarray(obj, require_attrs=None):
 
 
 def is_dataset(obj, require_attrs=None):
-    """ Check whether an object is a Dataset.
+    """Check whether an object is a Dataset.
 
     Parameters
     ----------
@@ -435,7 +436,7 @@ def is_dataset(obj, require_attrs=None):
 
 
 class ExampleDataStore:
-    """ Storage interface for example data. """
+    """Storage interface for example data."""
 
     base_url = "https://github.com/phausamann/rbm-data/raw/main/"
 

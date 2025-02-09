@@ -362,7 +362,10 @@ class TestReferenceFrame:
 
         rf_world = rbm.ReferenceFrame("world")
         rf_child1 = rbm.ReferenceFrame(
-            "child1", rf_world, translation=t1, timestamps=np.arange(10),
+            "child1",
+            rf_world,
+            translation=t1,
+            timestamps=np.arange(10),
         )
         rf_child2 = rbm.ReferenceFrame(
             "child2",
@@ -522,13 +525,18 @@ class TestReferenceFrame:
 
         # transform reference frame
         w_eyes_world_rf = rbm.registry["head"].transform_angular_velocity(
-            w_eyes_head, "world", timestamps=ts,
+            w_eyes_head,
+            "world",
+            timestamps=ts,
         )
         assert (w_eyes_world_rf < 1e-10).all()
 
         # transform moving frame
         w_eyes_world_mf = rbm.registry["head"].transform_angular_velocity(
-            w_head_world, "eyes", what="moving_frame", timestamps=ts,
+            w_head_world,
+            "eyes",
+            what="moving_frame",
+            timestamps=ts,
         )
         assert (w_eyes_world_mf < 1e-10).all()
 

@@ -4,7 +4,7 @@ from rigid_body_motion.utils import from_euler_angles
 
 
 def load_optitrack(filepath, import_format="numpy"):
-    """ Load rigid body poses from OptiTrack csv export.
+    """Load rigid body poses from OptiTrack csv export.
 
     Parameters
     ----------
@@ -76,7 +76,8 @@ def load_optitrack(filepath, import_format="numpy"):
             q, index=position.index, columns=["w", "x", "y", "z"]
         )
         data_dict[name] = pd.concat(
-            {"position": position, "orientation": orientation}, axis=1,
+            {"position": position, "orientation": orientation},
+            axis=1,
         )
 
     # return in requested format

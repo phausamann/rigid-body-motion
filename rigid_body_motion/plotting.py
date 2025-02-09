@@ -8,22 +8,22 @@ from rigid_body_motion.utils import rotate_vectors
 
 
 class Arrow3D(FancyArrowPatch):
-    """ Colored arrows representing coordinate system. """
+    """Colored arrows representing coordinate system."""
 
     def __init__(self, xs, ys, zs, *args, **kwargs):
-        """ Constructor. """
+        """Constructor."""
         FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
         self._verts3d = xs, ys, zs
 
     def draw(self, renderer):
-        """ Draw to the given renderer. """
+        """Draw to the given renderer."""
         xs3d, ys3d, zs3d = self._verts3d
         xs, ys, _ = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
     def do_3d_projection(self, renderer=None):
-        """ Do 3d projection. """
+        """Do 3d projection."""
         xs3d, ys3d, zs3d = self._verts3d
         xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
@@ -32,7 +32,7 @@ class Arrow3D(FancyArrowPatch):
 
 
 def _add_frame(ax, frame, world_frame=None, arrow_len=1.0):
-    """ Add coordinates representing a reference frame. """
+    """Add coordinates representing a reference frame."""
     from rigid_body_motion import transform_points
 
     o = [0.0, 0.0, 0.0]
@@ -86,7 +86,7 @@ def _add_frame(ax, frame, world_frame=None, arrow_len=1.0):
 
 
 def _set_axes_equal(ax):
-    """ Make axes of 3D plot have equal scale.
+    """Make axes of 3D plot have equal scale.
     from https://stackoverflow.com/a/31364297
     """
     x_limits = ax.get_xlim3d()
@@ -112,7 +112,7 @@ def _set_axes_equal(ax):
 def plot_reference_frame(
     frame, world_frame=None, ax=None, figsize=(6, 6), arrow_len=1.0
 ):
-    """ Plot a 3D coordinate system representing a static reference frame.
+    """Plot a 3D coordinate system representing a static reference frame.
 
     Parameters
     ----------
@@ -156,7 +156,7 @@ def plot_reference_frame(
 
 
 def plot_points(arr, ax=None, figsize=(6, 6), fmt="", **kwargs):
-    """ Plot an array of 3D points.
+    """Plot an array of 3D points.
 
     Parameters
     ----------
@@ -198,7 +198,7 @@ def plot_points(arr, ax=None, figsize=(6, 6), fmt="", **kwargs):
 
 
 def plot_quaternions(arr, base=None, ax=None, figsize=(6, 6), **kwargs):
-    """ Plot an array of quaternions.
+    """Plot an array of quaternions.
 
     Parameters
     ----------
@@ -240,7 +240,7 @@ def plot_quaternions(arr, base=None, ax=None, figsize=(6, 6), **kwargs):
 
 
 def plot_vectors(arr, base=None, ax=None, figsize=(6, 6), **kwargs):
-    """ Plot an array of 3D vectors.
+    """Plot an array of 3D vectors.
 
     Parameters
     ----------

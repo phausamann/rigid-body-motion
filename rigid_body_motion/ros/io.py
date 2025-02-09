@@ -4,10 +4,10 @@ import numpy as np
 
 
 class RosbagReader:
-    """ Reader for motion topics from rosbag files. """
+    """Reader for motion topics from rosbag files."""
 
     def __init__(self, bag_file):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -30,11 +30,11 @@ class RosbagReader:
 
     @staticmethod
     def _get_msg_type(bag, topic):
-        """ Get type of message. """
+        """Get type of message."""
         return bag.get_type_and_topic_info(topic).topics[topic].msg_type
 
     def _get_filename(self, output_file, extension):
-        """ Get export filename and create folder. """
+        """Get export filename and create folder."""
         if output_file is None:
             folder, filename = self.bag_file.parent, self.bag_file.stem
             filename = folder / f"{filename}.{extension}"
@@ -48,7 +48,7 @@ class RosbagReader:
 
     @staticmethod
     def _write_netcdf(ds, filename, dtype="int32"):
-        """ Write dataset to netCDF file. """
+        """Write dataset to netCDF file."""
         comp = {
             "zlib": True,
             "dtype": dtype,
@@ -63,7 +63,7 @@ class RosbagReader:
         ds.to_netcdf(filename, encoding=encoding)
 
     def get_topics_and_types(self):
-        """ Get topics and corresponding message types included in rosbag.
+        """Get topics and corresponding message types included in rosbag.
 
         Returns
         -------
@@ -82,7 +82,7 @@ class RosbagReader:
         return {k: v[0] for k, v in info[1].items()}
 
     def load_messages(self, topic):
-        """ Load messages from topic as dict.
+        """Load messages from topic as dict.
 
         Only nav_msgs/Odometry and geometry_msgs/TransformStamped topics are
         supported so far.
@@ -156,7 +156,7 @@ class RosbagReader:
         return return_vals
 
     def load_dataset(self, topic, cache=False):
-        """ Load messages from topic as xarray.Dataset.
+        """Load messages from topic as xarray.Dataset.
 
         Only nav_msgs/Odometry and geometry_msgs/TransformStamped topics are
         supported so far.
@@ -226,7 +226,7 @@ class RosbagReader:
         return ds
 
     def export(self, topic, output_file=None):
-        """ Export messages from topic as netCDF4 file.
+        """Export messages from topic as netCDF4 file.
 
         Parameters
         ----------
@@ -242,10 +242,10 @@ class RosbagReader:
 
 
 class RosbagWriter:
-    """ Writer for motion topics to rosbag files. """
+    """Writer for motion topics to rosbag files."""
 
     def __init__(self, bag_file):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -269,7 +269,7 @@ class RosbagWriter:
     def write_transform_stamped(
         self, timestamps, translation, rotation, topic, frame, child_frame
     ):
-        """ Write multiple geometry_msgs/TransformStamped messages.
+        """Write multiple geometry_msgs/TransformStamped messages.
 
         Parameters
         ----------
@@ -329,7 +329,7 @@ class RosbagWriter:
         translation="position",
         rotation="orientation",
     ):
-        """ Write a dataset as geometry_msgs/TransformStamped messages.
+        """Write a dataset as geometry_msgs/TransformStamped messages.
 
         Parameters
         ----------

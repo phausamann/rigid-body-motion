@@ -1,4 +1,5 @@
 """Top-level package for rigid-body-motion."""
+
 __author__ = """Peter Hausamann"""
 __email__ = "peter.hausamann@tum.de"
 __version__ = "0.9.1"
@@ -116,7 +117,7 @@ def transform_vectors(
     time_axis=None,
     return_timestamps=False,
 ):
-    """ Transform an array of vectors between reference frames.
+    """Transform an array of vectors between reference frames.
 
     Parameters
     ----------
@@ -190,7 +191,7 @@ def transform_points(
     time_axis=None,
     return_timestamps=False,
 ):
-    """ Transform an array of points between reference frames.
+    """Transform an array of points between reference frames.
 
     Parameters
     ----------
@@ -264,7 +265,7 @@ def transform_quaternions(
     time_axis=None,
     return_timestamps=False,
 ):
-    """ Transform an array of quaternions between reference frames.
+    """Transform an array of quaternions between reference frames.
 
     Parameters
     ----------
@@ -340,7 +341,7 @@ def transform_angular_velocity(
     cutoff=None,
     return_timestamps=False,
 ):
-    """ Transform an array of angular velocities between frames.
+    """Transform an array of angular velocities between frames.
 
     The array represents the velocity of a moving body or frame wrt a
     reference frame, expressed in a representation frame.
@@ -451,7 +452,7 @@ def transform_linear_velocity(
     outlier_thresh=None,
     return_timestamps=False,
 ):
-    """ Transform an array of linear velocities between frames.
+    """Transform an array of linear velocities between frames.
 
     The array represents the velocity of a moving body or frame wrt a
     reference frame, expressed in a representation frame.
@@ -571,7 +572,7 @@ def transform_linear_velocity(
 def transform_coordinates(
     arr, into, outof=None, dim=None, axis=None, replace_dim=True
 ):
-    """ Transform motion between coordinate systems.
+    """Transform motion between coordinate systems.
 
     Parameters
     ----------
@@ -650,7 +651,7 @@ def transform_coordinates(
 
 
 def lookup_transform(outof, into, as_dataset=False, return_timestamps=False):
-    """ Look up transformation from one frame to another.
+    """Look up transformation from one frame to another.
 
     The transformation is a rotation `r` followed by a translation `t` which,
     when applied to a point expressed wrt the base frame `B`, yields that
@@ -701,7 +702,7 @@ def lookup_transform(outof, into, as_dataset=False, return_timestamps=False):
 
 
 def lookup_pose(frame, reference, as_dataset=False, return_timestamps=False):
-    """ Look up pose of one frame wrt a reference.
+    """Look up pose of one frame wrt a reference.
 
     Parameters
     ----------
@@ -755,7 +756,7 @@ def lookup_twist(
     as_dataset=False,
     return_timestamps=False,
 ):
-    """ Estimate linear and angular velocity of a frame wrt a reference.
+    """Estimate linear and angular velocity of a frame wrt a reference.
 
     Parameters
     ----------
@@ -842,7 +843,7 @@ def lookup_linear_velocity(
     as_dataarray=False,
     return_timestamps=False,
 ):
-    """ Estimate linear velocity of a frame wrt a reference.
+    """Estimate linear velocity of a frame wrt a reference.
 
     Parameters
     ----------
@@ -920,7 +921,7 @@ def lookup_angular_velocity(
     as_dataarray=False,
     return_timestamps=False,
 ):
-    """ Estimate angular velocity of a frame wrt a reference.
+    """Estimate angular velocity of a frame wrt a reference.
 
     Parameters
     ----------
@@ -980,7 +981,12 @@ def lookup_angular_velocity(
 
     if as_dataarray:
         return _make_velocity_dataarray(
-            angular, "angular", frame, reference, represent_in, timestamps,
+            angular,
+            "angular",
+            frame,
+            reference,
+            represent_in,
+            timestamps,
         )
     elif return_timestamps:
         return angular, timestamps

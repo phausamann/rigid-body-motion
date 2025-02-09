@@ -114,14 +114,22 @@ def compensated_tree():
 
     t, r, ts = make_test_motion(n_samples, stack=stack)
     rbm.ReferenceFrame(
-        translation=t, rotation=r, timestamps=ts, parent="world", name="head",
+        translation=t,
+        rotation=r,
+        timestamps=ts,
+        parent="world",
+        name="head",
     ).register(update=True)
 
     it, ir, _ = make_test_motion(
         n_samples, inverse=True, stack=stack, offset=(1.0, 0.0, 0.0)
     )
     rbm.ReferenceFrame(
-        translation=it, rotation=ir, timestamps=ts, parent="head", name="eyes",
+        translation=it,
+        rotation=ir,
+        timestamps=ts,
+        parent="head",
+        name="eyes",
     ).register(update=True)
 
 
@@ -156,7 +164,12 @@ def head_rf_tree(head_dataset):
     """"""
     rbm.register_frame("world")
     rbm.ReferenceFrame.from_dataset(
-        head_dataset, "position", "orientation", "time", "world", "head",
+        head_dataset,
+        "position",
+        "orientation",
+        "time",
+        "world",
+        "head",
     ).register()
 
 

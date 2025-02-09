@@ -1,4 +1,5 @@
 """"""
+
 import numpy as np
 from anytree import NodeMixin, RenderTree, Walker
 from quaternion import as_float_array, as_quat_array, from_rotation_matrix
@@ -15,7 +16,7 @@ _registry = {}
 
 
 def _register(rf, update=False):
-    """ Register a reference frame. """
+    """Register a reference frame."""
     if rf.name is None:
         raise ValueError("Reference frame name cannot be None.")
     if rf.name in _registry:
@@ -32,7 +33,7 @@ def _register(rf, update=False):
 
 
 def _deregister(name):
-    """ Deregister a reference frame. """
+    """Deregister a reference frame."""
     if name not in _registry:
         raise ValueError(
             "Reference frame with name " + name + " not found in registry"
@@ -42,7 +43,7 @@ def _deregister(name):
 
 
 def render_tree(root):
-    """ Render a reference frame tree.
+    """Render a reference frame tree.
 
     Parameters
     ----------
@@ -63,7 +64,7 @@ def register_frame(
     discrete=False,
     update=False,
 ):
-    """ Register a new reference frame in the registry.
+    """Register a new reference frame in the registry.
 
     Parameters
     ----------
@@ -115,7 +116,7 @@ def register_frame(
 
 
 def deregister_frame(name):
-    """ Remove a reference frame from the registry.
+    """Remove a reference frame from the registry.
 
     Parameters
     ----------
@@ -126,12 +127,12 @@ def deregister_frame(name):
 
 
 def clear_registry():
-    """ Clear the reference frame registry. """
+    """Clear the reference frame registry."""
     _registry.clear()
 
 
 class ReferenceFrame(NodeMixin):
-    """ A three-dimensional reference frame. """
+    """A three-dimensional reference frame."""
 
     def __init__(
         self,
@@ -143,7 +144,7 @@ class ReferenceFrame(NodeMixin):
         inverse=False,
         discrete=False,
     ):
-        """ Constructor.
+        """Constructor.
 
         Parameters
         ----------
@@ -200,21 +201,21 @@ class ReferenceFrame(NodeMixin):
             self.discrete = discrete
 
     def __del__(self):
-        """ Destructor. """
+        """Destructor."""
         if self.name in _registry and _registry[self.name] is self:
             _deregister(self.name)
 
     def __str__(self):
-        """ String representation. """
+        """String representation."""
         return f"<ReferenceFrame '{self.name}'>"
 
     def __repr__(self):
-        """ String representation. """
+        """String representation."""
         return self.__str__()
 
     @staticmethod
     def _init_arrays(translation, rotation, timestamps, inverse):
-        """ Initialize translation, rotation and timestamp arrays. """
+        """Initialize translation, rotation and timestamp arrays."""
         if timestamps is not None:
             timestamps = np.asarray(timestamps)
             if timestamps.ndim != 1:
@@ -254,7 +255,7 @@ class ReferenceFrame(NodeMixin):
 
     @staticmethod
     def _verify_root(translation, rotation, timestamps):
-        """ Verify arguments for root node. """
+        """Verify arguments for root node."""
         # TODO test
         if translation is not None:
             raise ValueError("translation specified without parent frame.")
@@ -265,7 +266,7 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def _validate_input(cls, arr, axis, n_axis, timestamps, time_axis):
-        """ Validate shape of array and timestamps. """
+        """Validate shape of array and timestamps."""
         # TODO process DataArray (dim=str, timestamps=str)
         arr = np.asarray(arr)
 
@@ -291,7 +292,7 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def _expand_singleton_axes(cls, t_or_r, ndim):
-        """ Expand singleton axes for correct broadcasting with array. """
+        """Expand singleton axes for correct broadcasting with array."""
         if t_or_r.ndim > 1:
             for _ in range(ndim - 2):
                 t_or_r = np.expand_dims(t_or_r, 1)
@@ -300,7 +301,7 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def _match_arrays(cls, arrays, timestamps=None):
-        """ Match multiple arrays with timestamps. """
+        """Match multiple arrays with timestamps."""
         matcher = TransformMatcher()
 
         for array in arrays:
@@ -309,14 +310,14 @@ class ReferenceFrame(NodeMixin):
         return matcher.get_arrays(timestamps)
 
     def _walk(self, to_rf):
-        """ Walk from this frame to a target frame along the tree. """
+        """Walk from this frame to a target frame along the tree."""
         to_rf = _resolve_rf(to_rf)
         walker = Walker()
         up, _, down = walker.walk(self, to_rf)
         return up, down
 
     def _get_matcher(self, to_frame, arrays=None):
-        """ Get a TransformMatcher from this frame to another. """
+        """Get a TransformMatcher from this frame to another."""
         up, down = self._walk(to_frame)
 
         matcher = TransformMatcher()
@@ -343,7 +344,7 @@ class ReferenceFrame(NodeMixin):
         inverse=False,
         discrete=False,
     ):
-        """ Construct a reference frame from a Dataset.
+        """Construct a reference frame from a Dataset.
 
         Parameters
         ----------
@@ -397,9 +398,15 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def from_translation_dataarray(
-        cls, da, timestamps, parent, name=None, inverse=False, discrete=False,
+        cls,
+        da,
+        timestamps,
+        parent,
+        name=None,
+        inverse=False,
+        discrete=False,
     ):
-        """ Construct a reference frame from a translation DataArray.
+        """Construct a reference frame from a translation DataArray.
 
         Parameters
         ----------
@@ -444,9 +451,15 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def from_rotation_dataarray(
-        cls, da, timestamps, parent, name=None, inverse=False, discrete=False,
+        cls,
+        da,
+        timestamps,
+        parent,
+        name=None,
+        inverse=False,
+        discrete=False,
     ):
-        """ Construct a reference frame from a rotation DataArray.
+        """Construct a reference frame from a rotation DataArray.
 
         Parameters
         ----------
@@ -491,7 +504,7 @@ class ReferenceFrame(NodeMixin):
 
     @classmethod
     def from_rotation_matrix(cls, mat, parent, name=None, inverse=False):
-        """ Construct a static reference frame from a rotation matrix.
+        """Construct a static reference frame from a rotation matrix.
 
         Parameters
         ----------
@@ -529,7 +542,7 @@ class ReferenceFrame(NodeMixin):
         )
 
     def get_transformation(self, to_frame):
-        """ Alias for lookup_transform.
+        """Alias for lookup_transform.
 
         See Also
         --------
@@ -547,7 +560,7 @@ class ReferenceFrame(NodeMixin):
         return self.lookup_transform(to_frame)
 
     def lookup_transform(self, to_frame):
-        """ Look up the transformation from this frame to another.
+        """Look up the transformation from this frame to another.
 
         Parameters
         ----------
@@ -583,7 +596,7 @@ class ReferenceFrame(NodeMixin):
         timestamps=None,
         return_timestamps=False,
     ):
-        """ Transform array of vectors from this frame to another.
+        """Transform array of vectors from this frame to another.
 
         Parameters
         ----------
@@ -644,7 +657,7 @@ class ReferenceFrame(NodeMixin):
         timestamps=None,
         return_timestamps=False,
     ):
-        """ Transform array of points from this frame to another.
+        """Transform array of points from this frame to another.
 
         Parameters
         ----------
@@ -707,7 +720,7 @@ class ReferenceFrame(NodeMixin):
         timestamps=None,
         return_timestamps=False,
     ):
-        """ Transform array of quaternions from this frame to another.
+        """Transform array of quaternions from this frame to another.
 
         Parameters
         ----------
@@ -773,7 +786,7 @@ class ReferenceFrame(NodeMixin):
         return_timestamps=False,
         cutoff=None,
     ):
-        """ Transform array of angular velocities from this frame to another.
+        """Transform array of angular velocities from this frame to another.
 
         Parameters
         ----------
@@ -891,7 +904,7 @@ class ReferenceFrame(NodeMixin):
         outlier_thresh=None,
         cutoff=None,
     ):
-        """ Transform array of linear velocities from this frame to another.
+        """Transform array of linear velocities from this frame to another.
 
         Parameters
         ----------
@@ -1042,7 +1055,7 @@ class ReferenceFrame(NodeMixin):
         allow_static=False,
         return_timestamps=False,
     ):
-        """ Estimate linear and angular velocity of this frame wrt a reference.
+        """Estimate linear and angular velocity of this frame wrt a reference.
 
         Parameters
         ----------
@@ -1145,7 +1158,7 @@ class ReferenceFrame(NodeMixin):
         allow_static=False,
         return_timestamps=False,
     ):
-        """ Estimate linear velocity of this frame wrt a reference.
+        """Estimate linear velocity of this frame wrt a reference.
 
         Parameters
         ----------
@@ -1226,7 +1239,7 @@ class ReferenceFrame(NodeMixin):
         allow_static=False,
         return_timestamps=False,
     ):
-        """ Estimate angular velocity of this frame wrt a reference.
+        """Estimate angular velocity of this frame wrt a reference.
 
         Parameters
         ----------
@@ -1308,7 +1321,7 @@ class ReferenceFrame(NodeMixin):
             return angular
 
     def register(self, update=False):
-        """ Register this frame in the registry.
+        """Register this frame in the registry.
 
         Parameters
         ----------
@@ -1319,5 +1332,5 @@ class ReferenceFrame(NodeMixin):
         _register(self, update=update)
 
     def deregister(self):
-        """ Remove this frame from the registry. """
+        """Remove this frame from the registry."""
         _deregister(self.name)

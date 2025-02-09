@@ -1,5 +1,5 @@
 def fn_stub(*args, **kwargs):
-    """ Stub function that raises an error on use. """
+    """Stub function that raises an error on use."""
     raise ImportError("Install matplotlib to use plotting functions")
 
 

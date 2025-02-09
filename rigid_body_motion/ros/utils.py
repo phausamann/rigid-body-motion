@@ -1,4 +1,5 @@
 """"""
+
 import atexit
 import warnings
 
@@ -6,7 +7,7 @@ import numpy as np
 
 
 def init_node(name, start_master=False):
-    """ Register a client node with the master.
+    """Register a client node with the master.
 
     Parameters
     ----------
@@ -56,7 +57,7 @@ def init_node(name, start_master=False):
 
 
 def play_publisher(publisher, step=1, speed=1.0, skip=None, timestamps=None):
-    """ Interactive widget for playing back messages from a publisher.
+    """Interactive widget for playing back messages from a publisher.
 
     Parameters
     ----------

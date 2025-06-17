@@ -79,7 +79,7 @@ jobs:
         run: conda mambabuild ci/conda_recipe -c conda-forge -c robostack
       - name: Upload to channel on tags
         if: startsWith(github.ref, 'refs/tags/')
-        run: anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload -u phausamann /usr/share/miniconda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
+        run: anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload -u phausamann /usr/share/miniconda/envs/__setup_conda/conda-bld/noarch/rigid-body-motion*.tar.bz2 --force
 
   docs:
     runs-on: ubuntu-latest

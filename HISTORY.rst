@@ -2,6 +2,16 @@
 History
 =======
 
+
+0.9.3 (June 17th, 2025)
+-----------------------
+
+Dependency changes
+~~~~~~~~~~~~~~~~~~
+
+* Removed unnecessary ``<2`` restriction on ``numpy`` dependency.
+
+
 0.9.2 (February 9th, 2025)
 --------------------------
 
